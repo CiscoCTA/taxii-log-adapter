@@ -1,2 +1,1 @@
-# taxii-log-adapter
-Integration between SIEMs and TAXII services
+Please see the project homepage https://github.com/CiscoCTA/taxii-log-adapter/wiki

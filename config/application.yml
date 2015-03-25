@@ -1,0 +1,16 @@
+taxiiService:
+    pollEndpoint: http://localhost:8080/skym-taxii-ws/PollService/
+    username: user
+    password: pass
+    feeds:
+        - collection_name
+    statusFile: target/taxii-status.xml
+
+schedule:
+    cron: "0 0 * * * *"
+
+transform:
+    stylesheet: config/stix2json.xsl
+
+logging:
+    config: config/logback.xml

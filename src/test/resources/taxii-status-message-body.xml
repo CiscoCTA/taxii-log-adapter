@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<t:Status_Message xmlns:t="http://taxii.mitre.org/messages/taxii_xml_binding-1.1"
+                  status_type="FAILURE" in_response_to="123456" message_id="3ecc5782-9f29-468d-9004-144125a9f072">
+    <t:Message>An error occurred during request processing.</t:Message>
+</t:Status_Message>

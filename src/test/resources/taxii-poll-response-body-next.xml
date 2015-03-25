@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Poll_Response
+    xmlns="http://taxii.mitre.org/messages/taxii_xml_binding-1.1"
+    xmlns:c="http://cybox.mitre.org/cybox-2" xmlns:cc="http://cybox.mitre.org/common-2"
+    xmlns:co="http://cybox.mitre.org/objects#CustomObject-1"
+    xmlns:sc="http://stix.mitre.org/common-1"
+    xmlns:ind="http://stix.mitre.org/Indicator-2"
+    xmlns:ttp="http://stix.mitre.org/TTP-1" xmlns:ns101="http://stix.mitre.org/CourseOfAction-1"
+    xmlns:inc="http://stix.mitre.org/Incident-1"
+    xmlns:s="http://stix.mitre.org/stix-1"
+    xmlns:sv="http://stix.mitre.org/default_vocabularies-1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cta="http://cisco.com/td/cta"
+
+    collection_name="webflows_c815b935-a432-4c14-a8c1-a6a168de3ffd_v0" in_response_to="234" message_id="2c7414b0-5f00-4a23-be71-9448db40805d">
+    <Exclusive_Begin_Timestamp>2000-12-24T01:02:03.004+01:00</Exclusive_Begin_Timestamp>
+    <Inclusive_End_Timestamp>2000-12-25T02:02:03.004+01:00</Inclusive_End_Timestamp>
+    <Content_Block>
+        <Content_Binding binding_id="STIX_XML_1.1" />
+        <Content>
+            <s:STIX_Package id="cta:package-c815b935-a432-4c14-a8c1-a6a168de3ffd-c2803c67-733e-428c-ac40-2e6c135cd5ee" timestamp="2014-12-28T10:21:18.250+01:00" version="1.1.1">
+                <s:STIX_Header>
+                    <s:Package_Intent>Incident</s:Package_Intent>
+                    <s:Information_Source>
+                        <sc:Identity id="cta:customer-c815b935-a432-4c14-a8c1-a6a168de3ffd" />
+                        <sc:Tools>
+                            <cc:Tool id="cta:tool-cta">
+                                <cc:Name>Cognitive Threat Analytics</cc:Name>
+                                <cc:Vendor>Cisco</cc:Vendor>
+                            </cc:Tool>
+                            <cc:Tool id="cta:tool-amp">
+                                <cc:Name>Advanced Malware Protection</cc:Name>
+                                <cc:Vendor>Cisco</cc:Vendor>
+                            </cc:Tool>
+                        </sc:Tools>
+                    </s:Information_Source>
+                </s:STIX_Header>
+                <s:Incidents>
+                    <s:Incident xsi:type="inc:IncidentType" id="cta:incident-incident-6e89f5eb-be77-466e-89b4-44eef877526a">
+                        <inc:Title>incidentClass2</inc:Title>
+                        <inc:Victim>
+                            <sc:Name>userName2</sc:Name>
+                        </inc:Victim>
+                        <inc:Related_Indicators>
+                            <inc:Related_Indicator>
+                                <sc:Indicator xsi:type="ind:IndicatorType" id="cta:indicator-event-2">
+                                    <ind:Observable>
+                                        <c:Observable_Composition operator="AND">
+                                            <c:Observable>
+                                                <c:Object>
+                                                    <c:Properties xsi:type="co:CustomObjectType">
+                                                        <cc:Custom_Properties>
+                                                            <cc:Property name="timestamp">2000</cc:Property>
+                                                            <cc:Property name="xElapsedTime">20</cc:Property>
+                                                            <cc:Property name="scHttpStatus">200</cc:Property>
+                                                            <cc:Property name="scResultCode">OK</cc:Property>
+                                                            <cc:Property name="scContentType">text/2</cc:Property>
+                                                            <cc:Property name="xMagicContentType">magic/2</cc:Property>
+                                                            <cc:Property name="csReferer">http://ref2</cc:Property>
+                                                            <cc:Property name="csUserAgent">agent002</cc:Property>
+                                                            <cc:Property name="csContentBytes">2222</cc:Property>
+                                                            <cc:Property name="scContentBytes">222</cc:Property>
+                                                            <cc:Property name="csUrl">http://chuck.norris.com/2</cc:Property>
+                                                            <cc:Property name="sIP">2.2.2.2</cc:Property>
+                                                            <cc:Property name="sPort">2</cc:Property>
+                                                            <cc:Property name="cIP">2.22.222.2</cc:Property>
+                                                            <cc:Property name="cPort">12</cc:Property>
+                                                            <cc:Property name="cUsername">Mr2</cc:Property>
+                                                            <cc:Property name="sReputation">2</cc:Property>
+                                                            <cc:Property name="sCategory">category</cc:Property>
+                                                            <cc:Property name="scFileName">file2</cc:Property>
+                                                            <cc:Property name="scSHA256">274EBF83F3BC49DA511E7A9EADA1F35651A3F176F5D8403E2444E33DC60EFE76</cc:Property>
+                                                            <cc:Property name="scMD5">274EBF83F3BC49DA511E7A9EADA1F356</cc:Property>
+                                                        </cc:Custom_Properties>
+                                                    </c:Properties>
+                                                </c:Object>
+                                            </c:Observable>
+                                        </c:Observable_Composition>
+                                    </ind:Observable>
+                                    <ind:Indicated_TTP>
+                                        <sc:TTP xsi:type="ttp:TTPType">
+                                            <ttp:Title>eventClass2</ttp:Title>
+                                        </sc:TTP>
+                                    </ind:Indicated_TTP>
+                                </sc:Indicator>
+                            </inc:Related_Indicator>
+                        </inc:Related_Indicators>
+                        <inc:Discovery_Method>Log Review</inc:Discovery_Method>
+                        <inc:Confidence>
+                            <sc:Value>High</sc:Value>
+                        </inc:Confidence>
+                        <inc:Information_Source>
+                            <sc:Tools>
+                                <cc:Tool idref="cta:tool-amp" />
+                            </sc:Tools>
+                        </inc:Information_Source>
+                    </s:Incident>
+                </s:Incidents>
+            </s:STIX_Package>
+        </Content>
+    </Content_Block>
+</Poll_Response>

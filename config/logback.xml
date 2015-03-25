@@ -1,0 +1,23 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-5level [%logger{0}] %msg%n%ex</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SIMPLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="output" level="info" additivity="false">
+        <appender-ref ref="SIMPLE"/>
+    </logger>
+
+    <root level="trace">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

@@ -22,9 +22,9 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 
 /**
  * Exposes adapter statistics via a JMX bean.
- * <code>com.sample.taxii:component=taxii-log-adapter,type=statistics</code>
+ * <code>com.cisco.cta.taxii:component=taxii-log-adapter,type=statistics</code>
  */
-@ManagedResource("com.sample.taxii:component=taxii-log-adapter,type=statistics")
+@ManagedResource("com.cisco.cta.taxii:component=taxii-log-adapter,type=statistics")
 public class AdapterStatistics implements AdapterStatisticsMBean {
 
     private final AtomicLong pollCounter = new AtomicLong();

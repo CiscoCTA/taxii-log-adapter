@@ -82,7 +82,7 @@ public class AdapterConfigurationTest {
     @Test
     public void jmxStatisticsRegistered() throws Exception {
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name = new ObjectName("com.sample.taxii:component=taxii-log-adapter,type=statistics");
+        ObjectName name = new ObjectName("com.cisco.cta.taxii:component=taxii-log-adapter,type=statistics");
         assertTrue(mbs.isRegistered(name));
     }
 }

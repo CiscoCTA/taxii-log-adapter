@@ -2,7 +2,7 @@
 #
 # This script runs the example application.
 # Usage: adapter.sh <command>
-# <command> is one of: start, stop, restart, now
+# <command> is one of: start, stop, now
 
 # The name to be displayed when starting/stopping the application
 SERVICE_NAME=taxii-log-adapter

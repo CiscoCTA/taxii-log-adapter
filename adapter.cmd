@@ -3,7 +3,7 @@ REM This script runs the example application.
 
 REM Usage: adapter.sh <command>
 
-REM <command> is one of: start, stop, restart, now
+REM <command> is one of: start, stop, now
 
 REM The name to be displayed when starting/stopping the application
 

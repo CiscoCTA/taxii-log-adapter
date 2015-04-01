@@ -1,19 +1,3 @@
-/*
-   Copyright 2015 Cisco Systems
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-
 package com.cisco.cta.taxii.adapter;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -31,6 +15,8 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.mock.env.MockPropertySource;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+
+import java.net.URL;
 
 
 public class ValidateSettingsTest {
@@ -56,9 +42,32 @@ public class ValidateSettingsTest {
                 .withProperty("taxiiService.feeds[0]", "alpha-feed")
                 .withProperty("taxiiService.statusFile", "taxii-status.xml")
                 .withProperty("schedule.cron", "* * * * * *")
-                .withProperty("transform.stylesheet", "transform.xsl");
+                .withProperty("transform.stylesheet", "transform.xsl")
+                .withProperty("proxy.url", "http://localhost:8001/")
+                .withProperty("proxy.authenticationType", ProxyAuthenticationType.NONE.name());
             ctx.getEnvironment().getPropertySources().addFirst(source);
             ctx.refresh();
+        }
+    }
+
+    @Test
+    public void typeConversion() throws Exception {
+        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
+            ctx.register(SettingsTestConfiguration.class);
+            PropertySource<?> source = new MockPropertySource()
+                    .withProperty("taxiiService.pollEndpoint", "http://taxii")
+                    .withProperty("taxiiService.username", "smith")
+                    .withProperty("taxiiService.password", "secret")
+                    .withProperty("taxiiService.feeds[0]", "alpha-feed")
+                    .withProperty("taxiiService.statusFile", "taxii-status.xml")
+                    .withProperty("schedule.cron", "* * * * * *")
+                    .withProperty("transform.stylesheet", "transform.xsl")
+                    .withProperty("proxy.url", "http://localhost:8001/")
+                    .withProperty("proxy.authenticationType", ProxyAuthenticationType.NONE.name());
+            ctx.getEnvironment().getPropertySources().addFirst(source);
+            ctx.refresh();
+            assertThat(ctx.getBean(ProxySettings.class).getUrl(), is(new URL("http://localhost:8001/")));
+            assertThat(ctx.getBean(ProxySettings.class).getAuthenticationType(), is(ProxyAuthenticationType.NONE));
         }
     }
 

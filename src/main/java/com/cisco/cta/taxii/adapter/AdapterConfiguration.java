@@ -1,33 +1,13 @@
-/*
-   Copyright 2015 Cisco Systems
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-
 package com.cisco.cta.taxii.adapter;
 
-import java.io.Writer;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.transform.Templates;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.stream.StreamSource;
-
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpHost;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.dellroad.stuff.pobj.PersistentObject;
 import org.dellroad.stuff.pobj.PersistentObjectDelegate;
 import org.dellroad.stuff.pobj.SpringDelegate;
@@ -37,11 +17,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.jmx.support.RegistrationPolicy;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.threeten.bp.Clock;
 
-import com.google.common.collect.ImmutableMap;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamSource;
+import java.io.Writer;
+import java.net.URL;
 
 /**
  * Spring configuration providing factory methods for core beans.
@@ -55,7 +44,12 @@ public class AdapterConfiguration {
     public TaxiiServiceSettings taxiiServiceSettings() {
         return new TaxiiServiceSettings();
     }
-    
+
+    @Bean
+    public ProxySettings proxySettings() {
+        return new ProxySettings();
+    }
+
     @Bean
     public TransformSettings transformSettings() {
         return new TransformSettings();
@@ -118,8 +112,29 @@ public class AdapterConfiguration {
     }
 
     @Bean
+    public HttpClient httpClient() {
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        ProxySettings proxySettings = proxySettings();
+        if (proxySettings.getUrl() != null) {
+            URL proxyUrl = proxySettings.getUrl();
+            HttpHost proxyHost = new HttpHost(
+                    proxyUrl.getHost(),
+                    proxyUrl.getPort(),
+                    proxyUrl.getProtocol());
+            clientBuilder.setProxy(proxyHost);
+        }
+        return clientBuilder.build();
+    }
+
+    @Bean
+    public CredentialsProvider credentialsProvider() {
+        return new CredentialsProviderFactory(taxiiServiceSettings(), proxySettings())
+                .build();
+    }
+
+    @Bean
     public ClientHttpRequestFactory httpRequestFactory() {
-        BasicAuthHttpRequestFactory factory = new BasicAuthHttpRequestFactory(taxiiServiceSettings());
+        HttpComponentsClientHttpRequestFactory factory = new BasicAuthHttpRequestFactory(httpClient(), taxiiServiceSettings(), proxySettings(), credentialsProvider());
         factory.setConnectTimeout(300000); //5min
         factory.setConnectionRequestTimeout(300000); //5min
         factory.setReadTimeout(300000); //5min

@@ -1,5 +1,5 @@
 taxiiService:
-    pollEndpoint: http://localhost:8080/skym-taxii-ws/PollService/
+    pollEndpoint: https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/
     username: user
     password: pass
     feeds:
@@ -15,8 +15,8 @@ transform:
 logging:
     config: config/logback.xml
 
-proxy:
-    url: http://localhost:8001/
-    authenticationType: none
-    username:
-    password:
+# proxy:
+#    url: http://localhost:8002/
+#    authenticationType: basic
+#    username: user
+#    password: pass

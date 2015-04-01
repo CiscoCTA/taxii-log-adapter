@@ -14,3 +14,9 @@ transform:
 
 logging:
     config: config/logback.xml
+
+proxy:
+    url: http://localhost:8001/
+    authenticationType: none
+    username:
+    password:

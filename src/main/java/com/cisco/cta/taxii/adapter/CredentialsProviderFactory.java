@@ -1,3 +1,19 @@
+/*
+   Copyright 2015 Cisco Systems
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 package com.cisco.cta.taxii.adapter;
 
 import org.apache.http.HttpHost;
@@ -24,6 +40,9 @@ public class CredentialsProviderFactory {
         if (proxySettings.getUrl() == null) {
             return ;
         }
+        if (proxySettings.getAuthenticationType() == null) {
+            throw new IllegalStateException("Both proxy url and proxy authentication type have to be specified.");
+        }
 
         ProxyAuthenticationType authType = proxySettings.getAuthenticationType();
 
@@ -33,20 +52,27 @@ public class CredentialsProviderFactory {
                 proxyUrl.getPort(),
                 proxyUrl.getProtocol());
 
-        Credentials credentials = null;
-        if (ProxyAuthenticationType.NONE == authType) {
+        Credentials credentials;
+        switch(authType) {
+            case NONE:
+                break;
 
-        } else  if (ProxyAuthenticationType.BASIC == authType) {
-            credentials = new UsernamePasswordCredentials(proxySettings.getUsername(), proxySettings.getPassword());
-            credsProvider.setCredentials(new AuthScope(proxyHost.getHostName(), proxyHost.getPort()), credentials);
+            case BASIC:
+                credentials = new UsernamePasswordCredentials(proxySettings.getUsername(), proxySettings.getPassword());
+                credsProvider.setCredentials(new AuthScope(proxyHost.getHostName(), proxyHost.getPort()), credentials);
+                break;
 
-        } else if (ProxyAuthenticationType.NTLM == authType) {
-            credentials = new NTCredentials(
-                    proxySettings.getUsername(),
-                    proxySettings.getPassword(),
-                    proxySettings.getWorkstation(),
-                    proxySettings.getDomain());
-            credsProvider.setCredentials(new AuthScope(proxyHost.getHostName(), proxyHost.getPort()), credentials);
+            case NTLM:
+                credentials = new NTCredentials(
+                        proxySettings.getUsername(),
+                        proxySettings.getPassword(),
+                        proxySettings.getWorkstation(),
+                        proxySettings.getDomain());
+                credsProvider.setCredentials(new AuthScope(proxyHost.getHostName(), proxyHost.getPort()), credentials);
+                break;
+
+            default:
+                throw new IllegalStateException("Unsupported authentication type: " + authType);
         }
     }
 

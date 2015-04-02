@@ -44,7 +44,7 @@ public class ValidateSettingsTest {
                 .withProperty("schedule.cron", "* * * * * *")
                 .withProperty("transform.stylesheet", "transform.xsl")
                 .withProperty("proxy.url", "http://localhost:8001/")
-                .withProperty("proxy.authenticationType", ProxyAuthenticationType.NONE.name());
+                .withProperty("proxy.authenticationType", "NONE");
             ctx.getEnvironment().getPropertySources().addFirst(source);
             ctx.refresh();
         }
@@ -63,7 +63,7 @@ public class ValidateSettingsTest {
                     .withProperty("schedule.cron", "* * * * * *")
                     .withProperty("transform.stylesheet", "transform.xsl")
                     .withProperty("proxy.url", "http://localhost:8001/")
-                    .withProperty("proxy.authenticationType", ProxyAuthenticationType.NONE.name());
+                    .withProperty("proxy.authenticationType", "NONE");
             ctx.getEnvironment().getPropertySources().addFirst(source);
             ctx.refresh();
             assertThat(ctx.getBean(ProxySettings.class).getUrl(), is(new URL("http://localhost:8001/")));

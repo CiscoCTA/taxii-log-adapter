@@ -104,7 +104,7 @@ public class AdapterTaskIT {
     public void setUp() throws Exception {
         initLogbackOutput();
         MockitoAnnotations.initMocks(this);
-        pollServiceUri = new URI("http://localhost:8080/skym-taxii-ws/PollService/");
+        pollServiceUri = new URI("https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/");
         when(httpRequestFactory.createRequest(pollServiceUri, HttpMethod.POST)).thenReturn(httpReq);
         httpReqHeaders = new HttpHeaders();
         when(httpReq.getHeaders()).thenReturn(httpReqHeaders);

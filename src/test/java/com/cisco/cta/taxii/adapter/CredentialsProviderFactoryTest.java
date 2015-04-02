@@ -4,7 +4,6 @@ package com.cisco.cta.taxii.adapter;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.CredentialsProvider;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

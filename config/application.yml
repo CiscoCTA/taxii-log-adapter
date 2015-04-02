@@ -15,6 +15,8 @@ transform:
 logging:
     config: config/logback.xml
 
+# Uncomment the following lines to use HTTP proxy when performing TAXII requests
+
 # proxy:
 #    url: http://localhost:8002/
 #    authenticationType: basic

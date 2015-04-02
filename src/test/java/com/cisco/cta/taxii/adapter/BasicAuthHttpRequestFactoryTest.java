@@ -45,7 +45,7 @@ public class BasicAuthHttpRequestFactoryTest {
         httpClient = HttpClients.createDefault();
         credentialsProvider = Mockito.mock(CredentialsProvider.class);
         connSettings = TaxiiServiceSettingsFactory.createDefaults();
-        proxySettings = ProxySettingsFactory.createDefaults();
+        proxySettings = new ProxySettings();
         credentialsProvider = Mockito.mock(CredentialsProvider.class);
         factory = new BasicAuthHttpRequestFactory(httpClient, connSettings, proxySettings, credentialsProvider);
         MockitoAnnotations.initMocks(this);

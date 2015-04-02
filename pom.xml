@@ -6,7 +6,7 @@
     <groupId>com.cisco.cta.taxii.adapter</groupId>
     <artifactId>taxii-log-adapter</artifactId>
     <name>TAXII Log Adapter</name>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <description>Integration between SIEMs and TAXII services</description>
 
@@ -25,7 +25,8 @@
     <scm>
         <url>https://github.com/CiscoCTA/taxii-log-adapter</url>
         <connection>scm:git:https://github.com/CiscoCTA/taxii-log-adapter</connection>
-    </scm>
+        <tag>1.0.0</tag>
+  </scm>
 
     <issueManagement>
         <url>https://github.com/CiscoCTA/taxii-log-adapter/issues</url>

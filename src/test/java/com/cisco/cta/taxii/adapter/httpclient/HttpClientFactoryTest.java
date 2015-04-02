@@ -17,7 +17,8 @@
 package com.cisco.cta.taxii.adapter.httpclient;
 
 import com.cisco.cta.taxii.adapter.httpclient.HttpClientFactory;
-import com.cisco.cta.taxii.adapter.httpclient.ProxySettings;
+import com.cisco.cta.taxii.adapter.settings.ProxySettings;
+
 import org.apache.http.client.HttpClient;
 import org.junit.Before;
 import org.junit.Test;

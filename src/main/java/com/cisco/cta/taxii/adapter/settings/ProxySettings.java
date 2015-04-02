@@ -14,24 +14,28 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.settings;
 
-import java.io.File;
-
-import javax.validation.constraints.NotNull;
-
+import com.cisco.cta.taxii.adapter.httpclient.ProxyAuthenticationType;
 import lombok.Data;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * Holds transform configuration parameters.
- */
-@ConfigurationProperties(prefix="transform")
-@Data
-public class TransformSettings {
+import java.net.URL;
 
-    @NotNull
-    private File stylesheet;
+@ConfigurationProperties(prefix="proxy")
+@Data
+public class ProxySettings {
+
+    private URL url;
+
+    private ProxyAuthenticationType authenticationType;
+
+    private String domain;
+
+    private String username;
+
+    private String password;
+
+    private String workstation;
 
 }

@@ -27,6 +27,8 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 
+import com.cisco.cta.taxii.adapter.settings.ScheduleSettings;
+
 /**
  * Spring configuration providing factory methods for scheduling beans.
  */

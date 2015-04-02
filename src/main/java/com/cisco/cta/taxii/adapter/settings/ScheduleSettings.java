@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.settings;
 
 import javax.validation.constraints.NotNull;
 

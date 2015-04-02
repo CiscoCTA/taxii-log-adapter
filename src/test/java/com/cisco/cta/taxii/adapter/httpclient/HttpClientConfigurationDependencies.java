@@ -16,8 +16,9 @@
 
 package com.cisco.cta.taxii.adapter.httpclient;
 
-import com.cisco.cta.taxii.adapter.TaxiiServiceSettings;
 import com.cisco.cta.taxii.adapter.TaxiiStatusDao;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

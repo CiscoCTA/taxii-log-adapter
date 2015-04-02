@@ -17,6 +17,9 @@
 package com.cisco.cta.taxii.adapter.httpclient;
 
 import com.cisco.cta.taxii.adapter.*;
+import com.cisco.cta.taxii.adapter.settings.ProxySettings;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.springframework.beans.factory.annotation.Autowired;

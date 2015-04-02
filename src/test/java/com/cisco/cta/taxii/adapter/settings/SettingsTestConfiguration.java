@@ -14,9 +14,13 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.settings;
 
-import com.cisco.cta.taxii.adapter.httpclient.ProxySettings;
+import com.cisco.cta.taxii.adapter.settings.ProxySettings;
+import com.cisco.cta.taxii.adapter.settings.ScheduleSettings;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+import com.cisco.cta.taxii.adapter.settings.TransformSettings;
+
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

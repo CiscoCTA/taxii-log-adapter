@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.settings;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -25,7 +25,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import com.cisco.cta.taxii.adapter.httpclient.ProxyAuthenticationType;
-import com.cisco.cta.taxii.adapter.httpclient.ProxySettings;
+import com.cisco.cta.taxii.adapter.settings.ProxySettings;
+
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.NestedRuntimeException;

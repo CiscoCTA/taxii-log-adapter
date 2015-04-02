@@ -16,7 +16,9 @@
 
 package com.cisco.cta.taxii.adapter.httpclient;
 
-import com.cisco.cta.taxii.adapter.TaxiiServiceSettings;
+import com.cisco.cta.taxii.adapter.settings.ProxySettings;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;

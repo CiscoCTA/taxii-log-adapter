@@ -14,12 +14,12 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.settings;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.cisco.cta.taxii.adapter.TaxiiServiceSettings;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 
 public class TaxiiServiceSettingsFactory {
 

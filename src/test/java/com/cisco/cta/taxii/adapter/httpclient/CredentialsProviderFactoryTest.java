@@ -16,11 +16,12 @@
 
 package com.cisco.cta.taxii.adapter.httpclient;
 
-import com.cisco.cta.taxii.adapter.TaxiiServiceSettings;
-import com.cisco.cta.taxii.adapter.TaxiiServiceSettingsFactory;
 import com.cisco.cta.taxii.adapter.httpclient.CredentialsProviderFactory;
 import com.cisco.cta.taxii.adapter.httpclient.ProxyAuthenticationType;
-import com.cisco.cta.taxii.adapter.httpclient.ProxySettings;
+import com.cisco.cta.taxii.adapter.settings.ProxySettings;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettingsFactory;
+
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.CredentialsProvider;

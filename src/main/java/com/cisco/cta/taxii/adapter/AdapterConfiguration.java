@@ -17,7 +17,10 @@
 package com.cisco.cta.taxii.adapter;
 
 import com.cisco.cta.taxii.adapter.httpclient.HttpClientConfiguration;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+import com.cisco.cta.taxii.adapter.settings.TransformSettings;
 import com.google.common.collect.ImmutableMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dellroad.stuff.pobj.PersistentObject;
@@ -41,6 +44,7 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamSource;
+
 import java.io.Writer;
 
 /**

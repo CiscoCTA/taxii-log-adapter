@@ -17,10 +17,12 @@
 package com.cisco.cta.taxii.adapter.httpclient;
 
 import ch.qos.logback.core.Appender;
-import com.cisco.cta.taxii.adapter.TaxiiServiceSettings;
-import com.cisco.cta.taxii.adapter.TaxiiServiceSettingsFactory;
+
 import com.cisco.cta.taxii.adapter.httpclient.BasicAuthHttpRequestFactory;
-import com.cisco.cta.taxii.adapter.httpclient.ProxySettings;
+import com.cisco.cta.taxii.adapter.settings.ProxySettings;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettingsFactory;
+
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.protocol.RequestAuthCache;
@@ -37,6 +39,7 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 
 import javax.net.ServerSocketFactory;
+
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.SocketTimeoutException;

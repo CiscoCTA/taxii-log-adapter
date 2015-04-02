@@ -16,26 +16,7 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import com.cisco.cta.taxii.adapter.httpclient.HttpClientConfiguration;
-import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
-import com.cisco.cta.taxii.adapter.settings.TransformSettings;
-import com.google.common.collect.ImmutableMap;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.dellroad.stuff.pobj.PersistentObject;
-import org.dellroad.stuff.pobj.PersistentObjectDelegate;
-import org.dellroad.stuff.pobj.SpringDelegate;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableMBeanExport;
-import org.springframework.context.annotation.Import;
-import org.springframework.jmx.support.RegistrationPolicy;
-import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import org.threeten.bp.Clock;
+import java.io.Writer;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -45,36 +26,49 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamSource;
 
-import java.io.Writer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableMBeanExport;
+import org.springframework.context.annotation.Import;
+import org.springframework.jmx.support.RegistrationPolicy;
+import org.threeten.bp.Clock;
+
+import com.cisco.cta.taxii.adapter.httpclient.HttpClientConfiguration;
+import com.cisco.cta.taxii.adapter.persistence.PersistenceConfiguration;
+import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+import com.cisco.cta.taxii.adapter.settings.TransformSettings;
 
 /**
  * Spring configuration providing factory methods for core beans.
  */
 @Configuration
-@EnableConfigurationProperties
 @EnableMBeanExport(registration=RegistrationPolicy.FAIL_ON_EXISTING)
-@Import(HttpClientConfiguration.class)
+@Import({HttpClientConfiguration.class, SettingsConfiguration.class, PersistenceConfiguration.class})
 public class AdapterConfiguration {
 
     @Autowired
     private RequestFactory requestFactory;
 
-    @Bean
-    public TaxiiServiceSettings taxiiServiceSettings() {
-        return new TaxiiServiceSettings();
-    }
+    @Autowired
+    private TaxiiServiceSettings taxiiServiceSettings;
 
-    @Bean
-    public TransformSettings transformSettings() {
-        return new TransformSettings();
-    }
+    @Autowired
+    private TransformSettings transformSettings;
+
+    @Autowired
+    private TaxiiStatusDao taxiiStatusDao;
 
     @Bean
     public Runnable adapterTask() throws Exception {
         return new AdapterTask(
             requestFactory,
             responseHandler(),
-            taxiiServiceSettings().getFeeds(),
+            taxiiServiceSettings.getFeeds(),
             statistics());
     }
 
@@ -95,7 +89,7 @@ public class AdapterConfiguration {
         return new ResponseHandler(
                 templates(),
                 logWriter(),
-                taxiiStatusDao(),
+                taxiiStatusDao,
                 taxiiPollResponseReaderFactory(),
                 datatypeFactory(),
                 clock());
@@ -120,44 +114,12 @@ public class AdapterConfiguration {
     public Templates templates() throws Exception {
         return transformerFactory().newTemplates(
             new StreamSource(
-                transformSettings().getStylesheet()));
+                transformSettings.getStylesheet()));
     }
 
     @Bean
     public TransformerFactory transformerFactory() throws TransformerFactoryConfigurationError {
         return TransformerFactory.newInstance();
-    }
-
-    @Bean
-    public TaxiiStatusDao taxiiStatusDao() {
-        return new TaxiiStatusDao(taxiiStatusPersistent());
-    }
-
-    @Bean
-    public PersistentObject<TaxiiStatus> taxiiStatusPersistent() {
-        PersistentObject<TaxiiStatus> persistentObject = new PersistentObject<>(
-                taxiiStatusPersistentDelegate(),
-                taxiiServiceSettings().getStatusFile());
-        persistentObject.setAllowEmptyStart(true);
-        persistentObject.start();
-        return persistentObject;
-    }
-
-    @Bean
-    public PersistentObjectDelegate<TaxiiStatus> taxiiStatusPersistentDelegate() {
-        SpringDelegate<TaxiiStatus> delegate = new SpringDelegate<>();
-        delegate.setMarshaller(taxiiStatusMarshaller());
-        delegate.setUnmarshaller(taxiiStatusMarshaller());
-        return delegate;
-    }
-
-    @Bean
-    public Jaxb2Marshaller taxiiStatusMarshaller() {
-        Jaxb2Marshaller jaxb2Marshaller = new Jaxb2Marshaller();
-        jaxb2Marshaller.setClassesToBeBound(TaxiiStatus.class);
-        jaxb2Marshaller.setMarshallerProperties(ImmutableMap.of(
-                javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true));
-        return jaxb2Marshaller;
     }
 
     @Bean

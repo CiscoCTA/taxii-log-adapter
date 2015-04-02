@@ -19,7 +19,6 @@ package com.cisco.cta.taxii.adapter;
 import java.util.concurrent.ScheduledFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -34,11 +33,13 @@ import com.cisco.cta.taxii.adapter.settings.ScheduleSettings;
  */
 @Configuration
 @Profile("schedule")
-@EnableConfigurationProperties
 public class ScheduleConfiguration {
 
     @Autowired
     private AdapterConfiguration adapterConfiguration;
+
+    @Autowired
+    private ScheduleSettings scheduleSettings;
     
     @Bean
     public TaskScheduler taskScheduler() throws Exception {
@@ -49,12 +50,7 @@ public class ScheduleConfiguration {
     public ScheduledFuture<?> scheduleAdapterTask() throws Exception {
         return taskScheduler().schedule(
             adapterConfiguration.adapterTask(),
-            new CronTrigger(scheduleSettings().getCron()));
-    }
-    
-    @Bean
-    public ScheduleSettings scheduleSettings() {
-        return new ScheduleSettings();
+            new CronTrigger(scheduleSettings.getCron()));
     }
     
 }

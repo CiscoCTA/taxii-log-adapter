@@ -38,11 +38,11 @@ import org.springframework.validation.FieldError;
 import java.net.URL;
 
 
-public class ValidateSettingsTest {
+public class SettingsConfigurationTest {
 
     @Test
     public void refuseMissingConfiguration() throws Exception {
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SettingsTestConfiguration.class)) {
+        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SettingsConfiguration.class)) {
             fail("The context creation must fail because of missing configuration.");
         } catch (NestedRuntimeException e) {
             BindException be = (BindException) e.getRootCause();
@@ -53,7 +53,7 @@ public class ValidateSettingsTest {
     @Test
     public void acceptValidConfiguration() throws Exception {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
-            ctx.register(SettingsTestConfiguration.class);
+            ctx.register(SettingsConfiguration.class);
             PropertySource<?> source = new MockPropertySource()
                 .withProperty("taxiiService.pollEndpoint", "http://taxii")
                 .withProperty("taxiiService.username", "smith")
@@ -72,7 +72,7 @@ public class ValidateSettingsTest {
     @Test
     public void typeConversion() throws Exception {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
-            ctx.register(SettingsTestConfiguration.class);
+            ctx.register(SettingsConfiguration.class);
             PropertySource<?> source = new MockPropertySource()
                     .withProperty("taxiiService.pollEndpoint", "http://taxii")
                     .withProperty("taxiiService.username", "smith")
@@ -93,7 +93,7 @@ public class ValidateSettingsTest {
     @Test
     public void resfuseMissingPollEndpoint() throws Exception {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
-            ctx.register(SettingsTestConfiguration.class);
+            ctx.register(SettingsConfiguration.class);
             PropertySource<?> source = new MockPropertySource()
                 .withProperty("taxiiService.username", "smith")
                 .withProperty("taxiiService.password", "secret")

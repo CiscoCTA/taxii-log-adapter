@@ -23,14 +23,12 @@ import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
 @Configuration
-@EnableConfigurationProperties
 public class HttpClientConfiguration {
 
     @Autowired
@@ -39,19 +37,17 @@ public class HttpClientConfiguration {
     @Autowired
     private TaxiiStatusDao taxiiStatusDao;
 
-    @Bean
-    public ProxySettings proxySettings() {
-        return new ProxySettings();
-    }
+    @Autowired
+    private ProxySettings proxySettings;
 
     @Bean
     public HttpClient httpClient() {
-        return new HttpClientFactory(proxySettings()).create();
+        return new HttpClientFactory(proxySettings).create();
     }
 
     @Bean
     public CredentialsProvider credentialsProvider() {
-        return new CredentialsProviderFactory(taxiiServiceSettings, proxySettings())
+        return new CredentialsProviderFactory(taxiiServiceSettings, proxySettings)
                 .build();
     }
 
@@ -76,7 +72,8 @@ public class HttpClientConfiguration {
 
     @Bean
     public ClientHttpRequestFactory httpRequestFactory() {
-        HttpComponentsClientHttpRequestFactory factory = new BasicAuthHttpRequestFactory(httpClient(), taxiiServiceSettings, proxySettings(), credentialsProvider());
+        HttpComponentsClientHttpRequestFactory factory = new BasicAuthHttpRequestFactory(
+                httpClient(), taxiiServiceSettings, proxySettings, credentialsProvider());
         factory.setConnectTimeout(300000); //5min
         factory.setConnectionRequestTimeout(300000); //5min
         factory.setReadTimeout(300000); //5min

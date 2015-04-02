@@ -16,24 +16,22 @@
 
 package com.cisco.cta.taxii.adapter.settings;
 
-import com.cisco.cta.taxii.adapter.settings.ProxySettings;
-import com.cisco.cta.taxii.adapter.settings.ScheduleSettings;
-import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
-import com.cisco.cta.taxii.adapter.settings.TransformSettings;
-
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Spring configuration providing all settings beans.
+ */
 @Configuration
 @EnableConfigurationProperties
-public class SettingsTestConfiguration {
+public class SettingsConfiguration {
 
     @Bean
     public TaxiiServiceSettings taxiiServiceSettings() {
         return new TaxiiServiceSettings();
     }
-    
+
     @Bean
     public TransformSettings transformSettings() {
         return new TransformSettings();
@@ -43,7 +41,7 @@ public class SettingsTestConfiguration {
     public ScheduleSettings scheduleSettings() {
         return new ScheduleSettings();
     }
-
+    
     @Bean
     public ProxySettings proxySettings() {
         return new ProxySettings();

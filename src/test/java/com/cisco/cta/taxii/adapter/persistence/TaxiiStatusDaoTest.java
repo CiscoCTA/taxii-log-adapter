@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter.status;
+package com.cisco.cta.taxii.adapter.persistence;
 
 
 import static org.hamcrest.CoreMatchers.nullValue;

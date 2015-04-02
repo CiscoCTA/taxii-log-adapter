@@ -39,6 +39,7 @@ import org.threeten.bp.Clock;
 
 import com.cisco.cta.taxii.adapter.httpclient.HttpClientConfiguration;
 import com.cisco.cta.taxii.adapter.persistence.PersistenceConfiguration;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import com.cisco.cta.taxii.adapter.settings.TransformSettings;

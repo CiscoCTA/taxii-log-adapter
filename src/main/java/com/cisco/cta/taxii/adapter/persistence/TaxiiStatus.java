@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.persistence;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.status;
 
 
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -34,8 +34,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
-import com.cisco.cta.taxii.adapter.TaxiiStatus;
-import com.cisco.cta.taxii.adapter.TaxiiStatusDao;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import com.google.common.collect.ImmutableMap;
 
 public class TaxiiStatusDaoTest {

@@ -17,6 +17,7 @@
 package com.cisco.cta.taxii.adapter.httpclient;
 
 import com.cisco.cta.taxii.adapter.*;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import com.cisco.cta.taxii.adapter.settings.ProxySettings;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 

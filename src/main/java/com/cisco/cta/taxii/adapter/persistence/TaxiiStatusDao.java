@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.persistence;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -22,7 +22,7 @@ import org.dellroad.stuff.pobj.PersistentObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cisco.cta.taxii.adapter.TaxiiStatus.Feed;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus.Feed;
 
 
 /**

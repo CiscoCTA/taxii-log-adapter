@@ -34,8 +34,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.cisco.cta.taxii.adapter.TaxiiStatusDao;
 import com.cisco.cta.taxii.adapter.httpclient.HttpBodyWriter;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpBodyWriterTest {

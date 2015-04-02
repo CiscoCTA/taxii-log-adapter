@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import com.cisco.cta.taxii.adapter.TaxiiStatusDao;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;

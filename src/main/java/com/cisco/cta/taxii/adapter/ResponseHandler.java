@@ -36,6 +36,8 @@ import org.threeten.bp.Clock;
 import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.ZoneId;
 
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
+
 /**
  * Handles TAXII responses.
  */

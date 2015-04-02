@@ -49,7 +49,7 @@ import org.threeten.bp.ZoneId;
 import com.cisco.cta.taxii.adapter.ResponseHandler;
 import com.cisco.cta.taxii.adapter.TaxiiPollResponseReader;
 import com.cisco.cta.taxii.adapter.TaxiiPollResponseReaderFactory;
-import com.cisco.cta.taxii.adapter.TaxiiStatusDao;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 
 public class ResponseHandlerTest {
 

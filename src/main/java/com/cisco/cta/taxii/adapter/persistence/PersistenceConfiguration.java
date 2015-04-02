@@ -25,8 +25,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
-import com.cisco.cta.taxii.adapter.TaxiiStatus;
-import com.cisco.cta.taxii.adapter.TaxiiStatusDao;
 import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import com.google.common.collect.ImmutableMap;

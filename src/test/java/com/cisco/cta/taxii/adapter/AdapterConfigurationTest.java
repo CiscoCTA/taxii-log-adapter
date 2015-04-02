@@ -25,9 +25,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.xml.datatype.DatatypeFactory;
+
 import java.lang.management.ManagementFactory;
 
 import static org.hamcrest.CoreMatchers.not;

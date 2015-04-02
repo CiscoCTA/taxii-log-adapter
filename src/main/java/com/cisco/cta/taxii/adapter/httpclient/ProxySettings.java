@@ -14,11 +14,28 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.httpclient;
 
-public enum ProxyAuthenticationType {
-    NONE,
-    BASIC,
-    NTLM
+import com.cisco.cta.taxii.adapter.httpclient.ProxyAuthenticationType;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.net.URL;
+
+@ConfigurationProperties(prefix="proxy")
+@Data
+public class ProxySettings {
+
+    private URL url;
+
+    private ProxyAuthenticationType authenticationType;
+
+    private String domain;
+
+    private String username;
+
+    private String password;
+
+    private String workstation;
 
 }

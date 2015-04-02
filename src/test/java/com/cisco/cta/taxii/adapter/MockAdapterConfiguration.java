@@ -31,7 +31,6 @@ import com.cisco.cta.taxii.adapter.AdapterConfiguration;
 @EnableConfigurationProperties
 public class MockAdapterConfiguration extends AdapterConfiguration {
 
-    @Override
     @Bean
     public ClientHttpRequestFactory httpRequestFactory() {
         return mock(ClientHttpRequestFactory.class);

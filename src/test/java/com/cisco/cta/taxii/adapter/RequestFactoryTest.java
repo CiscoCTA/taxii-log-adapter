@@ -16,15 +16,6 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import static com.cisco.cta.taxii.adapter.HasHeaderMatcher.hasAllTaxiiHeaders;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -34,9 +25,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 
-import com.cisco.cta.taxii.adapter.HttpBodyWriter;
-import com.cisco.cta.taxii.adapter.HttpHeadersAppender;
-import com.cisco.cta.taxii.adapter.RequestFactory;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URL;
+
+import static com.cisco.cta.taxii.adapter.HasHeaderMatcher.hasAllTaxiiHeaders;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 public class RequestFactoryTest {

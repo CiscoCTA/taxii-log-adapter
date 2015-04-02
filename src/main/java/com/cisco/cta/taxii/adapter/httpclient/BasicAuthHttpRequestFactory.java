@@ -14,8 +14,9 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.httpclient;
 
+import com.cisco.cta.taxii.adapter.TaxiiServiceSettings;
 import org.apache.http.HttpHost;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;

@@ -14,35 +14,25 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.httpclient;
 
-import com.cisco.cta.taxii.adapter.httpclient.ProxySettings;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import com.cisco.cta.taxii.adapter.TaxiiServiceSettings;
+import com.cisco.cta.taxii.adapter.TaxiiStatusDao;
+import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties
-public class SettingsTestConfiguration {
+public class HttpClientConfigurationDependencies {
 
     @Bean
     public TaxiiServiceSettings taxiiServiceSettings() {
         return new TaxiiServiceSettings();
     }
-    
-    @Bean
-    public TransformSettings transformSettings() {
-        return new TransformSettings();
-    }
 
     @Bean
-    public ScheduleSettings scheduleSettings() {
-        return new ScheduleSettings();
-    }
-
-    @Bean
-    public ProxySettings proxySettings() {
-        return new ProxySettings();
+    public TaxiiStatusDao taxiiStatusDao() {
+        return Mockito.mock(TaxiiStatusDao.class);
     }
 
 }

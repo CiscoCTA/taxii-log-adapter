@@ -16,21 +16,20 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import com.cisco.cta.taxii.adapter.httpclient.HttpClientConfiguration;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
 import org.dellroad.stuff.pobj.PersistentObject;
 import org.dellroad.stuff.pobj.PersistentObjectDelegate;
 import org.dellroad.stuff.pobj.SpringDelegate;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableMBeanExport;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.context.annotation.Import;
 import org.springframework.jmx.support.RegistrationPolicy;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.threeten.bp.Clock;
@@ -50,16 +49,15 @@ import java.io.Writer;
 @Configuration
 @EnableConfigurationProperties
 @EnableMBeanExport(registration=RegistrationPolicy.FAIL_ON_EXISTING)
+@Import(HttpClientConfiguration.class)
 public class AdapterConfiguration {
+
+    @Autowired
+    private RequestFactory requestFactory;
 
     @Bean
     public TaxiiServiceSettings taxiiServiceSettings() {
         return new TaxiiServiceSettings();
-    }
-
-    @Bean
-    public ProxySettings proxySettings() {
-        return new ProxySettings();
     }
 
     @Bean
@@ -70,7 +68,7 @@ public class AdapterConfiguration {
     @Bean
     public Runnable adapterTask() throws Exception {
         return new AdapterTask(
-            requestFactory(),
+            requestFactory,
             responseHandler(),
             taxiiServiceSettings().getFeeds(),
             statistics());
@@ -114,45 +112,6 @@ public class AdapterConfiguration {
         return XMLInputFactory.newFactory();
     }
 
-    @Bean
-    public RequestFactory requestFactory() throws Exception {
-        return new RequestFactory(
-                taxiiServiceSettings().getPollEndpoint(),
-                httpRequestFactory(),
-                httpHeadersAppender(),
-                httpBodyWriter());
-    }
-
-    @Bean
-    public HttpClient httpClient() {
-        return new HttpClientFactory(proxySettings()).create();
-    }
-
-    @Bean
-    public CredentialsProvider credentialsProvider() {
-        return new CredentialsProviderFactory(taxiiServiceSettings(), proxySettings())
-                .build();
-    }
-
-    @Bean
-    public ClientHttpRequestFactory httpRequestFactory() {
-        HttpComponentsClientHttpRequestFactory factory = new BasicAuthHttpRequestFactory(httpClient(), taxiiServiceSettings(), proxySettings(), credentialsProvider());
-        factory.setConnectTimeout(300000); //5min
-        factory.setConnectionRequestTimeout(300000); //5min
-        factory.setReadTimeout(300000); //5min
-        return factory;
-    }
-
-    @Bean
-    public HttpHeadersAppender httpHeadersAppender() {
-        return new HttpHeadersAppender();
-    }
-
-    @Bean
-    public HttpBodyWriter httpBodyWriter() throws Exception {
-        return new HttpBodyWriter(taxiiStatusDao());
-    }
-    
     @Bean
     public Templates templates() throws Exception {
         return transformerFactory().newTemplates(

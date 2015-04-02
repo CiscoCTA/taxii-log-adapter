@@ -14,8 +14,9 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.httpclient;
 
+import com.cisco.cta.taxii.adapter.httpclient.ProxySettings;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;

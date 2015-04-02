@@ -18,7 +18,6 @@ package com.cisco.cta.taxii.adapter.httpclient;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.cisco.cta.taxii.adapter.RequestFactory;
-import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
+import com.cisco.cta.taxii.adapter.persistence.PersistenceConfiguration;
 
-@ContextConfiguration(classes = {HttpClientConfiguration.class, SettingsConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
+
+@ContextConfiguration(classes = {HttpClientConfiguration.class, PersistenceConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class HttpClientConfigurationTest {
@@ -39,7 +39,6 @@ public class HttpClientConfigurationTest {
     private RequestFactory requestFactory;
 
     @Test
-    @Ignore("missing status DAO")
     public void requestFactoryProduced() {
         assertNotNull(requestFactory);
     }

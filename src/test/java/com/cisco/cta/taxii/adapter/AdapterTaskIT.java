@@ -16,9 +16,9 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import static com.cisco.cta.taxii.adapter.HasHeaderMatcher.hasAllTaxiiHeaders;
 import static com.cisco.cta.taxii.adapter.PollResponseMatcher.initialPollRequest;
 import static com.cisco.cta.taxii.adapter.PollResponseMatcher.nextPollRequest;
+import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;

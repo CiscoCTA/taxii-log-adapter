@@ -25,11 +25,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 
+import com.cisco.cta.taxii.adapter.httpclient.HttpBodyWriter;
+import com.cisco.cta.taxii.adapter.httpclient.HttpHeadersAppender;
+
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 
-import static com.cisco.cta.taxii.adapter.HasHeaderMatcher.hasAllTaxiiHeaders;
+import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

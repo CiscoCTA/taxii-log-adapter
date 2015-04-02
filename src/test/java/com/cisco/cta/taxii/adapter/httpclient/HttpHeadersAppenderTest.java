@@ -14,16 +14,16 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.httpclient;
 
-import static com.cisco.cta.taxii.adapter.HasHeaderMatcher.hasAllTaxiiHeaders;
+import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
 
-import com.cisco.cta.taxii.adapter.HttpHeadersAppender;
+import com.cisco.cta.taxii.adapter.httpclient.HttpHeadersAppender;
 
 public class HttpHeadersAppenderTest {
 

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.httpclient;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

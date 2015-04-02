@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.httpclient;
 
 import static com.cisco.cta.taxii.adapter.PollResponseMatcher.initialPollRequest;
 import static com.cisco.cta.taxii.adapter.PollResponseMatcher.nextPollRequest;
@@ -34,8 +34,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.cisco.cta.taxii.adapter.HttpBodyWriter;
 import com.cisco.cta.taxii.adapter.TaxiiStatusDao;
+import com.cisco.cta.taxii.adapter.httpclient.HttpBodyWriter;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpBodyWriterTest {

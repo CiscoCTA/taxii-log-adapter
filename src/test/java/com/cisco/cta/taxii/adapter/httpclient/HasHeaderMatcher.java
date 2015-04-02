@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.httpclient;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.Matchers.is;
@@ -24,7 +24,7 @@ import org.hamcrest.Matcher;
 import org.springframework.http.HttpHeaders;
 
 
-class HasHeaderMatcher extends FeatureMatcher<HttpHeaders, String> {
+public class HasHeaderMatcher extends FeatureMatcher<HttpHeaders, String> {
 
     public static Matcher<HttpHeaders> hasAllTaxiiHeaders() {
         return allOf(

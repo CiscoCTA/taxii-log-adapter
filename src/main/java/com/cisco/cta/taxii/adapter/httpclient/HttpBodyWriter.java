@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.httpclient;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,6 +22,8 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import com.cisco.cta.taxii.adapter.TaxiiStatusDao;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;

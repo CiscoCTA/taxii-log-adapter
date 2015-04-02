@@ -23,6 +23,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 
+import com.cisco.cta.taxii.adapter.httpclient.HttpBodyWriter;
+import com.cisco.cta.taxii.adapter.httpclient.HttpHeadersAppender;
+
 /**
  * Factory to create complete TAXII requests.
  */

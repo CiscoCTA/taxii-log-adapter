@@ -145,7 +145,7 @@
         <xsl:choose>
             <xsl:when test="string(number($value)) = 'NaN'">
                 <xsl:text>"</xsl:text>
-                <xsl:variable name="text" select="fn:replace($value, '\\', '\\\\')"/>
+                <xsl:variable name="text" select="fn:replace($value, '(\\|&quot;)', '\\$1')"/>
                 <xsl:value-of select="$text"/>
                 <xsl:text>"</xsl:text>
             </xsl:when>
@@ -157,6 +157,5 @@
             <xsl:text>,</xsl:text>
         </xsl:if>
     </xsl:template>
-
 
 </xsl:stylesheet>

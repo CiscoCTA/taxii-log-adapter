@@ -17,16 +17,20 @@
 package com.cisco.cta.taxii.adapter.settings;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.nio.charset.Charset;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import com.google.common.base.Preconditions;
+import com.google.common.io.Files;
 
 /**
  * Holds taxiiService configuration parameters.
@@ -34,6 +38,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix="taxiiService")
 @Data
 public class TaxiiServiceSettings {
+
+    private static final Charset UTF8 = Charset.forName("UTF-8");
 
     @NotNull
     private URL pollEndpoint;
@@ -44,10 +50,20 @@ public class TaxiiServiceSettings {
     @NotNull
     private String password;
 
-    @Size(min = 1)
-    private final List<String> feeds = new ArrayList<>();
+    private List<String> feeds;
+
+    private File feedNamesFile;
 
     @NotNull
     private File statusFile;
 
+    @PostConstruct
+    public void loadFeedNames() throws IOException {
+        Preconditions.checkState(
+            feeds != null || feedNamesFile != null,
+            "taxiiService.feeds or taxiiService.feedNamesFile must be set");
+        if (feedNamesFile != null) {
+            feeds = Files.readLines(feedNamesFile, UTF8);
+        }
+    }
 }

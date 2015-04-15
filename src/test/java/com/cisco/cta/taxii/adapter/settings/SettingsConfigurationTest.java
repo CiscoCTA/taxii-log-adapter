@@ -16,8 +16,10 @@
 
 package com.cisco.cta.taxii.adapter.settings;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
@@ -28,6 +30,7 @@ import com.cisco.cta.taxii.adapter.httpclient.ProxyAuthenticationType;
 import com.cisco.cta.taxii.adapter.settings.ProxySettings;
 
 import org.junit.Test;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.core.env.PropertySource;
@@ -36,6 +39,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 
 import java.net.URL;
+import java.util.List;
 
 
 public class SettingsConfigurationTest {
@@ -66,6 +70,7 @@ public class SettingsConfigurationTest {
                 .withProperty("proxy.authenticationType", "NONE");
             ctx.getEnvironment().getPropertySources().addFirst(source);
             ctx.refresh();
+            assertThat(ctx.getBean(TaxiiServiceSettings.class).getFeeds().get(0), is("alpha-feed"));
         }
     }
 
@@ -111,6 +116,49 @@ public class SettingsConfigurationTest {
             assertThat(be.getFieldError().getField(), is("pollEndpoint"));
             assertThat(be.getFieldError().getRejectedValue(), is(nullValue()));
             assertThat(be.getFieldError().getDefaultMessage(), is("may not be null"));
+        }
+    }
+
+    @Test
+    public void loadFeedNamesFromFile() throws Exception {
+        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
+            ctx.register(SettingsConfiguration.class);
+            PropertySource<?> source = new MockPropertySource()
+                .withProperty("taxiiService.pollEndpoint", "http://taxii")
+                .withProperty("taxiiService.username", "smith")
+                .withProperty("taxiiService.password", "secret")
+                .withProperty("taxiiService.feedNamesFile", "src/test/resources/feed-names.txt")
+                .withProperty("taxiiService.statusFile", "taxii-status.xml")
+                .withProperty("schedule.cron", "* * * * * *")
+                .withProperty("transform.stylesheet", "transform.xsl")
+                .withProperty("proxy.url", "http://localhost:8001/")
+                .withProperty("proxy.authenticationType", "NONE");
+            ctx.getEnvironment().getPropertySources().addFirst(source);
+            ctx.refresh();
+            List<String> feeds = ctx.getBean(TaxiiServiceSettings.class).getFeeds();
+            assertThat(feeds, contains("little-feed", "big-feed"));
+        }
+    }
+
+
+    @Test
+    public void refuseMissingFeedNames() throws Exception {
+        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
+            ctx.register(SettingsConfiguration.class);
+            PropertySource<?> source = new MockPropertySource()
+                .withProperty("taxiiService.pollEndpoint", "http://taxii")
+                .withProperty("taxiiService.username", "smith")
+                .withProperty("taxiiService.password", "secret")
+                .withProperty("taxiiService.statusFile", "taxii-status.xml")
+                .withProperty("schedule.cron", "* * * * * *")
+                .withProperty("transform.stylesheet", "transform.xsl")
+                .withProperty("proxy.url", "http://localhost:8001/")
+                .withProperty("proxy.authenticationType", "NONE");
+            ctx.getEnvironment().getPropertySources().addFirst(source);
+            ctx.refresh();
+            fail("The context creation must fail because of invalid configuration.");
+        } catch (BeanCreationException e) {
+            assertThat(e.getRootCause(), instanceOf(IllegalStateException.class));
         }
     }
 

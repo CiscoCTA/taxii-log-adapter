@@ -60,7 +60,7 @@ public class TaxiiServiceSettings {
     @PostConstruct
     public void loadFeedNames() throws IOException {
         Preconditions.checkState(
-            feeds != null || feedNamesFile != null,
+            feeds != null ^ feedNamesFile != null,
             "taxiiService.feeds or taxiiService.feedNamesFile must be set");
         if (feedNamesFile != null) {
             feeds = Files.readLines(feedNamesFile, UTF8);

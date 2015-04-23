@@ -133,7 +133,7 @@
         </xsl:call-template>
 
         <xsl:call-template name="property">
-            <xsl:with-param name="key">url</xsl:with-param>
+            <xsl:with-param name="key">incidentUrl</xsl:with-param>
             <xsl:with-param name="value" select="$url"/>
             <xsl:with-param name="delimiter"/>
         </xsl:call-template>

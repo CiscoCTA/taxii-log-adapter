@@ -214,12 +214,12 @@
         </xsl:call-template>
 
         <xsl:call-template name="property">
-            <xsl:with-param name="key">cs2Label</xsl:with-param>
-            <xsl:with-param name="value">incidentURL</xsl:with-param>
+            <xsl:with-param name="key">cs3Label</xsl:with-param>
+            <xsl:with-param name="value">IncidentURL</xsl:with-param>
         </xsl:call-template>
 
         <xsl:call-template name="property">
-            <xsl:with-param name="key">cs2</xsl:with-param>
+            <xsl:with-param name="key">cs3</xsl:with-param>
             <xsl:with-param name="value" select="$url"/>
             <xsl:with-param name="delimiter"/>
         </xsl:call-template>

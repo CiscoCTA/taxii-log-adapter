@@ -37,6 +37,7 @@
             <xsl:with-param name="victim" select="inc:Victim/sc:Name"/>
             <xsl:with-param name="confidence" select="inc:Confidence/sc:Value"/>
             <xsl:with-param name="tool" select="inc:Information_Source/sc:Tools/cc:Tool/@idref"/>
+            <xsl:with-param name="url" select="@URL"/>
         </xsl:apply-templates>
     </xsl:template>
 
@@ -48,6 +49,7 @@
         <xsl:param name="victim"/>
         <xsl:param name="confidence"/>
         <xsl:param name="tool"/>
+        <xsl:param name="url"/>
         <xsl:apply-templates select="ind:Observable">
             <xsl:with-param name="customer" select="$customer"/>
             <xsl:with-param name="incidentId" select="$incidentId"/>
@@ -55,6 +57,7 @@
             <xsl:with-param name="victim" select="$victim"/>
             <xsl:with-param name="confidence" select="$confidence"/>
             <xsl:with-param name="tool" select="$tool"/>
+            <xsl:with-param name="url" select="$url"/>
             <xsl:with-param name="indicatorId" select="@id"/>
             <xsl:with-param name="activity" select="ind:Indicated_TTP/sc:TTP/ttp:Title"/>
             <xsl:with-param name="campaign" select="ind:Related_Campaigns/ind:Related_Campaign/sc:Campaign/@idref"/>
@@ -70,6 +73,7 @@
         <xsl:param name="victim"/>
         <xsl:param name="confidence"/>
         <xsl:param name="tool"/>
+        <xsl:param name="url"/>
         <xsl:param name="indicatorId"/>
         <xsl:param name="activity"/>
         <xsl:param name="campaign"/>
@@ -207,6 +211,16 @@
         <xsl:call-template name="property">
             <xsl:with-param name="key">sourceServiceName</xsl:with-param>
             <xsl:with-param name="value" select="$tool"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">cs3Label</xsl:with-param>
+            <xsl:with-param name="value">IncidentURL</xsl:with-param>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">cs3</xsl:with-param>
+            <xsl:with-param name="value" select="$url"/>
             <xsl:with-param name="delimiter"/>
         </xsl:call-template>
 

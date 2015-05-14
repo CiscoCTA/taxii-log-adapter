@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # This script runs the example application.
 # Usage: adapter.sh <command>

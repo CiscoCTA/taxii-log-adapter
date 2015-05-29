@@ -36,7 +36,7 @@
                     </s:Information_Source>
                 </s:STIX_Header>
                 <s:Incidents>
-                    <s:Incident xsi:type="inc:IncidentType" id="cta:incident-incident-6e89f5eb-be77-466e-89b4-44eef877526a">
+                    <s:Incident xsi:type="inc:IncidentType" id="cta:incident-incident-6e89f5eb-be77-466e-89b4-44eef877526a" URL="https://incident.url">
                         <inc:Title>incidentClass1</inc:Title>
                         <inc:Victim>
                             <sc:Name>userName1</sc:Name>

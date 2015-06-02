@@ -16,24 +16,9 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import static com.cisco.cta.taxii.adapter.PollResponseMatcher.initialPollRequest;
-import static com.cisco.cta.taxii.adapter.PollResponseMatcher.nextPollRequest;
-import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-
-import javax.xml.datatype.DatatypeFactory;
-
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -54,11 +39,20 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.cisco.cta.taxii.adapter.AdapterStatistics;
+import javax.xml.datatype.DatatypeFactory;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
+import static com.cisco.cta.taxii.adapter.PollResponseMatcher.initialPollRequest;
+import static com.cisco.cta.taxii.adapter.PollResponseMatcher.nextPollRequest;
+import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 
 @ContextConfiguration(
@@ -142,9 +136,8 @@ public class AdapterTaskIT {
         assertThat(statistics.getPolls(), is(2L));
         assertThat(statistics.getLogs(), is(2L));
         assertThat(statistics.getErrors(), is(0L));
-        assertTrue(
-                OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
-                FileUtils.contentEquals(OUTPUT_FILE, EXPECTED_OUTPUT_FILE));
+        assertThat(OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
+                FileUtils.readFileToString(OUTPUT_FILE), is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE)));
     }
 
     @Test

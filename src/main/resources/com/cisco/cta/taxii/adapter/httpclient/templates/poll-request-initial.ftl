@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<t:Poll_Request xmlns:t="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" message_id="123" collection_name="${collection}">
+<t:Poll_Request xmlns:t="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" message_id="${messageId}" collection_name="${collection}">
   <t:Poll_Parameters allow_asynch="false">
     <t:Response_Type>FULL</t:Response_Type>
   </t:Poll_Parameters>

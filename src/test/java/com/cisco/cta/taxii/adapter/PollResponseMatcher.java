@@ -17,6 +17,7 @@
 package com.cisco.cta.taxii.adapter;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -34,6 +35,7 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 public class PollResponseMatcher extends TypeSafeDiagnosingMatcher<ByteArrayOutputStream> {
 
     private static final String NS = "http://taxii.mitre.org/messages/taxii_xml_binding-1.1";
+    private static final QName MESSAGE_ID = new QName("message_id");
     private static final QName COLLECTION_NAME = new QName("collection_name");
     private static final XMLInputFactory FACTORY = XMLInputFactory.newFactory();
 
@@ -64,6 +66,7 @@ public class PollResponseMatcher extends TypeSafeDiagnosingMatcher<ByteArrayOutp
             XMLEventReader xmlReader = FACTORY.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
             StartElement pollRequest = xmlReader.nextTag().asStartElement();
             assertThat(pollRequest.getName(), is(new QName(NS, "Poll_Request")));
+            assertThat(pollRequest.getAttributeByName(MESSAGE_ID).getValue(), startsWith("tla-"));
             assertThat(pollRequest.getAttributeByName(COLLECTION_NAME).getValue(), is(collection));
             if (begin != null) {
                 assertThat(xmlReader.nextTag().asStartElement().getName(), is(new QName(NS, "Exclusive_Begin_Timestamp")));

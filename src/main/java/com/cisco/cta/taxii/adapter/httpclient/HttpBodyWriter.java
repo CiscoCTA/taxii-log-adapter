@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.UUID;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -36,6 +37,8 @@ import freemarker.template.Version;
  */
 public class HttpBodyWriter {
 
+    private static final String MESSAGE_ID_PREFIX = "tla-";
+
     private final Configuration cfg;
     private final Template template;
     private final Template templateInitial;
@@ -50,6 +53,10 @@ public class HttpBodyWriter {
         templateInitial = cfg.getTemplate("poll-request-initial.ftl");
     }
 
+    private String createMessageId() {
+        return MESSAGE_ID_PREFIX + UUID.randomUUID().toString();
+    }
+
     /**
      * Write the TAXII poll request to an {@link OutputStream}.
      * 
@@ -60,6 +67,7 @@ public class HttpBodyWriter {
     public void write(String feed, OutputStream body) throws Exception {
         try (OutputStreamWriter out = new OutputStreamWriter(body, "UTF-8")) {
             HashMap<String, Object> data = new HashMap<>();
+            data.put("messageId", createMessageId());
             data.put("collection", feed);
             XMLGregorianCalendar lastUpdate = taxiiStatusDao.getLastUpdate(feed);
             if (lastUpdate == null) {

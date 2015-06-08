@@ -30,6 +30,7 @@ import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.Version;
+import org.apache.log4j.MDC;
 
 /**
  * Writes an HTTP request body to an {@link OutputStream}.
@@ -67,7 +68,9 @@ public class HttpBodyWriter {
     public void write(String feed, OutputStream body) throws Exception {
         try (OutputStreamWriter out = new OutputStreamWriter(body, "UTF-8")) {
             HashMap<String, Object> data = new HashMap<>();
-            data.put("messageId", createMessageId());
+            String messageId = createMessageId();
+            data.put("messageId", messageId);
+            MDC.put("messageId", messageId);
             data.put("collection", feed);
             XMLGregorianCalendar lastUpdate = taxiiStatusDao.getLastUpdate(feed);
             if (lastUpdate == null) {

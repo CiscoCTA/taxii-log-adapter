@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -64,6 +65,9 @@ public class AdapterTaskTest {
     @Mock
     private Appender mockAppender;
 
+    @Mock
+    private TaxiiServiceSettings settings;
+
     @Spy
     private AdapterStatistics statistics = new AdapterStatistics();
 
@@ -71,7 +75,8 @@ public class AdapterTaskTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
-        task = new AdapterTask(requestFactory, responseHandler, ImmutableList.of("my-collection"), statistics);
+       when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
+        task = new AdapterTask(requestFactory, responseHandler, settings, statistics);
         when(requestFactory.create("my-collection")).thenReturn(request);
     }
 

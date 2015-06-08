@@ -18,8 +18,11 @@ package com.cisco.cta.taxii.adapter;
 
 import java.util.List;
 
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+import org.apache.log4j.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 
 /**
@@ -31,13 +34,15 @@ public class AdapterTask implements Runnable {
 
     private final RequestFactory requestFactory;
     private final ResponseHandler responseHandler;
+    private String username;
     private final List<String> feeds;
     private final AdapterStatistics statistics;
 
-    public AdapterTask(RequestFactory requestFactory, ResponseHandler responseHandler, List<String> feeds, AdapterStatistics statistics) {
+    public AdapterTask(RequestFactory requestFactory, ResponseHandler responseHandler, TaxiiServiceSettings settings, AdapterStatistics statistics) {
         this.requestFactory = requestFactory;
         this.responseHandler = responseHandler;
-        this.feeds = feeds;
+        this.username = settings.getUsername();
+        this.feeds = settings.getFeeds();
         this.statistics = statistics;
     }
 
@@ -48,13 +53,21 @@ public class AdapterTask implements Runnable {
         LOG.trace("triggering task...");
         for (String feed : feeds) {
             statistics.incrementPolls();
-            try (
-                ClientHttpResponse resp = requestFactory.create(feed).execute();
-            ) {
+            ClientHttpResponse resp = null;
+            try {
+                MDC.put("username", username);
+                ClientHttpRequest request = requestFactory.create(feed);
+                resp = request.execute();
                 responseHandler.handle(feed, resp);
             } catch (Exception e) {
                 statistics.incrementErrors();
                 LOG.error("Error while processing feed " + feed, e);
+            }
+            finally {
+                if (resp != null) {
+                    resp.close();
+                }
+                MDC.clear();
             }
         }
     }

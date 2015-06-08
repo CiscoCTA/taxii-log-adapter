@@ -84,8 +84,6 @@ public class ResponseHandler {
                 if (responseReader.isPollResponse()) {
                     taxiiStatusDao.update(feed, lastUpdate(responseReader));
                 }
-            } finally {
-                MDC.clear();
             }
         } else {
             throw new IOException("HTTP response status " + resp.getRawStatusCode() + ":" + resp.getStatusText());

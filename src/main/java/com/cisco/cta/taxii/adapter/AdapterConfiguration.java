@@ -69,7 +69,7 @@ public class AdapterConfiguration {
         return new AdapterTask(
             requestFactory,
             responseHandler(),
-            taxiiServiceSettings.getFeeds(),
+            taxiiServiceSettings,
             statistics());
     }
 

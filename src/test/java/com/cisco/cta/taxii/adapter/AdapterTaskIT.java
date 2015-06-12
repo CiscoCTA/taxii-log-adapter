@@ -160,7 +160,7 @@ public class AdapterTaskIT {
         verify(httpRequestFactory).createRequest(pollServiceUri, HttpMethod.POST);
         verify(httpReq).execute();
         assertThat(httpReqHeaders, hasAllTaxiiHeaders());
-        assertThat(httpReqBody, is(initialPollRequest("collection_name")));
+        assertThat(httpReqBody, is(initialPollRequest("123", "collection_name")));
         httpReqBody.reset();
     }
 
@@ -171,7 +171,7 @@ public class AdapterTaskIT {
         verify(httpRequestFactory, times(count)).createRequest(pollServiceUri, HttpMethod.POST);
         verify(httpReq, times(count)).execute();
         assertThat(httpReqHeaders, hasAllTaxiiHeaders());
-        assertThat(httpReqBody, is(nextPollRequest(
+        assertThat(httpReqBody, is(nextPollRequest("123",
                 "collection_name",
                 "2000-12-24T01:02:03.004+01:00")));
         httpReqBody.reset();
@@ -184,7 +184,7 @@ public class AdapterTaskIT {
         verify(httpRequestFactory, times(count)).createRequest(pollServiceUri, HttpMethod.POST);
         verify(httpReq, times(count)).execute();
         assertThat(httpReqHeaders, hasAllTaxiiHeaders());
-        assertThat(httpReqBody, is(nextPollRequest(
+        assertThat(httpReqBody, is(nextPollRequest("123",
                 "collection_name",
                 "2000-12-24T01:02:03.004+01:00")));
         httpReqBody.reset();

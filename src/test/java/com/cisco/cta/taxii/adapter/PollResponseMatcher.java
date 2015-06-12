@@ -39,18 +39,20 @@ public class PollResponseMatcher extends TypeSafeDiagnosingMatcher<ByteArrayOutp
     private static final QName COLLECTION_NAME = new QName("collection_name");
     private static final XMLInputFactory FACTORY = XMLInputFactory.newFactory();
 
+    private final String messageId;
     private final String collection;
     private final String begin;
     
-    public static PollResponseMatcher initialPollRequest(String collection) {
-        return new PollResponseMatcher(collection, null);
+    public static PollResponseMatcher initialPollRequest(String messageId, String collection) {
+        return new PollResponseMatcher(messageId, collection, null);
     }
 
-    public static PollResponseMatcher nextPollRequest(String collection, String begin) {
-        return new PollResponseMatcher(collection, begin);
+    public static PollResponseMatcher nextPollRequest(String messageId, String collection, String begin) {
+        return new PollResponseMatcher(messageId, collection, begin);
     }
 
-    public PollResponseMatcher(String collection, String begin) {
+    public PollResponseMatcher(String messageId, String collection, String begin) {
+        this.messageId = messageId;
         this.collection = collection;
         this.begin = begin;
     }

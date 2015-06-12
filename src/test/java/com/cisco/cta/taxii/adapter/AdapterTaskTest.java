@@ -19,6 +19,7 @@ package com.cisco.cta.taxii.adapter;
 import static com.cisco.cta.taxii.adapter.IsEventContaining.verifyLog;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -77,14 +78,14 @@ public class AdapterTaskTest {
         ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
        when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
         task = new AdapterTask(requestFactory, responseHandler, settings, statistics);
-        when(requestFactory.create("my-collection")).thenReturn(request);
+        when(requestFactory.create(anyString(), anyString())).thenReturn(request);
     }
 
     @Test
     public void triggerRequestResponse() throws Exception {
         when(request.execute()).thenReturn(response);
         task.run();
-        verify(requestFactory).create("my-collection");
+        verify(requestFactory).create(anyString(), anyString());
         verify(request).execute();
         verify(responseHandler).handle("my-collection", response);
         assertThat(statistics.getPolls(), is(1L));
@@ -95,7 +96,7 @@ public class AdapterTaskTest {
     public void handleCommunicationError() throws Exception {
         when(request.execute()).thenThrow(IOException.class);
         task.run();
-        verify(requestFactory).create("my-collection");
+        verify(requestFactory).create(anyString(), anyString());
         verify(request).execute();
         verifyZeroInteractions(responseHandler);
         verifyLog(mockAppender, "Error");
@@ -108,8 +109,8 @@ public class AdapterTaskTest {
         when(request.execute()).thenReturn(response);
         doThrow(new Exception("Dummy response")).when(responseHandler).handle("my-collection", response);
         task.run();
-        verify(requestFactory).create("my-collection");
-        verify(request).execute();
+        verify(requestFactory).create(anyString(), anyString());
+                verify(request).execute();
         verifyLog(mockAppender, "Error");
         assertThat(statistics.getPolls(), is(1L));
         assertThat(statistics.getErrors(), is(1L));

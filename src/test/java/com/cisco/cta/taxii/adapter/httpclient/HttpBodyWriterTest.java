@@ -55,8 +55,8 @@ public class HttpBodyWriterTest {
     @Test
     public void writeInitialPollRequest() throws Exception {
         when(taxiiStatusDao.getLastUpdate("my-feed")).thenReturn(null);
-        writer.write("my-feed", out);
-        assertThat(out, is(initialPollRequest("my-feed")));
+        writer.write("tla-123", "my-feed", out);
+        assertThat(out, is(initialPollRequest("tla-123", "my-feed")));
         verify(out).close();
     }
 
@@ -64,8 +64,8 @@ public class HttpBodyWriterTest {
     public void writeNextPollRequest() throws Exception {
         when(calendar.toXMLFormat()).thenReturn("2015-01-01T00:00:00");
         when(taxiiStatusDao.getLastUpdate("my-feed")).thenReturn(calendar);
-        writer.write("my-feed", out);
-        assertThat(out, is(nextPollRequest("my-feed", "2015-01-01T00:00:00")));
+        writer.write("tla-123", "my-feed", out);
+        assertThat(out, is(nextPollRequest("tla-123", "my-feed", "2015-01-01T00:00:00")));
         verify(out).close();
     }
 

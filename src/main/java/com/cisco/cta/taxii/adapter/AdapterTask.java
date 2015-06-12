@@ -17,6 +17,7 @@
 package com.cisco.cta.taxii.adapter;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import org.apache.log4j.MDC;
@@ -29,8 +30,9 @@ import org.springframework.http.client.ClientHttpResponse;
  * Wraps everything what has to be triggered by a scheduler.
  */
 public class AdapterTask implements Runnable {
-
     private static final Logger LOG = LoggerFactory.getLogger(AdapterTask.class);
+
+    private static final String MESSAGE_ID_PREFIX = "tla-";
 
     private final RequestFactory requestFactory;
     private final ResponseHandler responseHandler;
@@ -46,6 +48,10 @@ public class AdapterTask implements Runnable {
         this.statistics = statistics;
     }
 
+    private String createMessageId() {
+        return MESSAGE_ID_PREFIX + UUID.randomUUID().toString();
+    }
+
     /**
      * Invoked by the scheduler.
      */
@@ -55,8 +61,9 @@ public class AdapterTask implements Runnable {
             statistics.incrementPolls();
             ClientHttpResponse resp = null;
             try {
-                MDC.put("username", username);
-                ClientHttpRequest request = requestFactory.create(feed);
+                String messageId = createMessageId();
+                MDC.put("messageId", messageId);
+                ClientHttpRequest request = requestFactory.create(messageId, feed);
                 resp = request.execute();
                 responseHandler.handle(feed, resp);
             } catch (Exception e) {

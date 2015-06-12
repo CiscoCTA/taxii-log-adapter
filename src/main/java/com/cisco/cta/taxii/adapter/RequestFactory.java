@@ -55,10 +55,10 @@ public class RequestFactory {
      * @return TAXII poll request.
      * @throws Exception When any error occurs.
      */
-    public ClientHttpRequest create(String feed) throws Exception {
+    public ClientHttpRequest create(String messageId, String feed) throws Exception {
         ClientHttpRequest req = httpRequestFactory.createRequest(pollEndpoint, HttpMethod.POST);
         httpHeadersAppender.appendTo(req.getHeaders());
-        httpBodyWriter.write(feed, req.getBody());
+        httpBodyWriter.write(messageId, feed, req.getBody());
         return req;
     }
 

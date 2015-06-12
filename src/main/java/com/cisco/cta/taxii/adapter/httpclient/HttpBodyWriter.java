@@ -38,8 +38,6 @@ import org.apache.log4j.MDC;
  */
 public class HttpBodyWriter {
 
-    private static final String MESSAGE_ID_PREFIX = "tla-";
-
     private final Configuration cfg;
     private final Template template;
     private final Template templateInitial;
@@ -54,10 +52,6 @@ public class HttpBodyWriter {
         templateInitial = cfg.getTemplate("poll-request-initial.ftl");
     }
 
-    private String createMessageId() {
-        return MESSAGE_ID_PREFIX + UUID.randomUUID().toString();
-    }
-
     /**
      * Write the TAXII poll request to an {@link OutputStream}.
      * 
@@ -65,12 +59,10 @@ public class HttpBodyWriter {
      * @param body The {@link OutputStream} to write the body to.
      * @throws Exception When any error occurs.
      */
-    public void write(String feed, OutputStream body) throws Exception {
+    public void write(String messageId, String feed, OutputStream body) throws Exception {
         try (OutputStreamWriter out = new OutputStreamWriter(body, "UTF-8")) {
             HashMap<String, Object> data = new HashMap<>();
-            String messageId = createMessageId();
             data.put("messageId", messageId);
-            MDC.put("messageId", messageId);
             data.put("collection", feed);
             XMLGregorianCalendar lastUpdate = taxiiStatusDao.getLastUpdate(feed);
             if (lastUpdate == null) {

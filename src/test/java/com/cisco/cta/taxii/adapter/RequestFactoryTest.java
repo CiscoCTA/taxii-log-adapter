@@ -79,8 +79,8 @@ public class RequestFactoryTest {
 
     @Test
     public void createRequest() throws Exception {
-        request = requestFactory.create("my-collection");
+        request = requestFactory.create("123", "my-collection");
         assertThat(headers, hasAllTaxiiHeaders());
-        verify(bodyWriter).write("my-collection", body);
+        verify(bodyWriter).write("123", "my-collection", body);
     }
 }

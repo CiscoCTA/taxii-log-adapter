@@ -36,14 +36,12 @@ public class AdapterTask implements Runnable {
 
     private final RequestFactory requestFactory;
     private final ResponseHandler responseHandler;
-    private String username;
     private final List<String> feeds;
     private final AdapterStatistics statistics;
 
     public AdapterTask(RequestFactory requestFactory, ResponseHandler responseHandler, TaxiiServiceSettings settings, AdapterStatistics statistics) {
         this.requestFactory = requestFactory;
         this.responseHandler = responseHandler;
-        this.username = settings.getUsername();
         this.feeds = settings.getFeeds();
         this.statistics = statistics;
     }

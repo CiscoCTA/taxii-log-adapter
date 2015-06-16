@@ -35,6 +35,7 @@
             <xsl:with-param name="incidentId" select="@id"/>
             <xsl:with-param name="incidentTitle" select="inc:Title"/>
             <xsl:with-param name="victim" select="inc:Victim/sc:Name"/>
+            <xsl:with-param name="risk" select="inc:Intended_Effect[sc:Description='Risk']/sc:Value"/>
             <xsl:with-param name="confidence" select="inc:Confidence/sc:Value"/>
             <xsl:with-param name="tool" select="inc:Information_Source/sc:Tools/cc:Tool/@idref"/>
             <xsl:with-param name="url" select="@URL"/>
@@ -47,6 +48,7 @@
         <xsl:param name="incidentId"/>
         <xsl:param name="incidentTitle"/>
         <xsl:param name="victim"/>
+        <xsl:param name="risk"/>
         <xsl:param name="confidence"/>
         <xsl:param name="tool"/>
         <xsl:param name="url"/>
@@ -55,6 +57,7 @@
             <xsl:with-param name="incidentId" select="$incidentId"/>
             <xsl:with-param name="incidentTitle" select="$incidentTitle"/>
             <xsl:with-param name="victim" select="$victim"/>
+            <xsl:with-param name="risk" select="$risk"/>
             <xsl:with-param name="confidence" select="$confidence"/>
             <xsl:with-param name="tool" select="$tool"/>
             <xsl:with-param name="url" select="$url"/>
@@ -71,6 +74,7 @@
         <xsl:param name="incidentId"/>
         <xsl:param name="incidentTitle"/>
         <xsl:param name="victim"/>
+        <xsl:param name="risk"/>
         <xsl:param name="confidence"/>
         <xsl:param name="tool"/>
         <xsl:param name="url"/>
@@ -105,6 +109,11 @@
         <xsl:call-template name="property">
             <xsl:with-param name="key">victim</xsl:with-param>
             <xsl:with-param name="value" select="$victim"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">risk</xsl:with-param>
+            <xsl:with-param name="value" select="$risk"/>
         </xsl:call-template>
 
         <xsl:call-template name="property">

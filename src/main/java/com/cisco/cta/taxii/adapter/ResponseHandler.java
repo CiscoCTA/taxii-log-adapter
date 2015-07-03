@@ -16,12 +16,12 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import static java.net.HttpURLConnection.HTTP_OK;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Writer;
-import java.util.GregorianCalendar;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
+import org.apache.log4j.MDC;
+import org.springframework.http.client.ClientHttpResponse;
+import org.threeten.bp.Clock;
+import org.threeten.bp.DateTimeUtils;
+import org.threeten.bp.ZoneId;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -29,20 +29,17 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Writer;
+import java.util.GregorianCalendar;
 
-import org.apache.log4j.MDC;
-import org.springframework.http.client.ClientHttpResponse;
-import org.threeten.bp.Clock;
-import org.threeten.bp.DateTimeUtils;
-import org.threeten.bp.ZoneId;
-
-import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
+import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
  * Handles TAXII responses.
  */
 public class ResponseHandler {
-    
     private final Templates templates;
     private final Writer logWriter;
     private final TaxiiStatusDao taxiiStatusDao;
@@ -74,7 +71,7 @@ public class ResponseHandler {
      * @param resp The TAXII poll response.
      * @throws Exception When any error occurs.
      */
-    public void handle(String feed, ClientHttpResponse resp) throws Exception {
+    public TaxiiPollResponse handle(String feed, ClientHttpResponse resp) throws Exception {
         if (resp.getRawStatusCode() == HTTP_OK) {
             MDC.put("feed", feed);
             try (InputStream body = resp.getBody()) {
@@ -83,6 +80,15 @@ public class ResponseHandler {
                 transformer.transform(new StAXSource(responseReader), new StreamResult(logWriter));
                 if (responseReader.isPollResponse()) {
                     taxiiStatusDao.update(feed, lastUpdate(responseReader));
+                }
+                if (responseReader.isMore() != null && responseReader.getResultId() != null && responseReader.getResultPartNumber() != null) {
+                    return TaxiiPollResponse.builder()
+                            .more(responseReader.isMore())
+                            .resultId(responseReader.getResultId())
+                            .resultPartNumber(responseReader.getResultPartNumber())
+                            .build();
+                } else {
+                    return null;
                 }
             }
         } else {

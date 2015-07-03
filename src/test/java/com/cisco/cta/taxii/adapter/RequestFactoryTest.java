@@ -78,9 +78,17 @@ public class RequestFactoryTest {
     }
 
     @Test
-    public void createRequest() throws Exception {
-        request = requestFactory.create("123", "my-collection");
+    public void createInitialRequest() throws Exception {
+        request = requestFactory.createInitialRequest("123", "my-collection");
         assertThat(headers, hasAllTaxiiHeaders());
         verify(bodyWriter).write("123", "my-collection", body);
     }
+
+    @Test
+    public void createFulfillmentRequest() throws Exception {
+        request = requestFactory.createFulfillmentRequest("123", "my-collection", "1000#2000", 1);
+        assertThat(headers, hasAllTaxiiHeaders());
+        verify(bodyWriter).write("123", "my-collection", "1000#2000", 1, body);
+    }
+
 }

@@ -41,6 +41,7 @@ public class HttpBodyWriter {
     private final Configuration cfg;
     private final Template template;
     private final Template templateInitial;
+    private final Template templateFulfillment;
     private final TaxiiStatusDao taxiiStatusDao;
 
     public HttpBodyWriter(TaxiiStatusDao taxiiStatusDao) throws IOException {
@@ -50,6 +51,7 @@ public class HttpBodyWriter {
         cfg.setTemplateLoader(new ClassTemplateLoader(HttpBodyWriter.class, "templates"));
         template = cfg.getTemplate("poll-request.ftl");
         templateInitial = cfg.getTemplate("poll-request-initial.ftl");
+        templateFulfillment = cfg.getTemplate("poll-fulfillment-request.ftl");
     }
 
     /**
@@ -71,6 +73,26 @@ public class HttpBodyWriter {
                 data.put("begin", lastUpdate.toXMLFormat());
                 template.process(data, out);
             }
+        }
+    }
+
+    /**
+     * Write the TAXII poll fulfillment request to an {@link OutputStream}.
+     *
+     * @param feed The TAXII feed name.
+     * @param resultId result id.
+     * @param resultPartNumber result part number.
+     * @param body The {@link OutputStream} to write the body to.
+     * @throws Exception When any error occurs.
+     */
+    public void write(String messageId, String feed, String resultId, Integer resultPartNumber, OutputStream body) throws Exception {
+        try (OutputStreamWriter out = new OutputStreamWriter(body, "UTF-8")) {
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("messageId", messageId);
+            data.put("collection", feed);
+            data.put("resultId", resultId);
+            data.put("resultPartNumber", resultPartNumber);
+            templateFulfillment.process(data, out);
         }
     }
 

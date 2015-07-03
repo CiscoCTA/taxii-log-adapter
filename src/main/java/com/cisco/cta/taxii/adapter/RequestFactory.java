@@ -55,10 +55,24 @@ public class RequestFactory {
      * @return TAXII poll request.
      * @throws Exception When any error occurs.
      */
-    public ClientHttpRequest create(String messageId, String feed) throws Exception {
+    public ClientHttpRequest createInitialRequest(String messageId, String feed) throws Exception {
         ClientHttpRequest req = httpRequestFactory.createRequest(pollEndpoint, HttpMethod.POST);
         httpHeadersAppender.appendTo(req.getHeaders());
         httpBodyWriter.write(messageId, feed, req.getBody());
+        return req;
+    }
+
+    /**
+     * Create the TAXII request.
+     *
+     * @param feed The TAXII feed name.
+     * @return TAXII poll request.
+     * @throws Exception When any error occurs.
+     */
+    public ClientHttpRequest createFulfillmentRequest(String messageId, String feed, String resultId, Integer resultPartNumber) throws Exception {
+        ClientHttpRequest req = httpRequestFactory.createRequest(pollEndpoint, HttpMethod.POST);
+        httpHeadersAppender.appendTo(req.getHeaders());
+        httpBodyWriter.write(messageId, feed, resultId, resultPartNumber, req.getBody());
         return req;
     }
 

@@ -58,22 +58,34 @@ public class AdapterTask implements Runnable {
         for (String feed : feeds) {
             statistics.incrementPolls();
             ClientHttpResponse resp = null;
-            try {
-                String messageId = createMessageId();
-                MDC.put("messageId", messageId);
-                ClientHttpRequest request = requestFactory.create(messageId, feed);
-                resp = request.execute();
-                responseHandler.handle(feed, resp);
-            } catch (Exception e) {
-                statistics.incrementErrors();
-                LOG.error("Error while processing feed " + feed, e);
-            }
-            finally {
-                if (resp != null) {
-                    resp.close();
+            TaxiiPollResponse response = null;
+            do {
+                try {
+                    String messageId = createMessageId();
+                    MDC.put("messageId", messageId);
+                    ClientHttpRequest request;
+                    if (response == null) {
+                        LOG.trace("creating initial taxii request...");
+                        request = requestFactory.createInitialRequest(messageId, feed);
+                    } else {
+                        LOG.trace("creating fulfillment taxii request - {}", response.getResultPartNumber() + 1);
+                        request = requestFactory.createFulfillmentRequest(messageId, feed, response.getResultId(), response.getResultPartNumber() + 1);
+                    }
+                    resp = request.execute();
+                    response = responseHandler.handle(feed, resp);
+
+                } catch (Exception e) {
+                    statistics.incrementErrors();
+                    LOG.error("Error while processing feed " + feed, e);
+                    break;
+
+                } finally{
+                    MDC.clear();
+                    if (resp != null) {
+                        resp.close();
+                    }
                 }
-                MDC.clear();
-            }
+            }while(response != null && response.isMore());
         }
     }
 }

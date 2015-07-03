@@ -30,28 +30,67 @@ import javax.xml.stream.util.StreamReaderDelegate;
  */
 public class TaxiiPollResponseReader extends StreamReaderDelegate {
 
+    private static final String TAXII_NAMESPACE_URI = "http://taxii.mitre.org/messages/taxii_xml_binding-1.1";
+
+    private static final String MORE_ATTRIBUTE = "more";
+
+    private static final String RESULT_ID_ATTRIBUTE = "result_id";
+
+    private static final String RESULT_PART_NUMBER_ATTRIBUTE = "result_part_number";
+
     private static final QName POLL_RESPONSE = new QName(
-            "http://taxii.mitre.org/messages/taxii_xml_binding-1.1",
+            TAXII_NAMESPACE_URI,
             "Poll_Response");
 
     private static final QName INCLUSIVE_END_TIMESTAMP = new QName(
-            "http://taxii.mitre.org/messages/taxii_xml_binding-1.1",
+            TAXII_NAMESPACE_URI,
             "Inclusive_End_Timestamp");
 
     private static final QName CONTENT_BLOCK = new QName(
-            "http://taxii.mitre.org/messages/taxii_xml_binding-1.1",
+            TAXII_NAMESPACE_URI,
             "Content_Block");
 
     private final DatatypeFactory datatypeFactory;
 
+    private Boolean more;
+    private String resultId;
+    private Integer resultPartNumber;
+
     private XMLGregorianCalendar inclusiveEndTime = null;
     private State state = State.ROOT;
 
-    private static enum State {ROOT, BEFORE_TIMESTAMP, TIMESTAMP, AFTER_TIMESTAMP, CONTENT, NOT_POLL_RESPONSE}
+    private enum State {ROOT, BEFORE_TIMESTAMP, TIMESTAMP, AFTER_TIMESTAMP, CONTENT, NOT_POLL_RESPONSE}
     
     public TaxiiPollResponseReader(XMLStreamReader xmlReader, DatatypeFactory datatypeFactory) {
         super(xmlReader);
         this.datatypeFactory = datatypeFactory;
+    }
+
+    /**
+     * This must be invoked after all events were read.
+     *
+     * @return more attribute parsed from the TAXII Poll_Response element.
+     */
+    public Boolean isMore() {
+        return more;
+    }
+
+    /**
+     * This must be invoked after all events were read.
+     *
+     * @return result_id attribute parsed from the TAXII Poll_Response element.
+     */
+    public String getResultId() {
+        return resultId;
+    }
+
+    /**
+     * This must be invoked after all events were read.
+     *
+     * @return result_part_numbner attribute parsed from the TAXII Poll_Response element.
+     */
+    public Integer getResultPartNumber() {
+        return resultPartNumber;
     }
 
     /**
@@ -80,6 +119,9 @@ public class TaxiiPollResponseReader extends StreamReaderDelegate {
             if (isStartElement()) {
                 if (getName().equals(POLL_RESPONSE)) {
                     state = State.BEFORE_TIMESTAMP;
+                    more = getAttributeValue(TAXII_NAMESPACE_URI, MORE_ATTRIBUTE) != null ? Boolean.valueOf(getAttributeValue(TAXII_NAMESPACE_URI, MORE_ATTRIBUTE)) : null;
+                    resultId = getAttributeValue(TAXII_NAMESPACE_URI, RESULT_ID_ATTRIBUTE) != null ? getAttributeValue(TAXII_NAMESPACE_URI, RESULT_ID_ATTRIBUTE) : null;
+                    resultPartNumber = getAttributeValue(TAXII_NAMESPACE_URI, RESULT_PART_NUMBER_ATTRIBUTE) != null ? Integer.valueOf(getAttributeValue(TAXII_NAMESPACE_URI, RESULT_PART_NUMBER_ATTRIBUTE)) : null;
                 } else {
                     state = State.NOT_POLL_RESPONSE;
                 }

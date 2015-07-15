@@ -16,16 +16,12 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import java.io.Writer;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.transform.Templates;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.stream.StreamSource;
-
+import com.cisco.cta.taxii.adapter.httpclient.HttpClientConfiguration;
+import com.cisco.cta.taxii.adapter.persistence.PersistenceConfiguration;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
+import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+import com.cisco.cta.taxii.adapter.settings.TransformSettings;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.slf4j.LoggerFactory;
@@ -37,12 +33,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jmx.support.RegistrationPolicy;
 import org.threeten.bp.Clock;
 
-import com.cisco.cta.taxii.adapter.httpclient.HttpClientConfiguration;
-import com.cisco.cta.taxii.adapter.persistence.PersistenceConfiguration;
-import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
-import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
-import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
-import com.cisco.cta.taxii.adapter.settings.TransformSettings;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamSource;
+import java.io.Writer;
 
 /**
  * Spring configuration providing factory methods for core beans.
@@ -70,7 +68,10 @@ public class AdapterConfiguration {
             requestFactory,
             responseHandler(),
             taxiiServiceSettings,
-            statistics());
+            statistics(),
+            taxiiStatusDao,
+            datatypeFactory(),
+            clock());
     }
 
     @Bean
@@ -90,10 +91,7 @@ public class AdapterConfiguration {
         return new ResponseHandler(
                 templates(),
                 logWriter(),
-                taxiiStatusDao,
-                taxiiPollResponseReaderFactory(),
-                datatypeFactory(),
-                clock());
+                taxiiPollResponseReaderFactory());
     }
 
     @Bean

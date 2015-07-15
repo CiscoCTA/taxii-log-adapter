@@ -19,10 +19,14 @@ package com.cisco.cta.taxii.adapter;
 import lombok.Builder;
 import lombok.Value;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 @Value
 @Builder
 public class TaxiiPollResponse {
+    private boolean multipart;
     private boolean more;
     private String resultId;
     private int resultPartNumber;
+    private XMLGregorianCalendar inclusiveEndTime;
 }

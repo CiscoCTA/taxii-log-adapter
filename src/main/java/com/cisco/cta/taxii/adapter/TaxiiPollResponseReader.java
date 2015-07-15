@@ -16,6 +16,9 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
@@ -29,6 +32,7 @@ import javax.xml.stream.util.StreamReaderDelegate;
  * providing the same data to its client (e.g. XSL transformation).
  */
 public class TaxiiPollResponseReader extends StreamReaderDelegate {
+    private static final Logger LOG = LoggerFactory.getLogger(TaxiiPollResponseReader.class);
 
     private static final String TAXII_NAMESPACE_URI = "http://taxii.mitre.org/messages/taxii_xml_binding-1.1";
 
@@ -119,9 +123,9 @@ public class TaxiiPollResponseReader extends StreamReaderDelegate {
             if (isStartElement()) {
                 if (getName().equals(POLL_RESPONSE)) {
                     state = State.BEFORE_TIMESTAMP;
-                    more = getAttributeValue(TAXII_NAMESPACE_URI, MORE_ATTRIBUTE) != null ? Boolean.valueOf(getAttributeValue(TAXII_NAMESPACE_URI, MORE_ATTRIBUTE)) : null;
-                    resultId = getAttributeValue(TAXII_NAMESPACE_URI, RESULT_ID_ATTRIBUTE) != null ? getAttributeValue(TAXII_NAMESPACE_URI, RESULT_ID_ATTRIBUTE) : null;
-                    resultPartNumber = getAttributeValue(TAXII_NAMESPACE_URI, RESULT_PART_NUMBER_ATTRIBUTE) != null ? Integer.valueOf(getAttributeValue(TAXII_NAMESPACE_URI, RESULT_PART_NUMBER_ATTRIBUTE)) : null;
+                    more = getAttributeValue("", MORE_ATTRIBUTE) != null ? Boolean.valueOf(getAttributeValue("", MORE_ATTRIBUTE)) : null;
+                    resultId = getAttributeValue("", RESULT_ID_ATTRIBUTE) != null ? getAttributeValue("", RESULT_ID_ATTRIBUTE) : null;
+                    resultPartNumber = getAttributeValue("", RESULT_PART_NUMBER_ATTRIBUTE) != null ? Integer.valueOf(getAttributeValue("", RESULT_PART_NUMBER_ATTRIBUTE)) : null;
                 } else {
                     state = State.NOT_POLL_RESPONSE;
                 }

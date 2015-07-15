@@ -1,19 +1,3 @@
-/*
-   Copyright 2015 Cisco Systems
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-
 package com.cisco.cta.taxii.adapter;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -34,62 +18,59 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.oxm.Unmarshaller;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.xml.datatype.DatatypeFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
+import static com.cisco.cta.taxii.adapter.PollFulfillmentMatcher.pollFulfillment;
 import static com.cisco.cta.taxii.adapter.PollRequestMatcher.initialPollRequest;
-import static com.cisco.cta.taxii.adapter.PollRequestMatcher.nextPollRequest;
 import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ContextConfiguration(
-    classes = MockAdapterConfiguration.class,
-    initializers = {ConfigFileApplicationContextInitializer.class, StatusFileContextInitializer.class})
+        classes = MockAdapterConfiguration.class,
+        initializers = {ConfigFileApplicationContextInitializer.class, StatusFileContextInitializer.class})
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class AdapterTaskIT {
+public class AdapterTaskMultipartIT {
+
 
     private static final File OUTPUT_FILE = new File("target/output.json");
     private static final File EXPECTED_OUTPUT_FILE = new File("src/test/resources/expected-output.json");
 
     @Autowired
     private Runnable task;
-    
+
     @Autowired
     private ClientHttpRequestFactory httpRequestFactory;
 
     @Mock
     private ClientHttpRequest httpReq;
+    @Mock
+    private ClientHttpRequest httpReq2;
 
     private URI pollServiceUri;
     private HttpHeaders httpReqHeaders;
     private ByteArrayOutputStream httpReqBody;
+    private ByteArrayOutputStream httpReq2Body;
 
     @Mock
     private ClientHttpResponse httpResp;
+    @Mock
+    private ClientHttpResponse httpResp2;
 
-    @Autowired
-    private Unmarshaller taxiiRequestMarshaller;
-    
     private InputStream taxiiPollRespBodyInitial;
     private InputStream taxiiPollRespBodyNext;
-    private InputStream taxiiStatusMsgBody;
-
-    @Autowired
-    private DatatypeFactory datatypeFactory;
 
     @Autowired
     private AdapterStatistics statistics;
@@ -99,18 +80,23 @@ public class AdapterTaskIT {
         initLogbackOutput();
         MockitoAnnotations.initMocks(this);
         pollServiceUri = new URI("https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/");
-        when(httpRequestFactory.createRequest(pollServiceUri, HttpMethod.POST)).thenReturn(httpReq);
+        when(httpRequestFactory.createRequest(pollServiceUri, HttpMethod.POST)).thenReturn(httpReq, httpReq2);
         httpReqHeaders = new HttpHeaders();
+
         when(httpReq.getHeaders()).thenReturn(httpReqHeaders);
         httpReqBody = new ByteArrayOutputStream();
         when(httpReq.getBody()).thenReturn(httpReqBody);
         when(httpReq.execute()).thenReturn(httpResp);
-        taxiiPollRespBodyInitial = AdapterTaskIT.class.getResourceAsStream(
-                "/taxii-poll-response-body-initial.xml");
-        taxiiPollRespBodyNext = AdapterTaskIT.class.getResourceAsStream(
-                "/taxii-poll-response-body-next.xml");
-        taxiiStatusMsgBody = AdapterTaskIT.class.getResourceAsStream(
-                "/taxii-status-message-body.xml");
+
+        when(httpReq2.getHeaders()).thenReturn(httpReqHeaders);
+        httpReq2Body = new ByteArrayOutputStream();
+        when(httpReq2.getBody()).thenReturn(httpReq2Body);
+        when(httpReq2.execute()).thenReturn(httpResp2);
+
+        taxiiPollRespBodyInitial = AdapterTaskMultipartIT.class.getResourceAsStream(
+                "/taxii-poll-response-mp-body-initial.xml");
+        taxiiPollRespBodyNext = AdapterTaskMultipartIT.class.getResourceAsStream(
+                "/taxii-poll-response-mp-body-next.xml");
     }
 
     private void initLogbackOutput() throws JoranException {
@@ -126,13 +112,11 @@ public class AdapterTaskIT {
     public void tearDown() throws Exception {
         taxiiPollRespBodyInitial.close();
         taxiiPollRespBodyNext.close();
-        taxiiStatusMsgBody.close();
     }
 
     @Test
     public void runFromEpochBegin() throws Exception {
-        initialRequestResponse();
-        nextRequestResponse(2);
+        initialMultipartRequestResponse();
         assertThat(statistics.getPolls(), is(2L));
         assertThat(statistics.getLogs(), is(2L));
         assertThat(statistics.getErrors(), is(0L));
@@ -140,53 +124,18 @@ public class AdapterTaskIT {
                 FileUtils.readFileToString(OUTPUT_FILE), is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE)));
     }
 
-    @Test
-    public void handleStatusMessage() throws Exception {
-        initialRequestResponse();
-        requestStatusMessage(2);
-        nextRequestResponse(3);
-        assertThat(statistics.getPolls(), is(3L));
-        assertThat(statistics.getLogs(), is(2L));
-        assertThat(statistics.getErrors(), is(0L));
-        assertTrue(
-                OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
-                FileUtils.contentEquals(OUTPUT_FILE, EXPECTED_OUTPUT_FILE));
-    }
-
-    private void initialRequestResponse() throws IOException {
+    private void initialMultipartRequestResponse() throws IOException {
         when(httpResp.getRawStatusCode()).thenReturn(200);
         when(httpResp.getBody()).thenReturn(taxiiPollRespBodyInitial);
+        when(httpResp2.getRawStatusCode()).thenReturn(200);
+        when(httpResp2.getBody()).thenReturn(taxiiPollRespBodyNext);
         task.run();
-        verify(httpRequestFactory).createRequest(pollServiceUri, HttpMethod.POST);
+        verify(httpRequestFactory, times(2)).createRequest(pollServiceUri, HttpMethod.POST);
+        assertThat(httpReqHeaders, hasAllTaxiiHeaders());
         verify(httpReq).execute();
-        assertThat(httpReqHeaders, hasAllTaxiiHeaders());
+        verify(httpReq2).execute();
         assertThat(httpReqBody, is(initialPollRequest("123", "collection_name")));
-        httpReqBody.reset();
-    }
-
-    private void nextRequestResponse(int count) throws IOException {
-        when(httpResp.getRawStatusCode()).thenReturn(200);
-        when(httpResp.getBody()).thenReturn(taxiiPollRespBodyNext);
-        task.run();
-        verify(httpRequestFactory, times(count)).createRequest(pollServiceUri, HttpMethod.POST);
-        verify(httpReq, times(count)).execute();
-        assertThat(httpReqHeaders, hasAllTaxiiHeaders());
-        assertThat(httpReqBody, is(nextPollRequest("123",
-                "collection_name",
-                "2000-12-24T01:02:03.004+01:00")));
-        httpReqBody.reset();
-    }
-
-    private void requestStatusMessage(int count) throws IOException {
-        when(httpResp.getRawStatusCode()).thenReturn(200);
-        when(httpResp.getBody()).thenReturn(taxiiStatusMsgBody);
-        task.run();
-        verify(httpRequestFactory, times(count)).createRequest(pollServiceUri, HttpMethod.POST);
-        verify(httpReq, times(count)).execute();
-        assertThat(httpReqHeaders, hasAllTaxiiHeaders());
-        assertThat(httpReqBody, is(nextPollRequest("123",
-                "collection_name",
-                "2000-12-24T01:02:03.004+01:00")));
+        assertThat(httpReq2Body, is(pollFulfillment("123", "collection_name", "1000#2000", "2")));
         httpReqBody.reset();
     }
 

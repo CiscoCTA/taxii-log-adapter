@@ -32,7 +32,7 @@ import javax.xml.stream.events.StartElement;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
-public class PollResponseMatcher extends TypeSafeDiagnosingMatcher<ByteArrayOutputStream> {
+public class PollRequestMatcher extends TypeSafeDiagnosingMatcher<ByteArrayOutputStream> {
 
     private static final String NS = "http://taxii.mitre.org/messages/taxii_xml_binding-1.1";
     private static final QName MESSAGE_ID = new QName("message_id");
@@ -43,15 +43,15 @@ public class PollResponseMatcher extends TypeSafeDiagnosingMatcher<ByteArrayOutp
     private final String collection;
     private final String begin;
     
-    public static PollResponseMatcher initialPollRequest(String messageId, String collection) {
-        return new PollResponseMatcher(messageId, collection, null);
+    public static PollRequestMatcher initialPollRequest(String messageId, String collection) {
+        return new PollRequestMatcher(messageId, collection, null);
     }
 
-    public static PollResponseMatcher nextPollRequest(String messageId, String collection, String begin) {
-        return new PollResponseMatcher(messageId, collection, begin);
+    public static PollRequestMatcher nextPollRequest(String messageId, String collection, String begin) {
+        return new PollRequestMatcher(messageId, collection, begin);
     }
 
-    public PollResponseMatcher(String messageId, String collection, String begin) {
+    public PollRequestMatcher(String messageId, String collection, String begin) {
         this.messageId = messageId;
         this.collection = collection;
         this.begin = begin;

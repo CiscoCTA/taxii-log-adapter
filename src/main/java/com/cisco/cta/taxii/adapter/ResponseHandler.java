@@ -16,15 +16,9 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import org.apache.log4j.MDC;
 import org.springframework.http.client.ClientHttpResponse;
-import org.threeten.bp.Clock;
-import org.threeten.bp.DateTimeUtils;
-import org.threeten.bp.ZoneId;
 
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stax.StAXSource;
@@ -32,7 +26,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
-import java.util.GregorianCalendar;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
@@ -42,25 +35,15 @@ import static java.net.HttpURLConnection.HTTP_OK;
 public class ResponseHandler {
     private final Templates templates;
     private final Writer logWriter;
-    private final TaxiiStatusDao taxiiStatusDao;
     private final TaxiiPollResponseReaderFactory readerFactory;
-    private final DatatypeFactory datatypeFactory;
-    private final Clock clock;
-
 
     public ResponseHandler(
             Templates templates,
             Writer logWriter,
-            TaxiiStatusDao taxiiStatusDao,
-            TaxiiPollResponseReaderFactory readerFactory,
-            DatatypeFactory datatypeFactory,
-            Clock clock) {
+            TaxiiPollResponseReaderFactory readerFactory) {
         this.templates = templates;
         this.logWriter = logWriter;
-        this.taxiiStatusDao = taxiiStatusDao;
         this.readerFactory = readerFactory;
-        this.datatypeFactory = datatypeFactory;
-        this.clock = clock;
     }
 
 
@@ -68,7 +51,8 @@ public class ResponseHandler {
      * Handle TAXII response.
      * 
      * @param feed The TAXII feed name, that was sent in the request.
-     * @param resp The TAXII poll response.
+     * @param resp HTTP response
+     * @return TaxiiPollResponse if valid TAXII poll response was returned, null otherwise
      * @throws Exception When any error occurs.
      */
     public TaxiiPollResponse handle(String feed, ClientHttpResponse resp) throws Exception {
@@ -79,30 +63,26 @@ public class ResponseHandler {
                 Transformer transformer = templates.newTransformer();
                 transformer.transform(new StAXSource(responseReader), new StreamResult(logWriter));
                 if (responseReader.isPollResponse()) {
-                    taxiiStatusDao.update(feed, lastUpdate(responseReader));
-                }
-                if (responseReader.isMore() != null && responseReader.getResultId() != null && responseReader.getResultPartNumber() != null) {
-                    return TaxiiPollResponse.builder()
-                            .more(responseReader.isMore())
-                            .resultId(responseReader.getResultId())
-                            .resultPartNumber(responseReader.getResultPartNumber())
-                            .build();
+                    if (responseReader.isMore() != null && responseReader.getResultId() != null && responseReader.getResultPartNumber() != null) {
+                        return TaxiiPollResponse.builder()
+                                .multipart(true)
+                                .more(responseReader.isMore())
+                                .resultId(responseReader.getResultId())
+                                .resultPartNumber(responseReader.getResultPartNumber())
+                                .inclusiveEndTime(responseReader.getInclusiveEndTime())
+                                .build();
+                    } else {
+                        return TaxiiPollResponse.builder()
+                                .multipart(false)
+                                .inclusiveEndTime(responseReader.getInclusiveEndTime())
+                                .build();
+                    }
                 } else {
                     return null;
                 }
             }
         } else {
             throw new IOException("HTTP response status " + resp.getRawStatusCode() + ":" + resp.getStatusText());
-        }
-    }
-
-
-    private XMLGregorianCalendar lastUpdate(TaxiiPollResponseReader responseReader) {
-        if (responseReader.getInclusiveEndTime() == null) {
-            GregorianCalendar gregorianCal = DateTimeUtils.toGregorianCalendar(clock.instant().atZone(ZoneId.systemDefault()));
-            return datatypeFactory.newXMLGregorianCalendar(gregorianCal);
-        } else {
-            return responseReader.getInclusiveEndTime();
         }
     }
 

@@ -16,8 +16,8 @@
 
 package com.cisco.cta.taxii.adapter.httpclient;
 
-import static com.cisco.cta.taxii.adapter.PollResponseMatcher.initialPollRequest;
-import static com.cisco.cta.taxii.adapter.PollResponseMatcher.nextPollRequest;
+import static com.cisco.cta.taxii.adapter.PollRequestMatcher.initialPollRequest;
+import static com.cisco.cta.taxii.adapter.PollRequestMatcher.nextPollRequest;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
@@ -34,7 +34,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.cisco.cta.taxii.adapter.httpclient.HttpBodyWriter;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 
 @RunWith(MockitoJUnitRunner.class)

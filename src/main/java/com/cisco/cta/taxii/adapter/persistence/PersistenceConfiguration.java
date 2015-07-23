@@ -16,6 +16,9 @@
 
 package com.cisco.cta.taxii.adapter.persistence;
 
+import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+import com.google.common.collect.ImmutableMap;
 import org.dellroad.stuff.pobj.PersistentObject;
 import org.dellroad.stuff.pobj.PersistentObjectDelegate;
 import org.dellroad.stuff.pobj.SpringDelegate;
@@ -24,10 +27,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.threeten.bp.Clock;
 
-import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
-import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
-import com.google.common.collect.ImmutableMap;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 
 /**
  * Spring configuration TAXII status persistence support.
@@ -40,8 +43,10 @@ public class PersistenceConfiguration {
     private TaxiiServiceSettings taxiiServiceSettings;
 
     @Bean
-    public TaxiiStatusDao taxiiStatusDao() {
-        return new TaxiiStatusDao(taxiiStatusPersistent());
+    public TaxiiStatusDao taxiiStatusDao() throws DatatypeConfigurationException {
+        return new TaxiiStatusDao(taxiiStatusPersistent(),
+                datatypeFactory(),
+                clock());
     }
 
     @Bean
@@ -69,6 +74,16 @@ public class PersistenceConfiguration {
         jaxb2Marshaller.setMarshallerProperties(ImmutableMap.of(
                 javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true));
         return jaxb2Marshaller;
+    }
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemDefaultZone();
+    }
+
+    @Bean
+    public DatatypeFactory datatypeFactory() throws DatatypeConfigurationException {
+        return DatatypeFactory.newInstance();
     }
 
 }

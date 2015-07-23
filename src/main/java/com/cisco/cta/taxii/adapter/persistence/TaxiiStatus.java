@@ -54,5 +54,15 @@ public class TaxiiStatus {
 
         @XmlAttribute
         private XMLGregorianCalendar lastUpdate;
+
+        @XmlAttribute
+        private Boolean more;
+
+        @XmlAttribute
+        private String resultId;
+
+        @XmlAttribute
+        private Integer resultPartNumber;
+
     }
 }

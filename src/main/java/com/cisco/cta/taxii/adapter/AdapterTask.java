@@ -23,13 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.threeten.bp.Clock;
-import org.threeten.bp.DateTimeUtils;
-import org.threeten.bp.ZoneId;
 
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,17 +41,13 @@ public class AdapterTask implements Runnable {
     private final AdapterStatistics statistics;
 
     private final TaxiiStatusDao taxiiStatusDao;
-    private final DatatypeFactory datatypeFactory;
-    private final Clock clock;
 
-    public AdapterTask(RequestFactory requestFactory, ResponseHandler responseHandler, TaxiiServiceSettings settings, AdapterStatistics statistics, TaxiiStatusDao taxiiStatusDao, DatatypeFactory datatypeFactory, Clock clock) {
+    public AdapterTask(RequestFactory requestFactory, ResponseHandler responseHandler, TaxiiServiceSettings settings, AdapterStatistics statistics, TaxiiStatusDao taxiiStatusDao) {
         this.requestFactory = requestFactory;
         this.responseHandler = responseHandler;
         this.feeds = settings.getFeeds();
         this.statistics = statistics;
         this.taxiiStatusDao = taxiiStatusDao;
-        this.datatypeFactory = datatypeFactory;
-        this.clock = clock;
     }
 
     private String createMessageId() {
@@ -83,19 +73,14 @@ public class AdapterTask implements Runnable {
         TaxiiPollResponse response = null;
         do {
             response = poll(feed, response);
+            if (response != null) {
+                taxiiStatusDao.update(feed, response);
+            }
         }while(hasPendingResultParts(response));
-
-        if (responseFullyFetched(response)) {
-            taxiiStatusDao.update(feed, lastUpdate(response.getInclusiveEndTime()));
-        }
     }
 
     private boolean hasPendingResultParts(TaxiiPollResponse response) {
         return response != null && response.isMore();
-    }
-
-    private boolean responseFullyFetched(TaxiiPollResponse response) {
-        return response != null && !(response.isMultipart() && response.isMore());
     }
 
     private TaxiiPollResponse poll(String feed, TaxiiPollResponse previousResponse) throws Exception {
@@ -116,15 +101,6 @@ public class AdapterTask implements Runnable {
             }
         } finally{
             MDC.clear();
-        }
-    }
-
-    private XMLGregorianCalendar lastUpdate(XMLGregorianCalendar inclusiveEndTimestamp) {
-        if (inclusiveEndTimestamp == null) {
-            GregorianCalendar gregorianCal = DateTimeUtils.toGregorianCalendar(clock.instant().atZone(ZoneId.systemDefault()));
-            return datatypeFactory.newXMLGregorianCalendar(gregorianCal);
-        } else {
-            return inclusiveEndTimestamp;
         }
     }
 

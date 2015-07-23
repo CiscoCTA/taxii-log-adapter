@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.context.annotation.Import;
 import org.springframework.jmx.support.RegistrationPolicy;
-import org.threeten.bp.Clock;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -62,6 +61,9 @@ public class AdapterConfiguration {
     @Autowired
     private TaxiiStatusDao taxiiStatusDao;
 
+    @Autowired
+    private DatatypeFactory datatypeFactory;
+
     @Bean
     public Runnable adapterTask() throws Exception {
         return new AdapterTask(
@@ -69,9 +71,7 @@ public class AdapterConfiguration {
             responseHandler(),
             taxiiServiceSettings,
             statistics(),
-            taxiiStatusDao,
-            datatypeFactory(),
-            clock());
+            taxiiStatusDao);
     }
 
     @Bean
@@ -96,12 +96,7 @@ public class AdapterConfiguration {
 
     @Bean
     public TaxiiPollResponseReaderFactory taxiiPollResponseReaderFactory() throws Exception {
-        return new TaxiiPollResponseReaderFactory(inputFactory(), datatypeFactory());
-    }
-
-    @Bean
-    public Clock clock() {
-        return Clock.systemDefaultZone();
+        return new TaxiiPollResponseReaderFactory(inputFactory(), datatypeFactory);
     }
 
     @Bean
@@ -112,18 +107,13 @@ public class AdapterConfiguration {
     @Bean
     public Templates templates() throws Exception {
         return transformerFactory().newTemplates(
-            new StreamSource(
-                transformSettings.getStylesheet()));
+                new StreamSource(
+                        transformSettings.getStylesheet()));
     }
 
     @Bean
     public TransformerFactory transformerFactory() throws TransformerFactoryConfigurationError {
         return TransformerFactory.newInstance();
-    }
-
-    @Bean
-    public DatatypeFactory datatypeFactory() throws DatatypeConfigurationException {
-        return DatatypeFactory.newInstance();
     }
 
     @Bean

@@ -60,21 +60,27 @@ public class AdapterTask implements Runnable {
     public void run() {
         LOG.trace("triggering task...");
         for (String feed : feeds) {
-            try {
-                downloadFeed(feed);
-            } catch (Exception e) {
-                statistics.incrementErrors();
-                LOG.error("Error while processing feed " + feed, e);
-            }
+            downloadFeed(feed);
         }
     }
 
-    private void downloadFeed(String feed) throws Exception {
+    private void downloadFeed(String feed) {
         TaxiiPollResponse response = null;
         do {
-            response = poll(feed, response);
-            if (response != null) {
-                taxiiStatusDao.update(feed, response);
+            try {
+                String messageId = createMessageId();
+                MDC.put("messageId", messageId);
+                response = poll(messageId, feed, response);
+                if (response != null) {
+                    taxiiStatusDao.update(feed, response);
+                }
+            } catch (Exception e) {
+                statistics.incrementErrors();
+                LOG.error("Error while processing feed " + feed, e);
+                return ;
+
+            } finally{
+                MDC.clear();
             }
         }while(hasPendingResultParts(response));
     }
@@ -83,25 +89,20 @@ public class AdapterTask implements Runnable {
         return response != null && response.isMore();
     }
 
-    private TaxiiPollResponse poll(String feed, TaxiiPollResponse previousResponse) throws Exception {
+    private TaxiiPollResponse poll(String messageId, String feed, TaxiiPollResponse previousResponse) throws Exception {
         statistics.incrementPolls();
-        try {
-            String messageId = createMessageId();
-            MDC.put("messageId", messageId);
-            ClientHttpRequest request;
-            if (previousResponse == null) {
-                LOG.trace("creating initial taxii request...");
-                request = requestFactory.createInitialRequest(messageId, feed);
-            } else {
-                LOG.trace("creating fulfillment taxii request - {}", previousResponse.getResultPartNumber() + 1);
-                request = requestFactory.createFulfillmentRequest(messageId, feed, previousResponse.getResultId(), previousResponse.getResultPartNumber() + 1);
-            }
-            try (ClientHttpResponse resp = request.execute()) {
-                return responseHandler.handle(feed, resp);
-            }
-        } finally{
-            MDC.clear();
+        ClientHttpRequest request;
+        if (previousResponse == null) {
+            LOG.trace("creating initial taxii request...");
+            request = requestFactory.createInitialRequest(messageId, feed);
+        } else {
+            LOG.trace("creating fulfillment taxii request - {}", previousResponse.getResultPartNumber() + 1);
+            request = requestFactory.createFulfillmentRequest(messageId, feed, previousResponse.getResultId(), previousResponse.getResultPartNumber() + 1);
         }
+        try (ClientHttpResponse resp = request.execute()) {
+            return responseHandler.handle(feed, resp);
+        }
+
     }
 
 }

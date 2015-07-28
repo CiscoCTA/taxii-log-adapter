@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.context.annotation.Import;
 import org.springframework.jmx.support.RegistrationPolicy;
+import org.threeten.bp.Clock;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -61,9 +62,6 @@ public class AdapterConfiguration {
     @Autowired
     private TaxiiStatusDao taxiiStatusDao;
 
-    @Autowired
-    private DatatypeFactory datatypeFactory;
-
     @Bean
     public Runnable adapterTask() throws Exception {
         return new AdapterTask(
@@ -71,7 +69,9 @@ public class AdapterConfiguration {
             responseHandler(),
             taxiiServiceSettings,
             statistics(),
-            taxiiStatusDao);
+            taxiiStatusDao,
+            datatypeFactory(),
+            clock());
     }
 
     @Bean
@@ -96,7 +96,7 @@ public class AdapterConfiguration {
 
     @Bean
     public TaxiiPollResponseReaderFactory taxiiPollResponseReaderFactory() throws Exception {
-        return new TaxiiPollResponseReaderFactory(inputFactory(), datatypeFactory);
+        return new TaxiiPollResponseReaderFactory(inputFactory(), datatypeFactory());
     }
 
     @Bean
@@ -119,6 +119,16 @@ public class AdapterConfiguration {
     @Bean
     public AdapterStatistics statistics() {
         return new AdapterStatistics();
+    }
+
+    @Bean
+    public DatatypeFactory datatypeFactory() throws DatatypeConfigurationException {
+        return DatatypeFactory.newInstance();
+    }
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemDefaultZone();
     }
 
 }

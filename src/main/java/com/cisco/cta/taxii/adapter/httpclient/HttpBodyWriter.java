@@ -16,21 +16,18 @@
 
 package com.cisco.cta.taxii.adapter.httpclient;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.UUID;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
-
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.Version;
-import org.apache.log4j.MDC;
+
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.HashMap;
 
 /**
  * Writes an HTTP request body to an {@link OutputStream}.
@@ -40,7 +37,6 @@ public class HttpBodyWriter {
 
     private final Configuration cfg;
     private final Template template;
-    private final Template templateInitial;
     private final Template templateFulfillment;
     private final TaxiiStatusDao taxiiStatusDao;
 
@@ -50,13 +46,12 @@ public class HttpBodyWriter {
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateLoader(new ClassTemplateLoader(HttpBodyWriter.class, "templates"));
         template = cfg.getTemplate("poll-request.ftl");
-        templateInitial = cfg.getTemplate("poll-request-initial.ftl");
         templateFulfillment = cfg.getTemplate("poll-fulfillment-request.ftl");
     }
 
     /**
      * Write the TAXII poll request to an {@link OutputStream}.
-     * 
+     *
      * @param feed The TAXII feed name.
      * @param body The {@link OutputStream} to write the body to.
      * @throws Exception When any error occurs.
@@ -66,23 +61,21 @@ public class HttpBodyWriter {
             HashMap<String, Object> data = new HashMap<>();
             data.put("messageId", messageId);
             data.put("collection", feed);
-            XMLGregorianCalendar lastUpdate = taxiiStatusDao.getLastUpdate(feed);
-            if (lastUpdate == null) {
-                templateInitial.process(data , out);
-            } else {
+            XMLGregorianCalendar lastUpdate = getLastUpdate(feed);
+            if (lastUpdate != null) {
                 data.put("begin", lastUpdate.toXMLFormat());
-                template.process(data, out);
             }
+            template.process(data, out);
         }
     }
 
     /**
      * Write the TAXII poll fulfillment request to an {@link OutputStream}.
      *
-     * @param feed The TAXII feed name.
-     * @param resultId result id.
+     * @param feed             The TAXII feed name.
+     * @param resultId         result id.
      * @param resultPartNumber result part number.
-     * @param body The {@link OutputStream} to write the body to.
+     * @param body             The {@link OutputStream} to write the body to.
      * @throws Exception When any error occurs.
      */
     public void write(String messageId, String feed, String resultId, Integer resultPartNumber, OutputStream body) throws Exception {
@@ -93,6 +86,15 @@ public class HttpBodyWriter {
             data.put("resultId", resultId);
             data.put("resultPartNumber", resultPartNumber);
             templateFulfillment.process(data, out);
+        }
+    }
+
+    private XMLGregorianCalendar getLastUpdate(String feedName) {
+        TaxiiStatus.Feed feed = taxiiStatusDao.find(feedName);
+        if (feed != null && feed.getLastUpdate() != null) {
+            return feed.getLastUpdate();
+        } else {
+            return null;
         }
     }
 

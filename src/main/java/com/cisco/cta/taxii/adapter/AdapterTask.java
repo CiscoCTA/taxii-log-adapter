@@ -16,6 +16,7 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import org.apache.log4j.MDC;
@@ -23,7 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
+import org.threeten.bp.Clock;
+import org.threeten.bp.DateTimeUtils;
+import org.threeten.bp.Instant;
+import org.threeten.bp.ZoneId;
 
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,15 +47,18 @@ public class AdapterTask implements Runnable {
     private final ResponseHandler responseHandler;
     private final List<String> feeds;
     private final AdapterStatistics statistics;
-
     private final TaxiiStatusDao taxiiStatusDao;
+    private final DatatypeFactory datatypeFactory;
+    private final Clock clock;
 
-    public AdapterTask(RequestFactory requestFactory, ResponseHandler responseHandler, TaxiiServiceSettings settings, AdapterStatistics statistics, TaxiiStatusDao taxiiStatusDao) {
+    public AdapterTask(RequestFactory requestFactory, ResponseHandler responseHandler, TaxiiServiceSettings settings, AdapterStatistics statistics, TaxiiStatusDao taxiiStatusDao, DatatypeFactory datatypeFactory, Clock clock) {
         this.requestFactory = requestFactory;
         this.responseHandler = responseHandler;
         this.feeds = settings.getFeeds();
         this.statistics = statistics;
         this.taxiiStatusDao = taxiiStatusDao;
+        this.datatypeFactory = datatypeFactory;
+        this.clock = clock;
     }
 
     private String createMessageId() {
@@ -64,25 +75,50 @@ public class AdapterTask implements Runnable {
         }
     }
 
-    private void downloadFeed(String feed) {
+    private void downloadFeed(String feedName) {
         TaxiiPollResponse response = null;
         do {
             try {
                 String messageId = createMessageId();
                 MDC.put("messageId", messageId);
-                response = poll(messageId, feed, response);
+                response = poll(messageId, feedName, response);
                 if (response != null) {
-                    taxiiStatusDao.update(feed, response);
+                    TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
+                    feed.setName(feedName);
+                    if (response.isMultipart() && response.isMore()) {
+                        feed.setMore(response.isMore());
+                        feed.setResultId(response.getResultId());
+                        feed.setResultPartNumber(response.getResultPartNumber());
+                    } else {
+                        feed.setMore(null);
+                        feed.setResultId(null);
+                        feed.setResultPartNumber(null);
+                    }
+                    feed.setLastUpdate(determineLastUpdate(response));
+                    taxiiStatusDao.updateOrAdd(feed);
                 }
             } catch (Exception e) {
                 statistics.incrementErrors();
-                LOG.error("Error while processing feed " + feed, e);
+                LOG.error("Error while processing feed " + feedName, e);
                 return ;
 
-            } finally{
+            } finally {
                 MDC.clear();
             }
         }while(hasPendingResultParts(response));
+    }
+
+    private XMLGregorianCalendar instantToXMLGregorianCalendar(Instant instant) {
+        GregorianCalendar gregorianCal = DateTimeUtils.toGregorianCalendar(instant.atZone(ZoneId.systemDefault()));
+        return datatypeFactory.newXMLGregorianCalendar(gregorianCal);
+    }
+
+    private XMLGregorianCalendar determineLastUpdate(TaxiiPollResponse response) {
+        if (response.getInclusiveEndTime() != null) {
+            return response.getInclusiveEndTime();
+        } else {
+            return instantToXMLGregorianCalendar(clock.instant());
+        }
     }
 
     private boolean hasPendingResultParts(TaxiiPollResponse response) {
@@ -102,7 +138,6 @@ public class AdapterTask implements Runnable {
         try (ClientHttpResponse resp = request.execute()) {
             return responseHandler.handle(feed, resp);
         }
-
     }
 
 }

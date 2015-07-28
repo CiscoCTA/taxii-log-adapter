@@ -24,9 +24,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.GregorianCalendar;
 
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -35,6 +40,9 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
+import org.threeten.bp.DateTimeUtils;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.format.DateTimeFormatter;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpBodyWriterTest {
@@ -48,12 +56,8 @@ public class HttpBodyWriterTest {
     @Spy
     private ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-    @Mock
-    private XMLGregorianCalendar calendar;
-
     @Test
     public void writeInitialPollRequest() throws Exception {
-        when(taxiiStatusDao.getLastUpdate("my-feed")).thenReturn(null);
         writer.write("tla-123", "my-feed", out);
         assertThat(out, is(initialPollRequest("tla-123", "my-feed")));
         verify(out).close();
@@ -61,8 +65,11 @@ public class HttpBodyWriterTest {
 
     @Test
     public void writeNextPollRequest() throws Exception {
-        when(calendar.toXMLFormat()).thenReturn("2015-01-01T00:00:00");
-        when(taxiiStatusDao.getLastUpdate("my-feed")).thenReturn(calendar);
+        TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
+        DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
+        XMLGregorianCalendar cal = datatypeFactory.newXMLGregorianCalendar("2015-01-01T00:00:00");
+        feed.setLastUpdate(cal);
+        when(taxiiStatusDao.find("my-feed")).thenReturn(feed);
         writer.write("tla-123", "my-feed", out);
         assertThat(out, is(nextPollRequest("tla-123", "my-feed", "2015-01-01T00:00:00")));
         verify(out).close();

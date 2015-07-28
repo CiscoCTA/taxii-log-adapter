@@ -27,10 +27,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import org.threeten.bp.Clock;
 
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 
 /**
  * Spring configuration TAXII status persistence support.
@@ -44,9 +42,7 @@ public class PersistenceConfiguration {
 
     @Bean
     public TaxiiStatusDao taxiiStatusDao() throws DatatypeConfigurationException {
-        return new TaxiiStatusDao(taxiiStatusPersistent(),
-                datatypeFactory(),
-                clock());
+        return new TaxiiStatusDao(taxiiStatusPersistent());
     }
 
     @Bean
@@ -74,16 +70,6 @@ public class PersistenceConfiguration {
         jaxb2Marshaller.setMarshallerProperties(ImmutableMap.of(
                 javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true));
         return jaxb2Marshaller;
-    }
-
-    @Bean
-    public Clock clock() {
-        return Clock.systemDefaultZone();
-    }
-
-    @Bean
-    public DatatypeFactory datatypeFactory() throws DatatypeConfigurationException {
-        return DatatypeFactory.newInstance();
     }
 
 }

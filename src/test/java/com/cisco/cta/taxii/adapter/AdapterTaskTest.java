@@ -28,14 +28,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.threeten.bp.Clock;
-import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.Instant;
 import org.threeten.bp.ZoneId;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
-import java.util.GregorianCalendar;
 
 import static com.cisco.cta.taxii.adapter.IsEventContaining.verifyLog;
 import static org.hamcrest.Matchers.is;
@@ -44,6 +42,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -65,7 +64,7 @@ public class AdapterTaskTest {
     private ClientHttpResponse response;
     
     @Mock
-    private ResponseHandler responseHandler;
+    private ResponseTransformer responseTransformer;
 
     @Mock
     private Appender mockAppender;
@@ -91,17 +90,20 @@ public class AdapterTaskTest {
        MockitoAnnotations.initMocks(this);
        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
        when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
-       task = new AdapterTask(requestFactory, responseHandler, settings, statistics, taxiiStatusDao, datatypeFactory, clock);
+       task = new AdapterTask(requestFactory, responseTransformer, settings, statistics, taxiiStatusDao, datatypeFactory, clock);
        when(requestFactory.createInitialRequest(anyString(), anyString())).thenReturn(request);
     }
 
     @Test
     public void triggerRequestResponse() throws Exception {
         when(request.execute()).thenReturn(response);
+        XMLGregorianCalendar cal = datatypeFactory.newXMLGregorianCalendar("2000-01-02T03:04:05.006+00:00");
+        TaxiiPollResponse pollResponse = TaxiiPollResponse.builder().multipart(false).inclusiveEndTime(cal).build();
+        when(responseTransformer.transform(anyString(), any(ClientHttpResponse.class))).thenReturn(pollResponse);
         task.run();
         verify(requestFactory).createInitialRequest(anyString(), anyString());
         verify(request).execute();
-        verify(responseHandler).handle("my-collection", response);
+        verify(responseTransformer).transform("my-collection", response);
         assertThat(statistics.getPolls(), is(1L));
         assertThat(statistics.getErrors(), is(0L));
     }
@@ -112,10 +114,10 @@ public class AdapterTaskTest {
         TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().more(true).resultPartNumber(1).inclusiveEndTime(cal).build();
         XMLGregorianCalendar cal2 = datatypeFactory.newXMLGregorianCalendar("2000-01-10T03:04:06.006+00:00");
         TaxiiPollResponse secondResponse = TaxiiPollResponse.builder().more(false).resultPartNumber(2).inclusiveEndTime(cal2).build();
-        when(responseHandler.handle(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
+        when(responseTransformer.transform(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
         when(requestFactory.createFulfillmentRequest(anyString(), anyString(), anyString(), anyInt())).thenReturn(request);
         task.run();
-        verify(responseHandler, times(2)).handle(anyString(), any(ClientHttpResponse.class));
+        verify(responseTransformer, times(2)).transform(anyString(), any(ClientHttpResponse.class));
         verify(requestFactory).createFulfillmentRequest(anyString(), anyString(), anyString(), anyInt());
     }
 
@@ -125,7 +127,7 @@ public class AdapterTaskTest {
         XMLGregorianCalendar cal = datatypeFactory.newXMLGregorianCalendar("2000-01-02T03:04:05.006+00:00");
         TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().more(true).resultPartNumber(1).inclusiveEndTime(cal).build();
         when(requestFactory.createFulfillmentRequest(anyString(), anyString(), anyString(), anyInt())).thenReturn(request);
-        when(responseHandler.handle(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse).thenThrow(new Exception());
+        when(responseTransformer.transform(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse).thenThrow(new Exception());
         task.run();
         TaxiiStatus.Feed expectedFeed = new TaxiiStatus.Feed();
         expectedFeed.setName("my-collection");
@@ -140,7 +142,7 @@ public class AdapterTaskTest {
         XMLGregorianCalendar cal2 = datatypeFactory.newXMLGregorianCalendar("2000-01-10T03:04:06.006+00:00");
         TaxiiPollResponse secondResponse = TaxiiPollResponse.builder().more(false).resultPartNumber(2).inclusiveEndTime(cal2).build();
         when(requestFactory.createFulfillmentRequest(anyString(), anyString(), anyString(), anyInt())).thenReturn(request);
-        when(responseHandler.handle(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
+        when(responseTransformer.transform(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
         task.run();
         InOrder inOrder = Mockito.inOrder(taxiiStatusDao);
         TaxiiStatus.Feed expectedFeed = new TaxiiStatus.Feed();
@@ -162,7 +164,7 @@ public class AdapterTaskTest {
         task.run();
         verify(requestFactory).createInitialRequest(anyString(), anyString());
         verify(request).execute();
-        verifyZeroInteractions(responseHandler);
+        verifyZeroInteractions(responseTransformer);
         verifyLog(mockAppender, "Error");
         assertThat(statistics.getPolls(), is(1L));
         assertThat(statistics.getErrors(), is(1L));
@@ -171,7 +173,7 @@ public class AdapterTaskTest {
     @Test
     public void handleInvalidResponseError() throws Exception {
         when(request.execute()).thenReturn(response);
-        doThrow(new Exception("Dummy response")).when(responseHandler).handle("my-collection", response);
+        doThrow(new Exception("Dummy response")).when(responseTransformer).transform("my-collection", response);
         task.run();
         verify(requestFactory).createInitialRequest(anyString(), anyString());
                 verify(request).execute();

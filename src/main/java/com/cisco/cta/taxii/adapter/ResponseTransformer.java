@@ -30,14 +30,14 @@ import java.io.Writer;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
- * Handles TAXII responses.
+ * Transforms TAXII responses.
  */
-public class ResponseHandler {
+public class ResponseTransformer {
     private final Templates templates;
     private final Writer logWriter;
     private final TaxiiPollResponseReaderFactory readerFactory;
 
-    public ResponseHandler(
+    public ResponseTransformer(
             Templates templates,
             Writer logWriter,
             TaxiiPollResponseReaderFactory readerFactory) {
@@ -48,38 +48,21 @@ public class ResponseHandler {
 
 
     /**
-     * Handle TAXII response.
+     * Transforms TAXII response.
      * 
      * @param feed The TAXII feed name, that was sent in the request.
      * @param resp HTTP response
-     * @return TaxiiPollResponse if valid TAXII poll response was returned, null otherwise
+     * @return TaxiiPollResponse if valid TAXII poll response was returned
      * @throws Exception When any error occurs.
      */
-    public TaxiiPollResponse handle(String feed, ClientHttpResponse resp) throws Exception {
+    public TaxiiPollResponse transform(String feed, ClientHttpResponse resp) throws Exception {
         if (resp.getRawStatusCode() == HTTP_OK) {
             MDC.put("feed", feed);
             try (InputStream body = resp.getBody()) {
                 TaxiiPollResponseReader responseReader = readerFactory.create(body);
                 Transformer transformer = templates.newTransformer();
                 transformer.transform(new StAXSource(responseReader), new StreamResult(logWriter));
-                if (responseReader.isPollResponse()) {
-                    if (responseReader.isMore() != null && responseReader.getResultId() != null && responseReader.getResultPartNumber() != null) {
-                        return TaxiiPollResponse.builder()
-                                .multipart(true)
-                                .more(responseReader.isMore())
-                                .resultId(responseReader.getResultId())
-                                .resultPartNumber(responseReader.getResultPartNumber())
-                                .inclusiveEndTime(responseReader.getInclusiveEndTime())
-                                .build();
-                    } else {
-                        return TaxiiPollResponse.builder()
-                                .multipart(false)
-                                .inclusiveEndTime(responseReader.getInclusiveEndTime())
-                                .build();
-                    }
-                } else {
-                    return null;
-                }
+                return responseReader.getResponse();
             }
         } else {
             throw new IOException("HTTP response status " + resp.getRawStatusCode() + ":" + resp.getStatusText());

@@ -55,6 +55,6 @@ public class TaxiiPollResponseReaderFactoryTest {
     public void createReader() throws Exception {
         TaxiiPollResponseReader reader = factory.create(taxiiPollRespBody);
         TaxiiPollResponseReaderTest.readFully(reader);
-        assertThat(reader.getInclusiveEndTime(), is(datatypeFactory.newXMLGregorianCalendar("2000-12-24T01:02:03.004+01:00")));
+        assertThat(reader.getResponse().getInclusiveEndTime(), is(datatypeFactory.newXMLGregorianCalendar("2000-12-24T01:02:03.004+01:00")));
     }
 }

@@ -87,8 +87,8 @@ public class AdapterConfiguration {
     }
 
     @Bean
-    public ResponseHandler responseHandler() throws Exception {
-        return new ResponseHandler(
+    public ResponseTransformer responseHandler() throws Exception {
+        return new ResponseTransformer(
                 templates(),
                 logWriter(),
                 taxiiPollResponseReaderFactory());

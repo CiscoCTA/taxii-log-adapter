@@ -25,13 +25,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.threeten.bp.Clock;
-import org.threeten.bp.DateTimeUtils;
-import org.threeten.bp.Instant;
-import org.threeten.bp.ZoneId;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,16 +40,16 @@ public class AdapterTask implements Runnable {
     private static final String MESSAGE_ID_PREFIX = "tla-";
 
     private final RequestFactory requestFactory;
-    private final ResponseHandler responseHandler;
+    private final ResponseTransformer responseTransformer;
     private final List<String> feeds;
     private final AdapterStatistics statistics;
     private final TaxiiStatusDao taxiiStatusDao;
     private final DatatypeFactory datatypeFactory;
     private final Clock clock;
 
-    public AdapterTask(RequestFactory requestFactory, ResponseHandler responseHandler, TaxiiServiceSettings settings, AdapterStatistics statistics, TaxiiStatusDao taxiiStatusDao, DatatypeFactory datatypeFactory, Clock clock) {
+    public AdapterTask(RequestFactory requestFactory, ResponseTransformer responseTransformer, TaxiiServiceSettings settings, AdapterStatistics statistics, TaxiiStatusDao taxiiStatusDao, DatatypeFactory datatypeFactory, Clock clock) {
         this.requestFactory = requestFactory;
-        this.responseHandler = responseHandler;
+        this.responseTransformer = responseTransformer;
         this.feeds = settings.getFeeds();
         this.statistics = statistics;
         this.taxiiStatusDao = taxiiStatusDao;
@@ -82,22 +78,20 @@ public class AdapterTask implements Runnable {
                 String messageId = createMessageId();
                 MDC.put("messageId", messageId);
                 response = poll(messageId, feedName, response);
-                if (response != null) {
-                    TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
-                    feed.setName(feedName);
-                    if (response.isMultipart() && response.isMore()) {
-                        feed.setMore(response.isMore());
-                        feed.setResultId(response.getResultId());
-                        feed.setResultPartNumber(response.getResultPartNumber());
-                    } else {
-                        feed.setMore(null);
-                        feed.setResultId(null);
-                        feed.setResultPartNumber(null);
-                    }
-                    feed.setLastUpdate(getLastUpdate(response));
-                    taxiiStatusDao.updateOrAdd(feed);
+                TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
+                feed.setName(feedName);
+                if (response.isMultipart() && response.isMore()) {
+                    feed.setMore(response.isMore());
+                    feed.setResultId(response.getResultId());
+                    feed.setResultPartNumber(response.getResultPartNumber());
+                } else {
+                    feed.setMore(null);
+                    feed.setResultId(null);
+                    feed.setResultPartNumber(null);
                 }
-            } catch (Exception e) {
+                feed.setLastUpdate(getLastUpdate(response));
+                taxiiStatusDao.updateOrAdd(feed);
+            } catch(Exception e) {
                 statistics.incrementErrors();
                 LOG.error("Error while processing feed " + feedName, e);
                 return ;
@@ -131,7 +125,7 @@ public class AdapterTask implements Runnable {
             request = requestFactory.createFulfillmentRequest(messageId, feed, previousResponse.getResultId(), previousResponse.getResultPartNumber() + 1);
         }
         try (ClientHttpResponse resp = request.execute()) {
-            return responseHandler.handle(feed, resp);
+            return responseTransformer.transform(feed, resp);
         }
     }
 

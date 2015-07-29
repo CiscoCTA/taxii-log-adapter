@@ -36,6 +36,8 @@ public class TaxiiPollResponseReader extends StreamReaderDelegate {
 
     private static final String TAXII_NAMESPACE_URI = "http://taxii.mitre.org/messages/taxii_xml_binding-1.1";
 
+    private static final String STATUS_TYPE_ATTRIBUTE = "status_type";
+
     private static final String MORE_ATTRIBUTE = "more";
 
     private static final String RESULT_ID_ATTRIBUTE = "result_id";
@@ -45,6 +47,14 @@ public class TaxiiPollResponseReader extends StreamReaderDelegate {
     private static final QName POLL_RESPONSE = new QName(
             TAXII_NAMESPACE_URI,
             "Poll_Response");
+
+    private static final QName STATUS_MESSAGE = new QName(
+            TAXII_NAMESPACE_URI,
+            "Status_Message");
+
+    private static final QName MESSAGE = new QName(
+            TAXII_NAMESPACE_URI,
+            "Message");
 
     private static final QName INCLUSIVE_END_TIMESTAMP = new QName(
             TAXII_NAMESPACE_URI,
@@ -56,54 +66,20 @@ public class TaxiiPollResponseReader extends StreamReaderDelegate {
 
     private final DatatypeFactory datatypeFactory;
 
+    private State state = State.ROOT;
+
+    private enum State {ROOT, BEFORE_TIMESTAMP, TIMESTAMP, AFTER_TIMESTAMP, CONTENT, STATUS_MESSAGE, STATUS_MESSAGE_TEXT, OTHER}
+
+    private String statusType;
+    private String statusMessage;
     private Boolean more;
     private String resultId;
     private Integer resultPartNumber;
+    private XMLGregorianCalendar inclusiveEndTime;
 
-    private XMLGregorianCalendar inclusiveEndTime = null;
-    private State state = State.ROOT;
-
-    private enum State {ROOT, BEFORE_TIMESTAMP, TIMESTAMP, AFTER_TIMESTAMP, CONTENT, NOT_POLL_RESPONSE}
-    
     public TaxiiPollResponseReader(XMLStreamReader xmlReader, DatatypeFactory datatypeFactory) {
         super(xmlReader);
         this.datatypeFactory = datatypeFactory;
-    }
-
-    /**
-     * This must be invoked after all events were read.
-     *
-     * @return more attribute parsed from the TAXII Poll_Response element.
-     */
-    public Boolean isMore() {
-        return more;
-    }
-
-    /**
-     * This must be invoked after all events were read.
-     *
-     * @return result_id attribute parsed from the TAXII Poll_Response element.
-     */
-    public String getResultId() {
-        return resultId;
-    }
-
-    /**
-     * This must be invoked after all events were read.
-     *
-     * @return result_part_numbner attribute parsed from the TAXII Poll_Response element.
-     */
-    public Integer getResultPartNumber() {
-        return resultPartNumber;
-    }
-
-    /**
-     * This must be invoked after all events were read.
-     * 
-     * @return Inclusive_End_Timestamp attribute parsed from the TAXII poll response.
-     */
-    public XMLGregorianCalendar getInclusiveEndTime() {
-        return inclusiveEndTime;
     }
 
     /**
@@ -112,43 +88,100 @@ public class TaxiiPollResponseReader extends StreamReaderDelegate {
      * @return True when the response type is poll response.
      */
     public boolean isPollResponse() {
-        return state != State.NOT_POLL_RESPONSE;
+        return state != State.STATUS_MESSAGE && state != State.STATUS_MESSAGE_TEXT && state != State.OTHER;
+    }
+
+    /**
+     * This must be invoked after all events were read.
+     *
+     * @return TaxiiPollResponse
+     * @throws TaxiiStatusException in case of taxii status message
+     */
+    public TaxiiPollResponse getResponse() throws  TaxiiStatusException {
+        if (isPollResponse()) {
+            if (more != null && resultId != null && resultPartNumber != null) {
+                return TaxiiPollResponse.builder()
+                        .multipart(true)
+                        .more(more)
+                        .resultId(resultId)
+                        .resultPartNumber(resultPartNumber)
+                        .inclusiveEndTime(inclusiveEndTime)
+                        .build();
+            } else {
+                return TaxiiPollResponse.builder()
+                        .multipart(false)
+                        .inclusiveEndTime(inclusiveEndTime)
+                        .build();
+            }
+        } else {
+            throw new TaxiiStatusException(statusType, statusMessage);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T getAttributeValue(String attributeName, Class<T> clazz) {
+        String value = getAttributeValue("", attributeName);
+        if (value == null) {
+            return null;
+        }
+        if (clazz.equals(String.class)) {
+            return (T)value;
+        } else if (clazz.equals(Integer.class)) {
+            return (T)Integer.valueOf(value);
+        } else if (clazz.equals(Boolean.class)) {
+            return (T)Boolean.valueOf(value);
+        } else {
+            throw new RuntimeException("Unsupported attribute type: " + clazz.getName());
+        }
     }
 
     @Override
     public int next() throws XMLStreamException {
         int result = super.next();
         switch (state) {
-        case ROOT:
-            if (isStartElement()) {
-                if (getName().equals(POLL_RESPONSE)) {
-                    state = State.BEFORE_TIMESTAMP;
-                    more = getAttributeValue("", MORE_ATTRIBUTE) != null ? Boolean.valueOf(getAttributeValue("", MORE_ATTRIBUTE)) : null;
-                    resultId = getAttributeValue("", RESULT_ID_ATTRIBUTE) != null ? getAttributeValue("", RESULT_ID_ATTRIBUTE) : null;
-                    resultPartNumber = getAttributeValue("", RESULT_PART_NUMBER_ATTRIBUTE) != null ? Integer.valueOf(getAttributeValue("", RESULT_PART_NUMBER_ATTRIBUTE)) : null;
+            case ROOT:
+                if (isStartElement()) {
+                    if (getName().equals(POLL_RESPONSE)) {
+                        state = State.BEFORE_TIMESTAMP;
+                        more = getAttributeValue(MORE_ATTRIBUTE, Boolean.class);
+                        resultId = getAttributeValue(RESULT_ID_ATTRIBUTE, String.class);
+                        resultPartNumber = getAttributeValue(RESULT_PART_NUMBER_ATTRIBUTE, Integer.class);
+                    } else if (getName().equals(STATUS_MESSAGE)) {
+                        statusType = getAttributeValue(STATUS_TYPE_ATTRIBUTE, String.class);
+                        state = State.STATUS_MESSAGE;
+                    } else {
+                        state = State.OTHER;
+                    }
+                }
+                break;
+            case BEFORE_TIMESTAMP:
+                if (isStartElement()) {
+                    if (getName().equals(INCLUSIVE_END_TIMESTAMP)) {
+                        state = State.TIMESTAMP;
+                    } else if (getName().equals(CONTENT_BLOCK)) {
+                        state = State.CONTENT;
+                    }
+                }
+                break;
+            case TIMESTAMP:
+                state = State.AFTER_TIMESTAMP;
+                if (isCharacters()) {
+                    inclusiveEndTime = datatypeFactory.newXMLGregorianCalendar(getText());
                 } else {
-                    state = State.NOT_POLL_RESPONSE;
+                    throw new IllegalStateException("Expected time value, but found " + getText());
                 }
-            }
-            break;
-        case BEFORE_TIMESTAMP:
-            if (isStartElement()) {
-                if (getName().equals(INCLUSIVE_END_TIMESTAMP)) {
-                    state = State.TIMESTAMP;
-                } else if (getName().equals(CONTENT_BLOCK)) {
-                    state = State.CONTENT;
+                break;
+            case STATUS_MESSAGE:
+                if (isStartElement() && getName().equals(MESSAGE)) {
+                    state = State.STATUS_MESSAGE_TEXT;
                 }
-            }
-            break;
-        case TIMESTAMP:
-            state = State.AFTER_TIMESTAMP;
-            if (isCharacters()) {
-                inclusiveEndTime = datatypeFactory.newXMLGregorianCalendar(getText());
-            } else {
-                throw new IllegalStateException("Expected time value, but found " + getText());
-            }
-            break;
-        default: // do nothing
+                break;
+            case STATUS_MESSAGE_TEXT:
+                if (isCharacters()) {
+                    statusMessage = getText();
+                    state = State.OTHER;
+                }
+            default: // do nothing
         }
         return result;
     }

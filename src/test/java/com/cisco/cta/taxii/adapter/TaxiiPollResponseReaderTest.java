@@ -71,7 +71,7 @@ public class TaxiiPollResponseReaderTest {
 
     @Test
     public void recognizeNonPollResponseMessage() throws Exception {
-        Reader in = new StringReader("<Status_Message xmlns=\"http://taxii.mitre.org/messages/taxii_xml_binding-1.1\">ABC</Status_Message>");
+        Reader in = new StringReader("<Status_Message xmlns=\"http://taxii.mitre.org/messages/taxii_xml_binding-1.1\"><Message>ABC</Message></Status_Message>");
         XMLStreamReader xmlReader = inputFactory.createXMLStreamReader(in);
         TaxiiPollResponseReader reader = new TaxiiPollResponseReader(xmlReader, datatypeFactory);
         readFully(reader);
@@ -83,7 +83,7 @@ public class TaxiiPollResponseReaderTest {
         XMLStreamReader xmlReader = inputFactory.createXMLStreamReader(taxiiPollRespBody);
         TaxiiPollResponseReader reader = new TaxiiPollResponseReader(xmlReader, datatypeFactory);
         readFully(reader);
-        assertThat(reader.getInclusiveEndTime(), is(datatypeFactory.newXMLGregorianCalendar("2000-12-24T01:02:03.004+01:00")));
+        assertThat(reader.getResponse().getInclusiveEndTime(), is(datatypeFactory.newXMLGregorianCalendar("2000-12-24T01:02:03.004+01:00")));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class TaxiiPollResponseReaderTest {
         XMLStreamReader xmlReader = inputFactory.createXMLStreamReader(taxiiPollRespBodyEmpty);
         TaxiiPollResponseReader reader = new TaxiiPollResponseReader(xmlReader, datatypeFactory);
         readFully(reader);
-        assertThat(reader.getInclusiveEndTime(), is(nullValue()));
+        assertThat(reader.getResponse().getInclusiveEndTime(), is(nullValue()));
     }
 
     @Test(expected=IllegalArgumentException.class)

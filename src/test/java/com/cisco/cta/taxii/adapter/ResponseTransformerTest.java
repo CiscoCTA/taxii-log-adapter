@@ -24,7 +24,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.client.ClientHttpResponse;
 
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -42,9 +41,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class ResponseHandlerTest {
+public class ResponseTransformerTest {
 
-    private ResponseHandler responseHandler;
+    private ResponseTransformer responseTransformer;
 
     @Mock
     private TaxiiPollResponseReaderFactory readerFactory;
@@ -70,23 +69,20 @@ public class ResponseHandlerTest {
     @Mock(answer=RETURNS_MOCKS)
     private TaxiiPollResponseReader responseReader;
 
-    private DatatypeFactory datatypeFactory;
-
     @Before
     public void setUp() throws Exception {
-        datatypeFactory = DatatypeFactory.newInstance();
         MockitoAnnotations.initMocks(this);
         when(resp.getBody()).thenReturn(body);
         when(templates.newTransformer()).thenReturn(transformer);
         when(readerFactory.create(body)).thenReturn(responseReader);
         when(responseReader.getEventType()).thenReturn(XMLStreamConstants.START_DOCUMENT);
-        responseHandler = new ResponseHandler(templates, logWriter, readerFactory);
+        responseTransformer = new ResponseTransformer(templates, logWriter, readerFactory);
     }
 
     @Test
     public void transformResponse() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(200);
-        responseHandler.handle("my-feed", resp);
+        responseTransformer.transform("my-feed", resp);
         verify(transformer).transform(isExpectedXmlSource(), isExpectedOutputTarget());
     }
 
@@ -94,7 +90,7 @@ public class ResponseHandlerTest {
     public void handleNonPollResponseMessage() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(200);
         when(responseReader.isPollResponse()).thenReturn(false);
-        responseHandler.handle("my-feed", resp);
+        responseTransformer.transform("my-feed", resp);
         verify(transformer).transform(isExpectedXmlSource(), isExpectedOutputTarget());
         verifyZeroInteractions(taxiiStatusDao);
     }
@@ -102,7 +98,7 @@ public class ResponseHandlerTest {
     @Test(expected=IOException.class)
     public void reportErrorHttpStatus() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(300);
-        responseHandler.handle("my-feed", resp);
+        responseTransformer.transform("my-feed", resp);
         verifyZeroInteractions(readerFactory);
         verifyZeroInteractions(templates);
         verifyZeroInteractions(taxiiStatusDao);

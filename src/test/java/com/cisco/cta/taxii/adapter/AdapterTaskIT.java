@@ -147,7 +147,7 @@ public class AdapterTaskIT {
         nextRequestResponse(3);
         assertThat(statistics.getPolls(), is(3L));
         assertThat(statistics.getLogs(), is(2L));
-        assertThat(statistics.getErrors(), is(0L));
+        assertThat(statistics.getErrors(), is(1L));
         assertTrue(
                 OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
                 FileUtils.contentEquals(OUTPUT_FILE, EXPECTED_OUTPUT_FILE));

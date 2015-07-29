@@ -108,8 +108,10 @@ public class AdapterTaskTest {
 
     @Test
     public void triggerMultipartRequestResponse() throws Exception {
-        TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().more(true).resultPartNumber(1).build();
-        TaxiiPollResponse secondResponse = TaxiiPollResponse.builder().more(false).resultPartNumber(2).build();
+        XMLGregorianCalendar cal = datatypeFactory.newXMLGregorianCalendar("2000-01-02T03:04:05.006+00:00");
+        TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().more(true).resultPartNumber(1).inclusiveEndTime(cal).build();
+        XMLGregorianCalendar cal2 = datatypeFactory.newXMLGregorianCalendar("2000-01-10T03:04:06.006+00:00");
+        TaxiiPollResponse secondResponse = TaxiiPollResponse.builder().more(false).resultPartNumber(2).inclusiveEndTime(cal2).build();
         when(responseHandler.handle(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
         when(requestFactory.createFulfillmentRequest(anyString(), anyString(), anyString(), anyInt())).thenReturn(request);
         task.run();
@@ -135,7 +137,7 @@ public class AdapterTaskTest {
     public void writeLastUpdateAfterMultipartFetched() throws Exception {
         XMLGregorianCalendar cal = datatypeFactory.newXMLGregorianCalendar("2000-01-02T03:04:05.006+00:00");
         TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().multipart(true).more(true).resultId("123#456").resultPartNumber(1).inclusiveEndTime(cal).build();
-        XMLGregorianCalendar cal2 = datatypeFactory.newXMLGregorianCalendar("2000-01-10T03:04:05.006+00:00");
+        XMLGregorianCalendar cal2 = datatypeFactory.newXMLGregorianCalendar("2000-01-10T03:04:06.006+00:00");
         TaxiiPollResponse secondResponse = TaxiiPollResponse.builder().more(false).resultPartNumber(2).inclusiveEndTime(cal2).build();
         when(requestFactory.createFulfillmentRequest(anyString(), anyString(), anyString(), anyInt())).thenReturn(request);
         when(responseHandler.handle(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);

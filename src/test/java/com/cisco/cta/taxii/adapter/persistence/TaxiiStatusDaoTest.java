@@ -33,6 +33,7 @@ import java.io.File;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -62,12 +63,6 @@ public class TaxiiStatusDaoTest {
         persistentObject.setAllowEmptyStart(true);
         persistentObject.start();
         dao = new TaxiiStatusDao(persistentObject);
-        feed = new TaxiiStatus.Feed();
-        feed.setMore(true);
-        feed.setResultId("1000#2000");
-        feed.setResultPartNumber(1);
-        GregorianCalendar gregorianCal = DateTimeUtils.toGregorianCalendar(now.atZone(ZoneId.systemDefault()));
-        feed.setLastUpdate(datatypeFactory.newXMLGregorianCalendar(gregorianCal));
     }
 
     @After
@@ -76,8 +71,51 @@ public class TaxiiStatusDaoTest {
     }
 
     @Test
-    public void saveAndLoad() {
+    public void initializeNewFeedWithNull() throws Exception {
+        assertThat(dao.find(UUID.randomUUID().toString()), nullValue());
+    }
+
+    private TaxiiStatus.Feed createNormalFeed() {
+        feed = new TaxiiStatus.Feed();
         feed.setName(UUID.randomUUID().toString());
+        GregorianCalendar gregorianCal = DateTimeUtils.toGregorianCalendar(now.atZone(ZoneId.systemDefault()));
+        feed.setLastUpdate(datatypeFactory.newXMLGregorianCalendar(gregorianCal));
+        return feed;
+    }
+
+    private TaxiiStatus.Feed createMultipartFeed() {
+        feed = new TaxiiStatus.Feed();
+        feed.setName(UUID.randomUUID().toString());
+        feed.setMore(true);
+        feed.setResultId("1000#2000");
+        feed.setResultPartNumber(1);
+        GregorianCalendar gregorianCal = DateTimeUtils.toGregorianCalendar(now.atZone(ZoneId.systemDefault()));
+        feed.setLastUpdate(datatypeFactory.newXMLGregorianCalendar(gregorianCal));
+        return feed;
+    }
+
+    @Test
+    public void saveLoadInSameInstance() throws Exception {
+        TaxiiStatus.Feed feed = createNormalFeed();
+        dao.updateOrAdd(feed);
+        TaxiiStatus.Feed loadedFeed = dao.find(feed.getName());
+        assertThat(feed, is(loadedFeed));
+    }
+
+    @Test
+    public void saveLoadInDifferentInstances() throws Exception {
+        TaxiiStatus.Feed feed = createNormalFeed();
+        dao.updateOrAdd(feed);
+        persistentObject.stop();
+        persistentObject.start();
+        dao = new TaxiiStatusDao(persistentObject);
+        TaxiiStatus.Feed loadedFeed = dao.find(feed.getName());
+        assertThat(feed, is(loadedFeed));
+    }
+
+    @Test
+    public void saveLoadMultipartFeed() throws Exception {
+        TaxiiStatus.Feed feed = createMultipartFeed();
         dao.updateOrAdd(feed);
         TaxiiStatus.Feed loadedFeed = dao.find(feed.getName());
         assertThat(feed, is(loadedFeed));
@@ -85,7 +123,7 @@ public class TaxiiStatusDaoTest {
 
     @Test
     public void update() {
-        feed.setName(UUID.randomUUID().toString());
+        TaxiiStatus.Feed feed = createNormalFeed();
         dao.updateOrAdd(feed);
         feed.setResultPartNumber(2);
         dao.updateOrAdd(feed);

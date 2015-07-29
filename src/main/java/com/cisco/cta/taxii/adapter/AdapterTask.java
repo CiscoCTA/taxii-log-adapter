@@ -94,7 +94,7 @@ public class AdapterTask implements Runnable {
                         feed.setResultId(null);
                         feed.setResultPartNumber(null);
                     }
-                    feed.setLastUpdate(determineLastUpdate(response));
+                    feed.setLastUpdate(getLastUpdate(response));
                     taxiiStatusDao.updateOrAdd(feed);
                 }
             } catch (Exception e) {
@@ -108,16 +108,11 @@ public class AdapterTask implements Runnable {
         }while(hasPendingResultParts(response));
     }
 
-    private XMLGregorianCalendar instantToXMLGregorianCalendar(Instant instant) {
-        GregorianCalendar gregorianCal = DateTimeUtils.toGregorianCalendar(instant.atZone(ZoneId.systemDefault()));
-        return datatypeFactory.newXMLGregorianCalendar(gregorianCal);
-    }
-
-    private XMLGregorianCalendar determineLastUpdate(TaxiiPollResponse response) {
+    private XMLGregorianCalendar getLastUpdate(TaxiiPollResponse response) throws Exception {
         if (response.getInclusiveEndTime() != null) {
             return response.getInclusiveEndTime();
         } else {
-            return instantToXMLGregorianCalendar(clock.instant());
+            throw new Exception("InclusiveEndTime must be present in TAXII Poll Response if the named data collection is a data feed.");
         }
     }
 

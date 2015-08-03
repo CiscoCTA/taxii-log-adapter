@@ -27,6 +27,6 @@ public class TaxiiPollResponse {
     private boolean multipart;
     private boolean more;
     private String resultId;
-    private int resultPartNumber;
+    private Integer resultPartNumber;
     private XMLGregorianCalendar inclusiveEndTime;
 }

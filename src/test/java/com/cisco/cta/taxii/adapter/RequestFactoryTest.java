@@ -16,6 +16,9 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import com.cisco.cta.taxii.adapter.httpclient.HttpBodyWriter;
+import com.cisco.cta.taxii.adapter.httpclient.HttpHeadersAppender;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -24,9 +27,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
-
-import com.cisco.cta.taxii.adapter.httpclient.HttpBodyWriter;
-import com.cisco.cta.taxii.adapter.httpclient.HttpHeadersAppender;
 
 import java.io.OutputStream;
 import java.net.URI;
@@ -57,6 +57,8 @@ public class RequestFactoryTest {
     @Mock
     private OutputStream body;
 
+    private TaxiiStatus.Feed feed;
+
     @Before
     public void setUp() throws Exception {
         pollEndpoint = new URL("http://somehost/service");
@@ -64,6 +66,8 @@ public class RequestFactoryTest {
         headersAppender = new HttpHeadersAppender();
         initMocks();
         requestFactory = new RequestFactory(pollEndpoint, httpRequestFactory, headersAppender, bodyWriter);
+        feed = new TaxiiStatus.Feed();
+        feed.setName("my-collection");
     }
 
     private void initMocks() throws Exception {
@@ -79,16 +83,16 @@ public class RequestFactoryTest {
 
     @Test
     public void createInitialRequest() throws Exception {
-        request = requestFactory.createInitialRequest("123", "my-collection");
+        request = requestFactory.createPollRequest("123", feed);
         assertThat(headers, hasAllTaxiiHeaders());
-        verify(bodyWriter).write("123", "my-collection", body);
+        verify(bodyWriter).write("123", feed, body);
     }
 
     @Test
     public void createFulfillmentRequest() throws Exception {
-        request = requestFactory.createFulfillmentRequest("123", "my-collection", "1000#2000", 1);
+        request = requestFactory.createFulfillmentRequest("123", feed, "1000#2000", 1);
         assertThat(headers, hasAllTaxiiHeaders());
-        verify(bodyWriter).write("123", "my-collection", "1000#2000", 1, body);
+        verify(bodyWriter).write("123", feed, "1000#2000", 1, body);
     }
 
 }

@@ -66,7 +66,7 @@ public class AdapterConfiguration {
     public Runnable adapterTask() throws Exception {
         return new AdapterTask(
             requestFactory,
-            responseHandler(),
+            responseTransformer(),
             taxiiServiceSettings,
             statistics(),
             taxiiStatusDao,
@@ -87,7 +87,7 @@ public class AdapterConfiguration {
     }
 
     @Bean
-    public ResponseTransformer responseHandler() throws Exception {
+    public ResponseTransformer responseTransformer() throws Exception {
         return new ResponseTransformer(
                 templates(),
                 logWriter(),

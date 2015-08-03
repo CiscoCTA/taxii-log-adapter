@@ -52,15 +52,15 @@ public class HttpBodyWriter {
     /**
      * Write the TAXII poll request to an {@link OutputStream}.
      *
-     * @param feed The TAXII feed name.
+     * @param feed The TAXII feed.
      * @param body The {@link OutputStream} to write the body to.
      * @throws Exception When any error occurs.
      */
-    public void write(String messageId, String feed, OutputStream body) throws Exception {
+    public void write(String messageId, TaxiiStatus.Feed feed, OutputStream body) throws Exception {
         try (OutputStreamWriter out = new OutputStreamWriter(body, "UTF-8")) {
             HashMap<String, Object> data = new HashMap<>();
             data.put("messageId", messageId);
-            data.put("collection", feed);
+            data.put("collection", feed.getName());
             XMLGregorianCalendar lastUpdate = getLastUpdate(feed);
             if (lastUpdate != null) {
                 data.put("begin", lastUpdate.toXMLFormat());
@@ -72,25 +72,24 @@ public class HttpBodyWriter {
     /**
      * Write the TAXII poll fulfillment request to an {@link OutputStream}.
      *
-     * @param feed             The TAXII feed name.
+     * @param feed             The TAXII feed.
      * @param resultId         result id.
      * @param resultPartNumber result part number.
      * @param body             The {@link OutputStream} to write the body to.
      * @throws Exception When any error occurs.
      */
-    public void write(String messageId, String feed, String resultId, Integer resultPartNumber, OutputStream body) throws Exception {
+    public void write(String messageId, TaxiiStatus.Feed feed, String resultId, Integer resultPartNumber, OutputStream body) throws Exception {
         try (OutputStreamWriter out = new OutputStreamWriter(body, "UTF-8")) {
             HashMap<String, Object> data = new HashMap<>();
             data.put("messageId", messageId);
-            data.put("collection", feed);
+            data.put("collection", feed.getName());
             data.put("resultId", resultId);
             data.put("resultPartNumber", resultPartNumber);
             templateFulfillment.process(data, out);
         }
     }
 
-    private XMLGregorianCalendar getLastUpdate(String feedName) {
-        TaxiiStatus.Feed feed = taxiiStatusDao.find(feedName);
+    private XMLGregorianCalendar getLastUpdate(TaxiiStatus.Feed feed) {
         if (feed != null && feed.getLastUpdate() != null) {
             return feed.getLastUpdate();
         } else {

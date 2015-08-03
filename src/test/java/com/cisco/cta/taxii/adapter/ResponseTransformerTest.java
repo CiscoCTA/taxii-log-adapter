@@ -16,6 +16,7 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,6 +70,8 @@ public class ResponseTransformerTest {
     @Mock(answer=RETURNS_MOCKS)
     private TaxiiPollResponseReader responseReader;
 
+    private TaxiiStatus.Feed feed;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -77,12 +80,14 @@ public class ResponseTransformerTest {
         when(readerFactory.create(body)).thenReturn(responseReader);
         when(responseReader.getEventType()).thenReturn(XMLStreamConstants.START_DOCUMENT);
         responseTransformer = new ResponseTransformer(templates, logWriter, readerFactory);
+        feed = new TaxiiStatus.Feed();
+        feed.setName("my-feed");
     }
 
     @Test
     public void transformResponse() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(200);
-        responseTransformer.transform("my-feed", resp);
+        responseTransformer.transform(feed, resp);
         verify(transformer).transform(isExpectedXmlSource(), isExpectedOutputTarget());
     }
 
@@ -90,7 +95,7 @@ public class ResponseTransformerTest {
     public void handleNonPollResponseMessage() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(200);
         when(responseReader.isPollResponse()).thenReturn(false);
-        responseTransformer.transform("my-feed", resp);
+        responseTransformer.transform(feed, resp);
         verify(transformer).transform(isExpectedXmlSource(), isExpectedOutputTarget());
         verifyZeroInteractions(taxiiStatusDao);
     }
@@ -98,7 +103,7 @@ public class ResponseTransformerTest {
     @Test(expected=IOException.class)
     public void reportErrorHttpStatus() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(300);
-        responseTransformer.transform("my-feed", resp);
+        responseTransformer.transform(feed, resp);
         verifyZeroInteractions(readerFactory);
         verifyZeroInteractions(templates);
         verifyZeroInteractions(taxiiStatusDao);

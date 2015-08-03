@@ -82,6 +82,9 @@ public class AdapterTaskTest {
 
     private Clock clock;
 
+    private TaxiiStatus.Feed feed;
+
+
    @Before
     public void setUp() throws Exception {
        datatypeFactory = DatatypeFactory.newInstance();
@@ -91,19 +94,22 @@ public class AdapterTaskTest {
        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
        when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
        task = new AdapterTask(requestFactory, responseTransformer, settings, statistics, taxiiStatusDao, datatypeFactory, clock);
-       when(requestFactory.createInitialRequest(anyString(), anyString())).thenReturn(request);
+       when(requestFactory.createPollRequest(anyString(), any(TaxiiStatus.Feed.class))).thenReturn(request);
+       feed = new TaxiiStatus.Feed();
+       feed.setName("my-collection");
     }
 
     @Test
     public void triggerRequestResponse() throws Exception {
         when(request.execute()).thenReturn(response);
+        when(taxiiStatusDao.find(anyString())).thenReturn(feed);
         XMLGregorianCalendar cal = datatypeFactory.newXMLGregorianCalendar("2000-01-02T03:04:05.006+00:00");
         TaxiiPollResponse pollResponse = TaxiiPollResponse.builder().multipart(false).inclusiveEndTime(cal).build();
-        when(responseTransformer.transform(anyString(), any(ClientHttpResponse.class))).thenReturn(pollResponse);
+        when(responseTransformer.transform(any(TaxiiStatus.Feed.class), any(ClientHttpResponse.class))).thenReturn(pollResponse);
         task.run();
-        verify(requestFactory).createInitialRequest(anyString(), anyString());
+        verify(requestFactory).createPollRequest(anyString(), any(TaxiiStatus.Feed.class));
         verify(request).execute();
-        verify(responseTransformer).transform("my-collection", response);
+        verify(responseTransformer).transform(feed, response);
         assertThat(statistics.getPolls(), is(1L));
         assertThat(statistics.getErrors(), is(0L));
     }
@@ -114,11 +120,11 @@ public class AdapterTaskTest {
         TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().more(true).resultPartNumber(1).inclusiveEndTime(cal).build();
         XMLGregorianCalendar cal2 = datatypeFactory.newXMLGregorianCalendar("2000-01-10T03:04:06.006+00:00");
         TaxiiPollResponse secondResponse = TaxiiPollResponse.builder().more(false).resultPartNumber(2).inclusiveEndTime(cal2).build();
-        when(responseTransformer.transform(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
-        when(requestFactory.createFulfillmentRequest(anyString(), anyString(), anyString(), anyInt())).thenReturn(request);
+        when(responseTransformer.transform(any(TaxiiStatus.Feed.class), any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
+        when(requestFactory.createFulfillmentRequest(anyString(), any(TaxiiStatus.Feed.class), anyString(), anyInt())).thenReturn(request);
         task.run();
-        verify(responseTransformer, times(2)).transform(anyString(), any(ClientHttpResponse.class));
-        verify(requestFactory).createFulfillmentRequest(anyString(), anyString(), anyString(), anyInt());
+        verify(responseTransformer, times(2)).transform(any(TaxiiStatus.Feed.class), any(ClientHttpResponse.class));
+        verify(requestFactory).createFulfillmentRequest(anyString(), any(TaxiiStatus.Feed.class), anyString(), anyInt());
     }
 
 
@@ -126,8 +132,8 @@ public class AdapterTaskTest {
     public void doNotWriteLastUpdateIfMultipartFails() throws Exception {
         XMLGregorianCalendar cal = datatypeFactory.newXMLGregorianCalendar("2000-01-02T03:04:05.006+00:00");
         TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().more(true).resultPartNumber(1).inclusiveEndTime(cal).build();
-        when(requestFactory.createFulfillmentRequest(anyString(), anyString(), anyString(), anyInt())).thenReturn(request);
-        when(responseTransformer.transform(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse).thenThrow(new Exception());
+        when(requestFactory.createFulfillmentRequest(anyString(), any(TaxiiStatus.Feed.class), anyString(), anyInt())).thenReturn(request);
+        when(responseTransformer.transform(any(TaxiiStatus.Feed.class), any(ClientHttpResponse.class))).thenReturn(firstResponse).thenThrow(new Exception());
         task.run();
         TaxiiStatus.Feed expectedFeed = new TaxiiStatus.Feed();
         expectedFeed.setName("my-collection");
@@ -141,8 +147,8 @@ public class AdapterTaskTest {
         TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().multipart(true).more(true).resultId("123#456").resultPartNumber(1).inclusiveEndTime(cal).build();
         XMLGregorianCalendar cal2 = datatypeFactory.newXMLGregorianCalendar("2000-01-10T03:04:06.006+00:00");
         TaxiiPollResponse secondResponse = TaxiiPollResponse.builder().more(false).resultPartNumber(2).inclusiveEndTime(cal2).build();
-        when(requestFactory.createFulfillmentRequest(anyString(), anyString(), anyString(), anyInt())).thenReturn(request);
-        when(responseTransformer.transform(anyString(), any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
+        when(requestFactory.createFulfillmentRequest(anyString(), any(TaxiiStatus.Feed.class), anyString(), anyInt())).thenReturn(request);
+        when(responseTransformer.transform(any(TaxiiStatus.Feed.class), any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
         task.run();
         InOrder inOrder = Mockito.inOrder(taxiiStatusDao);
         TaxiiStatus.Feed expectedFeed = new TaxiiStatus.Feed();
@@ -162,7 +168,7 @@ public class AdapterTaskTest {
     public void handleCommunicationError() throws Exception {
         when(request.execute()).thenThrow(IOException.class);
         task.run();
-        verify(requestFactory).createInitialRequest(anyString(), anyString());
+        verify(requestFactory).createPollRequest(anyString(), any(TaxiiStatus.Feed.class));
         verify(request).execute();
         verifyZeroInteractions(responseTransformer);
         verifyLog(mockAppender, "Error");
@@ -173,9 +179,9 @@ public class AdapterTaskTest {
     @Test
     public void handleInvalidResponseError() throws Exception {
         when(request.execute()).thenReturn(response);
-        doThrow(new Exception("Dummy response")).when(responseTransformer).transform("my-collection", response);
+        doThrow(new Exception("Dummy response")).when(responseTransformer).transform(feed, response);
         task.run();
-        verify(requestFactory).createInitialRequest(anyString(), anyString());
+        verify(requestFactory).createPollRequest(anyString(), any(TaxiiStatus.Feed.class));
                 verify(request).execute();
         verifyLog(mockAppender, "Error");
         assertThat(statistics.getPolls(), is(1L));

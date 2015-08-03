@@ -72,14 +72,17 @@ public class AdapterTask implements Runnable {
     }
 
     private void downloadFeed(String feedName) {
-        TaxiiPollResponse response = null;
-        do {
-            try {
+        try {
+            TaxiiPollResponse response = null;
+            do {
                 String messageId = createMessageId();
                 MDC.put("messageId", messageId);
-                response = poll(messageId, feedName, response);
-                TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
-                feed.setName(feedName);
+                TaxiiStatus.Feed feed = taxiiStatusDao.find(feedName);
+                if (feed == null) {
+                    feed = new TaxiiStatus.Feed();
+                    feed.setName(feedName);
+                }
+                response = poll(messageId, feed, response);
                 if (response.isMultipart() && response.isMore()) {
                     feed.setMore(response.isMore());
                     feed.setResultId(response.getResultId());
@@ -91,15 +94,15 @@ public class AdapterTask implements Runnable {
                 }
                 feed.setLastUpdate(getLastUpdate(response));
                 taxiiStatusDao.updateOrAdd(feed);
-            } catch(Exception e) {
-                statistics.incrementErrors();
-                LOG.error("Error while processing feed " + feedName, e);
-                return ;
+            }while(response.isMore());
+        } catch(Exception e) {
+            statistics.incrementErrors();
+            LOG.error("Error while processing feed " + feedName, e);
+            return ;
 
-            } finally {
-                MDC.clear();
-            }
-        }while(hasPendingResultParts(response));
+        } finally {
+            MDC.clear();
+        }
     }
 
     private XMLGregorianCalendar getLastUpdate(TaxiiPollResponse response) throws Exception {
@@ -110,16 +113,12 @@ public class AdapterTask implements Runnable {
         }
     }
 
-    private boolean hasPendingResultParts(TaxiiPollResponse response) {
-        return response != null && response.isMore();
-    }
-
-    private TaxiiPollResponse poll(String messageId, String feed, TaxiiPollResponse previousResponse) throws Exception {
+    private TaxiiPollResponse poll(String messageId, TaxiiStatus.Feed feed, TaxiiPollResponse previousResponse) throws Exception {
         statistics.incrementPolls();
         ClientHttpRequest request;
         if (previousResponse == null) {
             LOG.trace("creating initial taxii request...");
-            request = requestFactory.createInitialRequest(messageId, feed);
+            request = requestFactory.createPollRequest(messageId, feed);
         } else {
             LOG.trace("creating fulfillment taxii request - {}", previousResponse.getResultPartNumber() + 1);
             request = requestFactory.createFulfillmentRequest(messageId, feed, previousResponse.getResultId(), previousResponse.getResultPartNumber() + 1);

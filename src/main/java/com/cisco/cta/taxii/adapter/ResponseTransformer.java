@@ -16,6 +16,7 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import org.apache.log4j.MDC;
 import org.springframework.http.client.ClientHttpResponse;
 
@@ -50,12 +51,12 @@ public class ResponseTransformer {
     /**
      * Transforms TAXII response.
      * 
-     * @param feed The TAXII feed name, that was sent in the request.
+     * @param feed The TAXII feed.
      * @param resp HTTP response
      * @return TaxiiPollResponse if valid TAXII poll response was returned
      * @throws Exception When any error occurs.
      */
-    public TaxiiPollResponse transform(String feed, ClientHttpResponse resp) throws Exception {
+    public TaxiiPollResponse transform(TaxiiStatus.Feed feed, ClientHttpResponse resp) throws Exception {
         if (resp.getRawStatusCode() == HTTP_OK) {
             MDC.put("feed", feed);
             try (InputStream body = resp.getBody()) {

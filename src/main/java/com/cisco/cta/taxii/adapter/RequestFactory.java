@@ -19,6 +19,7 @@ package com.cisco.cta.taxii.adapter;
 import java.net.URI;
 import java.net.URL;
 
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -51,11 +52,11 @@ public class RequestFactory {
     /**
      * Create the TAXII request.
      * 
-     * @param feed The TAXII feed name.
+     * @param feed The TAXII feed.
      * @return TAXII poll request.
      * @throws Exception When any error occurs.
      */
-    public ClientHttpRequest createInitialRequest(String messageId, String feed) throws Exception {
+    public ClientHttpRequest createPollRequest(String messageId, TaxiiStatus.Feed feed) throws Exception {
         ClientHttpRequest req = httpRequestFactory.createRequest(pollEndpoint, HttpMethod.POST);
         httpHeadersAppender.appendTo(req.getHeaders());
         httpBodyWriter.write(messageId, feed, req.getBody());
@@ -69,7 +70,7 @@ public class RequestFactory {
      * @return TAXII poll request.
      * @throws Exception When any error occurs.
      */
-    public ClientHttpRequest createFulfillmentRequest(String messageId, String feed, String resultId, Integer resultPartNumber) throws Exception {
+    public ClientHttpRequest createFulfillmentRequest(String messageId, TaxiiStatus.Feed feed, String resultId, Integer resultPartNumber) throws Exception {
         ClientHttpRequest req = httpRequestFactory.createRequest(pollEndpoint, HttpMethod.POST);
         httpHeadersAppender.appendTo(req.getHeaders());
         httpBodyWriter.write(messageId, feed, resultId, resultPartNumber, req.getBody());

@@ -99,20 +99,13 @@ public class TaxiiPollResponseReader extends StreamReaderDelegate {
      */
     public TaxiiPollResponse getResponse() throws  TaxiiStatusException {
         if (isPollResponse()) {
-            if (more != null && resultId != null && resultPartNumber != null) {
-                return TaxiiPollResponse.builder()
-                        .multipart(true)
-                        .more(more)
-                        .resultId(resultId)
-                        .resultPartNumber(resultPartNumber)
-                        .inclusiveEndTime(inclusiveEndTime)
-                        .build();
-            } else {
-                return TaxiiPollResponse.builder()
-                        .multipart(false)
-                        .inclusiveEndTime(inclusiveEndTime)
-                        .build();
-            }
+            return TaxiiPollResponse.builder()
+                    .multipart(resultId != null)
+                    .more(more != null && more)
+                    .resultId(resultId)
+                    .resultPartNumber(resultPartNumber)
+                    .inclusiveEndTime(inclusiveEndTime)
+                    .build();
         } else {
             throw new TaxiiStatusException(statusType, statusMessage);
         }

@@ -25,6 +25,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.Writer;
 
+import com.cisco.cta.taxii.adapter.filter.JsonValidationFilter;
+import org.jboss.logging.MDC;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -105,6 +107,13 @@ public class Slf4JWriterTest {
         writer.flush();
         verifyZeroInteractions(logger);
         verifyZeroInteractions(statistics);
+    }
+
+    @Test(expected = JsonValidationException.class)
+    public void reactsOnJsonValidationError() throws Exception {
+        char[] chars = "PAYLOAD\n".toCharArray();
+        MDC.put(JsonValidationFilter.JSON_VALIDATION_ERROR, "test error");
+        writer.write(chars);
     }
 
 }

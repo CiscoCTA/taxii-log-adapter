@@ -21,6 +21,7 @@ import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import com.google.common.collect.ImmutableList;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
@@ -93,7 +94,7 @@ public class AdapterTaskTest {
        MockitoAnnotations.initMocks(this);
        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
        when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
-       task = new AdapterTask(requestFactory, responseTransformer, settings, statistics, taxiiStatusDao, datatypeFactory, clock);
+       task = new AdapterTask(requestFactory, responseTransformer, settings, statistics, taxiiStatusDao);
        when(requestFactory.createPollRequest(anyString(), any(TaxiiStatus.Feed.class))).thenReturn(request);
        feed = new TaxiiStatus.Feed();
        feed.setName("my-collection");
@@ -171,9 +172,9 @@ public class AdapterTaskTest {
         verify(requestFactory).createPollRequest(anyString(), any(TaxiiStatus.Feed.class));
         verify(request).execute();
         verifyZeroInteractions(responseTransformer);
-        verifyLog(mockAppender, "Error");
+        verifyLog(mockAppender, "HTTP connection problem occured");
         assertThat(statistics.getPolls(), is(1L));
-        assertThat(statistics.getErrors(), is(1L));
+        assertThat(statistics.getErrors(), is(0L));
     }
 
     @Test
@@ -185,6 +186,21 @@ public class AdapterTaskTest {
                 verify(request).execute();
         verifyLog(mockAppender, "Error");
         assertThat(statistics.getPolls(), is(1L));
+        assertThat(statistics.getErrors(), is(1L));
+    }
+
+    @Test
+    public void exceedMaxConnectionAttempts() throws Exception {
+        when(request.execute()).thenThrow(new ConnectTimeoutException("error"));
+        TaxiiStatus.Feed feedMock = mock(TaxiiStatus.Feed.class);
+        when(feedMock.getIoErrorCount()).thenReturn(0).thenReturn(1).thenReturn(2).thenReturn(3);
+        when(taxiiStatusDao.find("my-collection")).thenReturn(feedMock);
+        task.run();
+        task.run();
+        verifyLog(mockAppender, "HTTP connection problem occured");
+        assertThat(statistics.getErrors(), is(0L));
+        task.run();
+        verifyLog(mockAppender, "Error");
         assertThat(statistics.getErrors(), is(1L));
     }
 

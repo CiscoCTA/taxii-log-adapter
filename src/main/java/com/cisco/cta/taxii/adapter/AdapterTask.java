@@ -24,10 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.threeten.bp.Clock;
 
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,22 +38,20 @@ public class AdapterTask implements Runnable {
 
     private static final String MESSAGE_ID_PREFIX = "tla-";
 
+    private static final Integer MAX_HTTP_CONNECTION_ATTEMPTS = 3;
+
     private final RequestFactory requestFactory;
     private final ResponseTransformer responseTransformer;
     private final List<String> feeds;
     private final AdapterStatistics statistics;
     private final TaxiiStatusDao taxiiStatusDao;
-    private final DatatypeFactory datatypeFactory;
-    private final Clock clock;
 
-    public AdapterTask(RequestFactory requestFactory, ResponseTransformer responseTransformer, TaxiiServiceSettings settings, AdapterStatistics statistics, TaxiiStatusDao taxiiStatusDao, DatatypeFactory datatypeFactory, Clock clock) {
+    public AdapterTask(RequestFactory requestFactory, ResponseTransformer responseTransformer, TaxiiServiceSettings settings, AdapterStatistics statistics, TaxiiStatusDao taxiiStatusDao) {
         this.requestFactory = requestFactory;
         this.responseTransformer = responseTransformer;
         this.feeds = settings.getFeeds();
         this.statistics = statistics;
         this.taxiiStatusDao = taxiiStatusDao;
-        this.datatypeFactory = datatypeFactory;
-        this.clock = clock;
     }
 
     private String createMessageId() {
@@ -82,7 +79,12 @@ public class AdapterTask implements Runnable {
                     feed = new TaxiiStatus.Feed();
                     feed.setName(feedName);
                 }
-                response = poll(messageId, feed, response);
+                try {
+                    response = poll(messageId, feed, response);
+                }catch(IOException e) {
+                    handleIOError(feed, e);
+                    return ;
+                }
                 if (response.isMultipart() && response.isMore()) {
                     feed.setMore(response.isMore());
                     feed.setResultId(response.getResultId());
@@ -92,9 +94,10 @@ public class AdapterTask implements Runnable {
                     feed.setResultId(null);
                     feed.setResultPartNumber(null);
                 }
+                feed.setIoErrorCount(null);
                 feed.setLastUpdate(getLastUpdate(response));
                 taxiiStatusDao.updateOrAdd(feed);
-            }while(response.isMore());
+            } while (response.isMore());
         } catch(Exception e) {
             statistics.incrementErrors();
             LOG.error("Error while processing feed " + feedName, e);
@@ -102,6 +105,21 @@ public class AdapterTask implements Runnable {
 
         } finally {
             MDC.clear();
+        }
+    }
+
+    private void handleIOError(TaxiiStatus.Feed feed, Throwable e) throws Exception {
+        Integer ioErrorCount = feed.getIoErrorCount();
+        if (ioErrorCount == null) {
+            ioErrorCount = new Integer(1);
+        } else {
+            ioErrorCount += 1;
+        }
+        if (ioErrorCount >= MAX_HTTP_CONNECTION_ATTEMPTS) {
+            throw new Exception("Exceeded maximum number of HTTP connection retries",e);
+        } else {
+            taxiiStatusDao.updateOrAdd(feed);
+            LOG.warn("HTTP connection problem occured.");
         }
     }
 

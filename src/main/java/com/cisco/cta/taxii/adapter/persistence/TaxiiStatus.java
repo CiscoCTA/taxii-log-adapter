@@ -64,5 +64,8 @@ public class TaxiiStatus {
         @XmlAttribute
         private Integer resultPartNumber;
 
+        @XmlAttribute
+        private Integer ioErrorCount;
+
     }
 }

@@ -69,9 +69,7 @@ public class AdapterConfiguration {
             responseTransformer(),
             taxiiServiceSettings,
             statistics(),
-            taxiiStatusDao,
-            datatypeFactory(),
-            clock());
+            taxiiStatusDao);
     }
 
     @Bean

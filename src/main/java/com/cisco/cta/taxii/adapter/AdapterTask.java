@@ -113,12 +113,13 @@ public class AdapterTask implements Runnable {
         if (ioErrorCount == null) {
             ioErrorCount = new Integer(1);
         } else {
-            ioErrorCount += 1;
+            ioErrorCount = new Integer(ioErrorCount + 1);
         }
+        feed.setIoErrorCount(ioErrorCount);
+        taxiiStatusDao.updateOrAdd(feed);
         if (ioErrorCount >= MAX_HTTP_CONNECTION_ATTEMPTS) {
             throw new Exception("Exceeded maximum number of HTTP connection retries",e);
         } else {
-            taxiiStatusDao.updateOrAdd(feed);
             LOG.warn("HTTP connection problem occured.");
         }
     }

@@ -192,14 +192,16 @@ public class AdapterTaskTest {
     @Test
     public void exceedMaxConnectionAttempts() throws Exception {
         when(request.execute()).thenThrow(new ConnectTimeoutException("error"));
-        TaxiiStatus.Feed feedMock = mock(TaxiiStatus.Feed.class);
-        when(feedMock.getIoErrorCount()).thenReturn(0).thenReturn(1).thenReturn(2).thenReturn(3);
-        when(taxiiStatusDao.find("my-collection")).thenReturn(feedMock);
+        TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
+        when(taxiiStatusDao.find("my-collection")).thenReturn(feed);
         task.run();
+        assertThat(feed.getIoErrorCount(), is(1));
         task.run();
+        assertThat(feed.getIoErrorCount(), is(2));
         verifyLog(mockAppender, "HTTP connection problem occured");
         assertThat(statistics.getErrors(), is(0L));
         task.run();
+        assertThat(feed.getIoErrorCount(), is(3));
         verifyLog(mockAppender, "Error");
         assertThat(statistics.getErrors(), is(1L));
     }

@@ -16,13 +16,12 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import java.io.IOException;
-import java.io.Writer;
-
-import com.cisco.cta.taxii.adapter.filter.JsonValidationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Adapter from {@link Writer} to <a href="http://www.slf4j.org/">SLF4J</a>.
@@ -46,12 +45,12 @@ public class Slf4JWriter extends Writer {
         if (c == '\n' && lineBuffer.length() > 0) {
             try {
                 logger.info(lineBuffer.toString());
-                String validationError = MDC.get(JsonValidationFilter.JSON_VALIDATION_ERROR);
+                String validationError = MDC.get(OutputValidationException.MDC_KEY);
                 if (validationError != null) {
-                    throw new JsonValidationException(validationError);
+                    throw new OutputValidationException(validationError);
                 }
             } finally {
-                MDC.remove(JsonValidationFilter.JSON_VALIDATION_ERROR);
+                MDC.remove(OutputValidationException.MDC_KEY);
             }
             lineBuffer.setLength(0);
             statistics.incrementLogs();

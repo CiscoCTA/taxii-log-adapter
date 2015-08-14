@@ -19,14 +19,13 @@ package com.cisco.cta.taxii.adapter.filter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
+import com.cisco.cta.taxii.adapter.OutputValidationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.MDC;
 
 import java.io.IOException;
 
 public class JsonValidationFilter extends Filter<ILoggingEvent> {
-
-    public static final String JSON_VALIDATION_ERROR = "JsonValidationError";
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -36,7 +35,7 @@ public class JsonValidationFilter extends Filter<ILoggingEvent> {
         try {
             mapper.readTree(messsage);
         }catch(IOException e) {
-            MDC.put(JSON_VALIDATION_ERROR, e.getMessage());
+            MDC.put(OutputValidationException.MDC_KEY, e.getMessage());
             return FilterReply.DENY;
         }
         return FilterReply.ACCEPT;

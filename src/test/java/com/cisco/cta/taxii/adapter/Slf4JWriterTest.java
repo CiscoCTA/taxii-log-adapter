@@ -35,9 +35,6 @@ import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cisco.cta.taxii.adapter.AdapterStatistics;
-import com.cisco.cta.taxii.adapter.Slf4JWriter;
-
 import ch.qos.logback.core.Appender;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -109,10 +106,10 @@ public class Slf4JWriterTest {
         verifyZeroInteractions(statistics);
     }
 
-    @Test(expected = JsonValidationException.class)
+    @Test(expected = OutputValidationException.class)
     public void reactsOnJsonValidationError() throws Exception {
         char[] chars = "PAYLOAD\n".toCharArray();
-        MDC.put(JsonValidationFilter.JSON_VALIDATION_ERROR, "test error");
+        MDC.put(OutputValidationException.MDC_KEY, "test error");
         writer.write(chars);
     }
 

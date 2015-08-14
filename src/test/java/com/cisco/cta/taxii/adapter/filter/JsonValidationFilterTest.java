@@ -18,6 +18,7 @@ package com.cisco.cta.taxii.adapter.filter;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.spi.FilterReply;
+import com.cisco.cta.taxii.adapter.OutputValidationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.MDC;
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class JsonValidationFilterTest {
         loggingEvent.setMessage(readFirstLine("/valid-json.json"));
         FilterReply reply = jsonValidationFilter.decide(loggingEvent);
         assertThat(reply, is(FilterReply.ACCEPT));
-        assertThat(MDC.get(JsonValidationFilter.JSON_VALIDATION_ERROR), nullValue());
+        assertThat(MDC.get(OutputValidationException.MDC_KEY), nullValue());
     }
 
     @Test
@@ -57,9 +58,9 @@ public class JsonValidationFilterTest {
         try {
             FilterReply reply = jsonValidationFilter.decide(loggingEvent);
             assertThat(reply, is(FilterReply.DENY));
-            assertThat(MDC.get(JsonValidationFilter.JSON_VALIDATION_ERROR), notNullValue());
+            assertThat(MDC.get(OutputValidationException.MDC_KEY), notNullValue());
         }finally {
-            MDC.remove(JsonValidationFilter.JSON_VALIDATION_ERROR);
+            MDC.remove(OutputValidationException.MDC_KEY);
         }
     }
 

@@ -51,14 +51,12 @@ public class ResponseTransformer {
     /**
      * Transforms TAXII response.
      * 
-     * @param feed The TAXII feed.
      * @param resp HTTP response
      * @return TaxiiPollResponse if valid TAXII poll response was returned
      * @throws Exception When any error occurs.
      */
-    public TaxiiPollResponse transform(TaxiiStatus.Feed feed, ClientHttpResponse resp) throws Exception {
+    public TaxiiPollResponse transform(ClientHttpResponse resp) throws Exception {
         if (resp.getRawStatusCode() == HTTP_OK) {
-            MDC.put("feed", feed);
             try (InputStream body = resp.getBody()) {
                 TaxiiPollResponseReader responseReader = readerFactory.create(body);
                 Transformer transformer = templates.newTransformer();

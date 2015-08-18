@@ -74,6 +74,7 @@ public class AdapterTask implements Runnable {
             do {
                 String messageId = createMessageId();
                 MDC.put("messageId", messageId);
+                MDC.put("feed", feedName);
                 TaxiiStatus.Feed feed = taxiiStatusDao.find(feedName);
                 if (feed == null) {
                     feed = new TaxiiStatus.Feed();
@@ -143,7 +144,7 @@ public class AdapterTask implements Runnable {
             request = requestFactory.createFulfillmentRequest(messageId, feed, previousResponse.getResultId(), previousResponse.getResultPartNumber() + 1);
         }
         try (ClientHttpResponse resp = request.execute()) {
-            return responseTransformer.transform(feed, resp);
+            return responseTransformer.transform(resp);
         }
     }
 

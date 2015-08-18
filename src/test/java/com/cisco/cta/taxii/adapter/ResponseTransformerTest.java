@@ -87,7 +87,7 @@ public class ResponseTransformerTest {
     @Test
     public void transformResponse() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(200);
-        responseTransformer.transform(feed, resp);
+        responseTransformer.transform(resp);
         verify(transformer).transform(isExpectedXmlSource(), isExpectedOutputTarget());
     }
 
@@ -95,7 +95,7 @@ public class ResponseTransformerTest {
     public void handleNonPollResponseMessage() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(200);
         when(responseReader.isPollResponse()).thenReturn(false);
-        responseTransformer.transform(feed, resp);
+        responseTransformer.transform(resp);
         verify(transformer).transform(isExpectedXmlSource(), isExpectedOutputTarget());
         verifyZeroInteractions(taxiiStatusDao);
     }
@@ -103,7 +103,7 @@ public class ResponseTransformerTest {
     @Test(expected=IOException.class)
     public void reportErrorHttpStatus() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(300);
-        responseTransformer.transform(feed, resp);
+        responseTransformer.transform(resp);
         verifyZeroInteractions(readerFactory);
         verifyZeroInteractions(templates);
         verifyZeroInteractions(taxiiStatusDao);

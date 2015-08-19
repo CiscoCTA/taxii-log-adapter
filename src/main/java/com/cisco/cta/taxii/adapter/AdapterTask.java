@@ -114,7 +114,7 @@ public class AdapterTask implements Runnable {
         if (ioErrorCount == null) {
             ioErrorCount = new Integer(1);
         } else {
-            ioErrorCount = new Integer(ioErrorCount + 1);
+            ioErrorCount = ioErrorCount + 1;
         }
         feed.setIoErrorCount(ioErrorCount);
         taxiiStatusDao.updateOrAdd(feed);

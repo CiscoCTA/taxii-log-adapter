@@ -112,7 +112,7 @@ public class AdapterTask implements Runnable {
     private void handleIOError(TaxiiStatus.Feed feed, Throwable e) throws Exception {
         Integer ioErrorCount = feed.getIoErrorCount();
         if (ioErrorCount == null) {
-            ioErrorCount = new Integer(1);
+            ioErrorCount = 1;
         } else {
             ioErrorCount = ioErrorCount + 1;
         }

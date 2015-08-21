@@ -174,6 +174,7 @@ public class TaxiiPollResponseReader extends StreamReaderDelegate {
                     statusMessage = getText();
                     state = State.OTHER;
                 }
+                break;
             default: // do nothing
         }
         return result;

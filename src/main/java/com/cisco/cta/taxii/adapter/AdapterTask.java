@@ -71,22 +71,22 @@ public class AdapterTask implements Runnable {
     private void downloadFeed(String feedName) {
         try {
             TaxiiPollResponse response = null;
+            TaxiiStatus.Feed feed = taxiiStatusDao.find(feedName);
             do {
                 String messageId = createMessageId();
                 MDC.put("messageId", messageId);
                 MDC.put("feed", feedName);
-                TaxiiStatus.Feed feed = taxiiStatusDao.find(feedName);
                 if (feed == null) {
                     feed = new TaxiiStatus.Feed();
                     feed.setName(feedName);
                 }
                 try {
-                    response = poll(messageId, feed, response);
+                    response = poll(messageId, feed);
                 }catch(IOException e) {
                     handleIOError(feed, e);
                     return ;
                 }
-                if (response.isMultipart() && response.isMore()) {
+                if (response.getResultId() != null && response.isMore()) {
                     feed.setMore(response.isMore());
                     feed.setResultId(response.getResultId());
                     feed.setResultPartNumber(response.getResultPartNumber());
@@ -133,15 +133,16 @@ public class AdapterTask implements Runnable {
         }
     }
 
-    private TaxiiPollResponse poll(String messageId, TaxiiStatus.Feed feed, TaxiiPollResponse previousResponse) throws Exception {
+    private TaxiiPollResponse poll(String messageId, TaxiiStatus.Feed lastSuccessfulFeed) throws Exception {
         statistics.incrementPolls();
         ClientHttpRequest request;
-        if (previousResponse == null) {
+        if (lastSuccessfulFeed.getResultPartNumber() == null) {
             LOG.trace("creating initial taxii request...");
-            request = requestFactory.createPollRequest(messageId, feed);
+            request = requestFactory.createPollRequest(messageId, lastSuccessfulFeed);
         } else {
-            LOG.trace("creating fulfillment taxii request - {}", previousResponse.getResultPartNumber() + 1);
-            request = requestFactory.createFulfillmentRequest(messageId, feed, previousResponse.getResultId(), previousResponse.getResultPartNumber() + 1);
+            LOG.trace("creating fulfillment taxii request - {}", lastSuccessfulFeed.getResultPartNumber() + 1);
+            request = requestFactory.createFulfillmentRequest(
+                    messageId, lastSuccessfulFeed, lastSuccessfulFeed.getResultId(), lastSuccessfulFeed.getResultPartNumber() + 1);
         }
         try (ClientHttpResponse resp = request.execute()) {
             return responseTransformer.transform(resp);

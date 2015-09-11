@@ -24,7 +24,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 @Value
 @Builder
 public class TaxiiPollResponse {
-    private boolean multipart;
     private boolean more;
     private String resultId;
     private Integer resultPartNumber;

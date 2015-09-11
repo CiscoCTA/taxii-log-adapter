@@ -100,7 +100,6 @@ public class TaxiiPollResponseReader extends StreamReaderDelegate {
     public TaxiiPollResponse getResponse() throws  TaxiiStatusException {
         if (isPollResponse()) {
             return TaxiiPollResponse.builder()
-                    .multipart(resultId != null)
                     .more(more != null && more)
                     .resultId(resultId)
                     .resultPartNumber(resultPartNumber)

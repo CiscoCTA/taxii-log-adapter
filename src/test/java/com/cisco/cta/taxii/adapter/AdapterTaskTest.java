@@ -44,6 +44,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -77,6 +78,7 @@ public class AdapterTaskTest {
     @Spy
     private AdapterStatistics statistics = new AdapterStatistics();
 
+    @Mock
     private TaxiiStatusDao taxiiStatusDao;
 
     private DatatypeFactory datatypeFactory;
@@ -92,7 +94,6 @@ public class AdapterTaskTest {
        Instant now = Instant.parse("2000-01-02T03:04:05.006Z");
        clock = Clock.fixed(now, ZoneId.systemDefault());
        MockitoAnnotations.initMocks(this);
-       taxiiStatusDao = Mockito.mock(TaxiiStatusDao.class, withSettings().defaultAnswer(new ClonesArguments()));
        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
        when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
        task = new AdapterTask(requestFactory, responseTransformer, settings, statistics, taxiiStatusDao);
@@ -156,19 +157,20 @@ public class AdapterTaskTest {
         TaxiiPollResponse secondResponse = TaxiiPollResponse.builder().more(false).resultId("123#456").resultPartNumber(2).inclusiveEndTime(cal2).build();
         when(requestFactory.createFulfillmentRequest(anyString(), any(TaxiiStatus.Feed.class), anyString(), anyInt())).thenReturn(request);
         when(responseTransformer.transform(any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
+        TaxiiStatus.Feed feedMock = mock(TaxiiStatus.Feed.class);
+        when(taxiiStatusDao.find("my-collection")).thenReturn(feedMock);
         task.run();
-        InOrder inOrder = Mockito.inOrder(taxiiStatusDao);
-        TaxiiStatus.Feed expectedFeed = new TaxiiStatus.Feed();
-        expectedFeed.setName("my-collection");
-        expectedFeed.setMore(true);
-        expectedFeed.setResultId("123#456");
-        expectedFeed.setResultPartNumber(1);
-        expectedFeed.setLastUpdate(cal);
-        inOrder.verify(taxiiStatusDao).updateOrAdd(expectedFeed);
-        TaxiiStatus.Feed expectedFeed2 = new TaxiiStatus.Feed();
-        expectedFeed2.setName("my-collection");
-        expectedFeed2.setLastUpdate(cal2);
-        inOrder.verify(taxiiStatusDao).updateOrAdd(expectedFeed2);
+        InOrder inOrder = Mockito.inOrder(taxiiStatusDao, feedMock);
+        inOrder.verify(feedMock).setMore(true);
+        inOrder.verify(feedMock).setResultId("123#456");
+        inOrder.verify(feedMock).setResultPartNumber(1);
+        inOrder.verify(feedMock).setLastUpdate(cal);
+        inOrder.verify(taxiiStatusDao).updateOrAdd(feedMock);
+        inOrder.verify(feedMock).setMore(null);
+        inOrder.verify(feedMock).setResultId(null);
+        inOrder.verify(feedMock).setResultPartNumber(null);
+        inOrder.verify(feedMock).setLastUpdate(cal2);
+        inOrder.verify(taxiiStatusDao).updateOrAdd(feedMock);
     }
 
     @Test

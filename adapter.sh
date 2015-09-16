@@ -16,12 +16,13 @@ LOG_DIR=$HOME_DIR/log
 PATH_TO_JAR=$HOME_DIR/taxii-log-adapter.jar
 PID_PATH_NAME=$HOME_DIR/application.pid
 
+JAVA_OPTS="-Djsse.enableSNIExtension=false -Djava.io.tmpdir=$HOME_DIR"
 
 function now {
     echo "Triggering $SERVICE_NAME ..."
     if [ ! -f $PID_PATH_NAME ]; then
         cd $HOME_DIR
-        java -Djsse.enableSNIExtension=false -Dspring.profiles.active=now -jar $PATH_TO_JAR 2> $LOG_DIR/err.out > $LOG_DIR/std.out
+        java $JAVA_OPTS -Dspring.profiles.active=now -jar $PATH_TO_JAR 2> $LOG_DIR/err.out > $LOG_DIR/std.out
         echo "$SERVICE_NAME finished"
     else
         echo "$SERVICE_NAME is already running ..."
@@ -32,7 +33,7 @@ function start {
     echo "Starting $SERVICE_NAME ..."
     if [ ! -f $PID_PATH_NAME ]; then
         cd $HOME_DIR
-        nohup java -Djsse.enableSNIExtension=false -Dspring.profiles.active=schedule -jar $PATH_TO_JAR 2> $LOG_DIR/err.out > $LOG_DIR/std.out &
+        nohup java $JAVA_OPTS -Dspring.profiles.active=schedule -jar $PATH_TO_JAR 2> $LOG_DIR/err.out > $LOG_DIR/std.out &
         echo "$SERVICE_NAME started ..."
     else
         echo "$SERVICE_NAME is already running ..."

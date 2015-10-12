@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 
 import javax.xml.datatype.DatatypeFactory;
 
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import org.dellroad.stuff.pobj.PersistentObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,8 @@ import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.File;
 
 @ContextConfiguration(classes = PersistenceConfiguration.class, initializers = ConfigFileApplicationContextInitializer.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,6 +48,15 @@ public class PersistenceConfigurationTest {
         TaxiiStatus readRoot = taxiiStatusPersistent.getRoot();
         assertThat(writeRoot, not(sameInstance(readRoot)));
         assertThat(readRoot.getFeed().get(0), is(feed));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void persistenceConfigurationCreationWithWrongStatusFileFails() {
+        TaxiiServiceSettings settings = new TaxiiServiceSettings();
+        settings.setStatusFile(new File("/nonexistent/path"));
+        PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
+        persistenceConfiguration.taxiiServiceSettings = settings;
+        persistenceConfiguration.taxiiStatusPersistent();
     }
 
 }

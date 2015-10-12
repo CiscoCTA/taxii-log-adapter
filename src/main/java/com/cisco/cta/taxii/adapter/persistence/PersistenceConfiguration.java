@@ -38,7 +38,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 public class PersistenceConfiguration {
 
     @Autowired
-    private TaxiiServiceSettings taxiiServiceSettings;
+    TaxiiServiceSettings taxiiServiceSettings;
 
     @Bean
     public TaxiiStatusDao taxiiStatusDao() throws DatatypeConfigurationException {
@@ -47,6 +47,7 @@ public class PersistenceConfiguration {
 
     @Bean
     public PersistentObject<TaxiiStatus> taxiiStatusPersistent() {
+        StatusFileUtils.testIfFileCanBeCreated(taxiiServiceSettings.getStatusFile());
         PersistentObject<TaxiiStatus> persistentObject = new PersistentObject<>(
                 taxiiStatusPersistentDelegate(),
                 taxiiServiceSettings.getStatusFile());

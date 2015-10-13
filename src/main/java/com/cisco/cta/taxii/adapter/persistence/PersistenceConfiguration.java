@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import javax.xml.datatype.DatatypeConfigurationException;
+import java.io.File;
 
 /**
  * Spring configuration TAXII status persistence support.
@@ -47,18 +48,26 @@ public class PersistenceConfiguration {
 
     @Bean
     public PersistentObject<TaxiiStatus> taxiiStatusPersistent() {
-        StatusFileUtils.testIfFileCanBeCreated(taxiiServiceSettings.getStatusFile());
+        File statusFile = taxiiServiceSettings.getStatusFile();
         PersistentObject<TaxiiStatus> persistentObject = new PersistentObject<>(
                 taxiiStatusPersistentDelegate(),
-                taxiiServiceSettings.getStatusFile());
+                statusFile);
         persistentObject.setAllowEmptyStart(true);
         persistentObject.start();
+        if (!statusFile.exists()) {
+            throw new RuntimeException("Cannot create status file: " + statusFile.getPath() + ". Please check that the given path is correct and writable.");
+        }
         return persistentObject;
     }
 
     @Bean
     public PersistentObjectDelegate<TaxiiStatus> taxiiStatusPersistentDelegate() {
-        SpringDelegate<TaxiiStatus> delegate = new SpringDelegate<>();
+        SpringDelegate<TaxiiStatus> delegate = new SpringDelegate<TaxiiStatus>() {
+            @Override
+            public TaxiiStatus getDefaultValue() {
+                return new TaxiiStatus();
+            }
+        };
         delegate.setMarshaller(taxiiStatusMarshaller());
         delegate.setUnmarshaller(taxiiStatusMarshaller());
         return delegate;

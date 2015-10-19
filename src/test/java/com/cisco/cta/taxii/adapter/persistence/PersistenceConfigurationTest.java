@@ -50,13 +50,4 @@ public class PersistenceConfigurationTest {
         assertThat(readRoot.getFeed().get(0), is(feed));
     }
 
-    @Test(expected = RuntimeException.class)
-    public void persistenceConfigurationCreationWithWrongStatusFileFails() {
-        TaxiiServiceSettings settings = new TaxiiServiceSettings();
-        settings.setStatusFile(new File("/nonexistent/path"));
-        PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
-        persistenceConfiguration.taxiiServiceSettings = settings;
-        persistenceConfiguration.taxiiStatusPersistent();
-    }
-
 }

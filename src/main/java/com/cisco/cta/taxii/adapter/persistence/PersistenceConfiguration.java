@@ -21,7 +21,6 @@ import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import com.google.common.collect.ImmutableMap;
 import org.dellroad.stuff.pobj.PersistentObject;
 import org.dellroad.stuff.pobj.PersistentObjectDelegate;
-import org.dellroad.stuff.pobj.SpringDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +37,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 public class PersistenceConfiguration {
 
     @Autowired
-    private TaxiiServiceSettings taxiiServiceSettings;
+    TaxiiServiceSettings taxiiServiceSettings;
 
     @Bean
     public TaxiiStatusDao taxiiStatusDao() throws DatatypeConfigurationException {
@@ -47,20 +46,12 @@ public class PersistenceConfiguration {
 
     @Bean
     public PersistentObject<TaxiiStatus> taxiiStatusPersistent() {
-        PersistentObject<TaxiiStatus> persistentObject = new PersistentObject<>(
-                taxiiStatusPersistentDelegate(),
-                taxiiServiceSettings.getStatusFile());
-        persistentObject.setAllowEmptyStart(true);
-        persistentObject.start();
-        return persistentObject;
+        return new PersistenceObjectFactory(taxiiServiceSettings, taxiiStatusPersistentDelegate()).build();
     }
 
     @Bean
     public PersistentObjectDelegate<TaxiiStatus> taxiiStatusPersistentDelegate() {
-        SpringDelegate<TaxiiStatus> delegate = new SpringDelegate<>();
-        delegate.setMarshaller(taxiiStatusMarshaller());
-        delegate.setUnmarshaller(taxiiStatusMarshaller());
-        return delegate;
+        return new TaxiiStatusDelegate(taxiiStatusMarshaller());
     }
 
     @Bean

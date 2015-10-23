@@ -1,23 +1,41 @@
-<configuration>
+<configuration debug="true">
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%-5level [%logger{0}] [%X] %msg%n%ex</pattern>
-        </encoder>
-    </appender>
+<!--================= OUTPUT CONFIGURATION ================-->
 
-    <appender name="SIMPLE" class="ch.qos.logback.core.ConsoleAppender">
+    <logger name="output" level="info" additivity="false">
+        <!-- Configure the output method(s) here by adding appenders. E.g. FILE, TCP, UDP or other -->
+        <!-- All appenders configured here must have the following encoder configuration.
         <encoder>
             <pattern>%msg%n</pattern>
         </encoder>
-    </appender>
-
-    <logger name="output" level="info" additivity="false">
-        <appender-ref ref="SIMPLE"/>
+        -->
     </logger>
 
-    <root level="trace">
-        <appender-ref ref="STDOUT"/>
+
+
+<!--================== LOG CONFIGURATION ==================-->
+
+    <appender name="LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/adapter.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>log/adapter.%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>3</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>%date{YYYY-MM-dd HH:mm:ss} %level %logger{10} %msg%n%ex</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.apache.http.wire" level="debug" additivity="false">
+        <appender-ref ref="LOG_FILE"/>
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="LOG_FILE"/>
     </root>
 
 </configuration>

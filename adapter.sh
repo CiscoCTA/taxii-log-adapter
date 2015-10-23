@@ -12,6 +12,7 @@ HOME_DIR=/data/taxii-log-adapter
 
 # Directory where the log files will be created
 LOG_DIR=$HOME_DIR/log
+mkdir -p $LOG_DIR
 
 PATH_TO_JAR=$HOME_DIR/taxii-log-adapter.jar
 PID_PATH_NAME=$HOME_DIR/application.pid

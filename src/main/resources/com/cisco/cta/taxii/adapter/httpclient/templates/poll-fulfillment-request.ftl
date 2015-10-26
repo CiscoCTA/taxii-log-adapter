@@ -13,4 +13,4 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<t:Poll_Fulfillment xmlns:t="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" message_id="${messageId}" collection_name="${collection}" result_id="${resultId}" result_part_number="${resultPartNumber}"/>
+<t:Poll_Fulfillment xmlns:t="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" message_id="${messageId}" collection_name="${collection}" result_id="${resultId}" result_part_number="${resultPartNumber?c}"/>

@@ -31,6 +31,7 @@ import java.io.ByteArrayOutputStream;
 
 import static com.cisco.cta.taxii.adapter.PollRequestMatcher.initialPollRequest;
 import static com.cisco.cta.taxii.adapter.PollRequestMatcher.nextPollRequest;
+import static com.cisco.cta.taxii.adapter.PollFulfillmentMatcher.pollFulfillment;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
@@ -50,10 +51,16 @@ public class HttpBodyWriterTest {
 
     private TaxiiStatus.Feed feed;
 
+    private DatatypeFactory datatypeFactory;
+    private XMLGregorianCalendar cal;
+
+
     @org.junit.Before
     public void setUp() throws Exception {
         feed = new TaxiiStatus.Feed();
         feed.setName("my-feed");
+        datatypeFactory = DatatypeFactory.newInstance();
+        cal = datatypeFactory.newXMLGregorianCalendar("2015-01-01T00:00:00");
     }
 
     @Test
@@ -65,12 +72,20 @@ public class HttpBodyWriterTest {
 
     @Test
     public void writeNextPollRequest() throws Exception {
-        DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-        XMLGregorianCalendar cal = datatypeFactory.newXMLGregorianCalendar("2015-01-01T00:00:00");
         feed.setLastUpdate(cal);
         when(taxiiStatusDao.find("my-feed")).thenReturn(feed);
         writer.write("tla-123", feed, out);
         assertThat(out, is(nextPollRequest("tla-123", "my-feed", "2015-01-01T00:00:00")));
+        verify(out).close();
+    }
+
+    @Test
+    public void resultPartNumberFormattedCorrectly() throws Exception {
+        feed.setLastUpdate(cal);
+        feed.setResultPartNumber(1000);
+        when(taxiiStatusDao.find("my-feed")).thenReturn(feed);
+        writer.write("tla-123", feed, "123#456", 1000, out);
+        assertThat(out, is(pollFulfillment("tla-123", "my-feed", "123#456", "1000")));
         verify(out).close();
     }
 

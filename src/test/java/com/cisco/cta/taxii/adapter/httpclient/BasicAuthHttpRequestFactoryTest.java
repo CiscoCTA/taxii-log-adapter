@@ -16,13 +16,12 @@
 
 package com.cisco.cta.taxii.adapter.httpclient;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.core.Appender;
-
-import com.cisco.cta.taxii.adapter.httpclient.BasicAuthHttpRequestFactory;
 import com.cisco.cta.taxii.adapter.settings.ProxySettings;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettingsFactory;
-
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.protocol.RequestAuthCache;
@@ -39,7 +38,6 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 
 import javax.net.ServerSocketFactory;
-
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
@@ -73,7 +71,9 @@ public class BasicAuthHttpRequestFactoryTest {
         factory = new BasicAuthHttpRequestFactory(httpClient, connSettings, proxySettings, credentialsProvider);
         MockitoAnnotations.initMocks(this);
         when(mockAppender.getName()).thenReturn("MOCK");
-        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(RequestAuthCache.class.getCanonicalName())).addAppender(mockAppender);
+        Logger authCacheLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(RequestAuthCache.class.getCanonicalName());
+        authCacheLogger.setLevel(Level.DEBUG);
+        authCacheLogger.addAppender(mockAppender);
     }
 
     @Test

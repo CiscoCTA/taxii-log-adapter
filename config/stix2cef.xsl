@@ -263,10 +263,10 @@
                 <xsl:text>5</xsl:text>
             </xsl:when>
             <xsl:when test="$risk = 'Medium'">
-                <xsl:text>6</xsl:text>
+                <xsl:text>7</xsl:text>
             </xsl:when>
             <xsl:when test="$risk = 'High'">
-                <xsl:text>7</xsl:text>
+                <xsl:text>9</xsl:text>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="error(QName('http://cisco.com/td/taxii-log-adapter', 'TLA-03'), concat('Error converting risk: ',$risk))"/>

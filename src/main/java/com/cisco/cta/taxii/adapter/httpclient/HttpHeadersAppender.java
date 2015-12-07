@@ -33,6 +33,7 @@ public class HttpHeadersAppender {
         headers.set("X-TAXII-Content-Type", "urn:taxii.mitre.org:message:xml:1.1");
         headers.set("X-Taxii-Protocol", "urn:taxii.mitre.org:protocol:https:1.0");
         headers.set("X-TAXII-Services", "urn:taxii.mitre.org:services:1.1");
+        headers.set("User-Agent", "taxii-log-adapter-" + Version.getImplVersion());
     }
 
 }

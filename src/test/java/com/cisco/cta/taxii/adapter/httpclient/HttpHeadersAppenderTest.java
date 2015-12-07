@@ -17,6 +17,7 @@
 package com.cisco.cta.taxii.adapter.httpclient;
 
 import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
+import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasUserAgentHeader;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
@@ -40,6 +41,7 @@ public class HttpHeadersAppenderTest {
     public void appendHeaders() throws Exception {
         appender.appendTo(headers);
         assertThat(headers, hasAllTaxiiHeaders());
+        assertThat(headers, hasUserAgentHeader());
     }
 
 }

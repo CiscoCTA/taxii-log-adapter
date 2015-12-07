@@ -37,6 +37,12 @@ public class HasHeaderMatcher extends FeatureMatcher<HttpHeaders, String> {
         );
     }
 
+    public static Matcher<HttpHeaders> hasUserAgentHeader() {
+        return allOf(
+                hasHeader("User-Agent", is("taxii-log-adapter-UNKNOWN"))
+        );
+    }
+
     public static Matcher<HttpHeaders> hasHeader(String name, Matcher<String> valueMatcher) {
         return new HasHeaderMatcher(name, valueMatcher);
     }

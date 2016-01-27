@@ -35,10 +35,10 @@ import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 public class LinuxPersistenceConfiguration {
 
     @Autowired
-    TaxiiServiceSettings taxiiServiceSettings;
+    private TaxiiServiceSettings taxiiServiceSettings;
     
     @Autowired
-    Jaxb2Marshaller taxiiStatusMarshaller;
+    private Jaxb2Marshaller taxiiStatusMarshaller;
     
     @Bean
     public TaxiiStatusFileHandler taxiiStatusFileHandler() {

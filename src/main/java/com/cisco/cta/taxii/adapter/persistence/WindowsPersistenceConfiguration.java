@@ -33,10 +33,10 @@ import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 public class WindowsPersistenceConfiguration {
 
     @Autowired
-    TaxiiServiceSettings taxiiServiceSettings;
+    private TaxiiServiceSettings taxiiServiceSettings;
     
     @Autowired
-    Jaxb2Marshaller taxiiStatusMarshaller;
+    private Jaxb2Marshaller taxiiStatusMarshaller;
     
     @Bean
     public TaxiiStatusFileHandler simpleFileHandler() {

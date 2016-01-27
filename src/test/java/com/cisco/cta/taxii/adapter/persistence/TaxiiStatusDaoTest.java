@@ -17,19 +17,20 @@
 package com.cisco.cta.taxii.adapter.persistence;
 
 
-import com.google.common.collect.ImmutableMap;
 import org.dellroad.stuff.pobj.PersistentObject;
-import org.dellroad.stuff.pobj.SpringDelegate;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.Instant;
 import org.threeten.bp.ZoneId;
 
 import javax.xml.datatype.DatatypeFactory;
-import java.io.File;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
@@ -37,37 +38,25 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+
+@ContextConfiguration(classes = PersistenceConfiguration.class, initializers = ConfigFileApplicationContextInitializer.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TaxiiStatusDaoTest {
     
+    @Autowired
     private TaxiiStatusDao dao;
+
+    @Autowired
     private PersistentObject<TaxiiStatus> persistentObject;
-    private TaxiiStatus.Feed feed;
-
+    
     private DatatypeFactory datatypeFactory;
-
     private Instant now;
 
     @Before
     public void setUp() throws Exception {
         datatypeFactory = DatatypeFactory.newInstance();
         now = Instant.parse("2000-01-02T03:04:05.006Z");
-        Jaxb2Marshaller jaxb2Marshaller = new Jaxb2Marshaller();
-        jaxb2Marshaller.setClassesToBeBound(TaxiiStatus.class);
-        jaxb2Marshaller.setMarshallerProperties(ImmutableMap.of(
-                javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true));
-        SpringDelegate<TaxiiStatus> delegate = new SpringDelegate<>();
-        delegate.setMarshaller(jaxb2Marshaller);
-        delegate.setUnmarshaller(jaxb2Marshaller);
-        File file = new File("target/TaxiiStatusDaoTest.xml");
-        persistentObject = new PersistentObject<>(delegate, file);
-        persistentObject.setAllowEmptyStart(true);
-        persistentObject.start();
-        dao = new TaxiiStatusDao(persistentObject);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        persistentObject.stop();
     }
 
     @Test
@@ -76,7 +65,7 @@ public class TaxiiStatusDaoTest {
     }
 
     private TaxiiStatus.Feed createNormalFeed() {
-        feed = new TaxiiStatus.Feed();
+        TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
         feed.setName(UUID.randomUUID().toString());
         GregorianCalendar gregorianCal = DateTimeUtils.toGregorianCalendar(now.atZone(ZoneId.systemDefault()));
         feed.setLastUpdate(datatypeFactory.newXMLGregorianCalendar(gregorianCal));
@@ -84,7 +73,7 @@ public class TaxiiStatusDaoTest {
     }
 
     private TaxiiStatus.Feed createMultipartFeed() {
-        feed = new TaxiiStatus.Feed();
+        TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
         feed.setName(UUID.randomUUID().toString());
         feed.setMore(true);
         feed.setResultId("1000#2000");
@@ -108,7 +97,6 @@ public class TaxiiStatusDaoTest {
         dao.updateOrAdd(feed);
         persistentObject.stop();
         persistentObject.start();
-        dao = new TaxiiStatusDao(persistentObject);
         TaxiiStatus.Feed loadedFeed = dao.find(feed.getName());
         assertThat(feed, is(loadedFeed));
     }

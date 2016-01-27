@@ -17,11 +17,8 @@
 package com.cisco.cta.taxii.adapter.persistence;
 
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus.Feed;
-import org.dellroad.stuff.pobj.PersistentObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
@@ -31,12 +28,12 @@ public class TaxiiStatusDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaxiiStatusDao.class);
     
-    private final PersistentObject<TaxiiStatus> pobj;
+    private final TaxiiStatusFileHandler fileHandler;
     private TaxiiStatus dirtyStatus;
 
-    public TaxiiStatusDao(PersistentObject<TaxiiStatus> pobj) {
-        this.pobj = pobj;
-        dirtyStatus = pobj.getRoot();
+    public TaxiiStatusDao(TaxiiStatusFileHandler fileHandler) {
+        this.fileHandler = fileHandler;
+        dirtyStatus = fileHandler.load();
         if (dirtyStatus == null) {
             LOG.warn("TAXII status file not found, all feeds will be fully downloaded");
             dirtyStatus = new TaxiiStatus();
@@ -64,7 +61,7 @@ public class TaxiiStatusDao {
         } else {
             dirtyStatus.getFeed().add(feed);
         }
-        pobj.setRoot(dirtyStatus);
+        fileHandler.save(dirtyStatus);
     }
 
 }

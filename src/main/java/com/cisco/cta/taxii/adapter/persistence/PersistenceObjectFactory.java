@@ -1,23 +1,20 @@
 package com.cisco.cta.taxii.adapter.persistence;
 
-import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+import lombok.RequiredArgsConstructor;
+
 import org.dellroad.stuff.pobj.PersistentObject;
 import org.dellroad.stuff.pobj.PersistentObjectDelegate;
 
 import java.io.File;
 
+
+@RequiredArgsConstructor
 public class PersistenceObjectFactory {
 
-    private TaxiiServiceSettings taxiiServiceSettings;
-    private PersistentObjectDelegate<TaxiiStatus> delegate;
-
-    public PersistenceObjectFactory(TaxiiServiceSettings taxiiServiceSettings, PersistentObjectDelegate<TaxiiStatus> delegate) {
-        this.taxiiServiceSettings = taxiiServiceSettings;
-        this.delegate = delegate;
-    }
+    private final File statusFile;
+    private final PersistentObjectDelegate<TaxiiStatus> delegate;
 
     public PersistentObject<TaxiiStatus> build() {
-        File statusFile = taxiiServiceSettings.getStatusFile();
         PersistentObject<TaxiiStatus> persistentObject = new PersistentObject<>(delegate, statusFile);
         persistentObject.setAllowEmptyStart(true);
         persistentObject.start();

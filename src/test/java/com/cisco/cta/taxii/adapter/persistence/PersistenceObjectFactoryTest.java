@@ -1,6 +1,5 @@
 package com.cisco.cta.taxii.adapter.persistence;
 
-import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,16 +25,14 @@ public class PersistenceObjectFactoryTest {
 
     @Test(expected = RuntimeException.class)
     public void buildFailsOnWrongStatusFilePath() throws Exception {
-        TaxiiServiceSettings settings = new TaxiiServiceSettings();
-        settings.setStatusFile(new File("/nonexistent/path"));
-        new PersistenceObjectFactory(settings, new TaxiiStatusDelegate(marshaller)).build();
+        File file = new File("/nonexistent/path");
+        new PersistenceObjectFactory(file, new TaxiiStatusDelegate(marshaller)).build();
     }
 
     @Test
     public void buildSuceedsOnCorrectStatusFilePath() throws Exception {
-        TaxiiServiceSettings settings = new TaxiiServiceSettings();
-        settings.setStatusFile( folder.newFile("taxii-status-"+System.currentTimeMillis()+".tmp"));
-        new PersistenceObjectFactory(settings, new TaxiiStatusDelegate(marshaller)).build();
+        File file = folder.newFile("taxii-status-"+System.currentTimeMillis()+".tmp");
+        new PersistenceObjectFactory(file, new TaxiiStatusDelegate(marshaller)).build();
     }
 
 }

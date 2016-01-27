@@ -16,37 +16,43 @@
 
 package com.cisco.cta.taxii.adapter.persistence;
 
-import com.google.common.collect.ImmutableMap;
+import org.dellroad.stuff.pobj.PersistentObject;
+import org.dellroad.stuff.pobj.PersistentObjectDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
-import javax.xml.datatype.DatatypeConfigurationException;
+import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 
 /**
- * Spring configuration TAXII status persistence support.
+ * Unix/Linux specific part of the {@link PersistenceConfiguration}.
  */
 @Configuration
-@Import({LinuxPersistenceConfiguration.class})
-public class PersistenceConfiguration {
+@Import(SettingsConfiguration.class)
+public class LinuxPersistenceConfiguration {
 
     @Autowired
-    private TaxiiStatusFileHandler taxiiStatusFileHandler;
-
+    TaxiiServiceSettings taxiiServiceSettings;
+    
+    @Autowired
+    Jaxb2Marshaller taxiiStatusMarshaller;
+    
     @Bean
-    public TaxiiStatusDao taxiiStatusDao() throws DatatypeConfigurationException {
-        return new TaxiiStatusDao(taxiiStatusFileHandler);
+    public TaxiiStatusFileHandler taxiiStatusFileHandler() {
+        return new TransactionalFileHandler(taxiiStatusPersistent());
     }
 
     @Bean
-    public Jaxb2Marshaller taxiiStatusMarshaller() {
-        Jaxb2Marshaller jaxb2Marshaller = new Jaxb2Marshaller();
-        jaxb2Marshaller.setClassesToBeBound(TaxiiStatus.class);
-        jaxb2Marshaller.setMarshallerProperties(ImmutableMap.of(
-                javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true));
-        return jaxb2Marshaller;
+    public PersistentObject<TaxiiStatus> taxiiStatusPersistent() {
+        return new PersistenceObjectFactory(taxiiServiceSettings.getStatusFile(), taxiiStatusPersistentDelegate()).build();
+    }
+
+    @Bean
+    public PersistentObjectDelegate<TaxiiStatus> taxiiStatusPersistentDelegate() {
+        return new TaxiiStatusDelegate(taxiiStatusMarshaller);
     }
 
 }

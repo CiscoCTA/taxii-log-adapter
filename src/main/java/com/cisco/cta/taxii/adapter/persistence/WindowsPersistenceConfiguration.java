@@ -18,10 +18,12 @@ package com.cisco.cta.taxii.adapter.persistence;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
+import com.cisco.cta.taxii.adapter.WindowsCondition;
 import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 
@@ -29,6 +31,7 @@ import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
  * Unix/Linux specific part of the {@link PersistenceConfiguration}.
  */
 @Configuration
+@Conditional(WindowsCondition.class)
 @Import(SettingsConfiguration.class)
 public class WindowsPersistenceConfiguration {
 

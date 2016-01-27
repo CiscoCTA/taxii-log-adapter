@@ -29,7 +29,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
  * Spring configuration TAXII status persistence support.
  */
 @Configuration
-@Import({LinuxPersistenceConfiguration.class})
+@Import({LinuxPersistenceConfiguration.class, WindowsPersistenceConfiguration.class})
 public class PersistenceConfiguration {
 
     @Autowired

@@ -17,20 +17,24 @@
 package com.cisco.cta.taxii.adapter.persistence;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.springframework.oxm.UnmarshallingFailureException;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * System crash during the {@link #save(TaxiiStatus)} may corrupt the file.
  */
 @RequiredArgsConstructor
+@Slf4j
 public class SimpleFileHandler implements TaxiiStatusFileHandler {
 
     private final File file;
@@ -38,8 +42,17 @@ public class SimpleFileHandler implements TaxiiStatusFileHandler {
 
     @Override
     public TaxiiStatus load() {
-        Source source = new StreamSource(file);
-        return (TaxiiStatus) marshaller.unmarshal(source);
+        try {
+            Source source = new StreamSource(file);
+            return (TaxiiStatus) marshaller.unmarshal(source);
+        } catch (UnmarshallingFailureException e) {
+            if (e.contains(FileNotFoundException.class)) {
+                log.info("File {} doesn't exist yet", file);
+                return new TaxiiStatus();
+            } else {
+                throw e;
+            }
+        }
     }
 
     @Override

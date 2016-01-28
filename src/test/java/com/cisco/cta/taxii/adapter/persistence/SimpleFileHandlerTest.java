@@ -3,6 +3,7 @@ package com.cisco.cta.taxii.adapter.persistence;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -16,11 +17,13 @@ import org.junit.Test;
 public class SimpleFileHandlerTest {
 
     private TaxiiStatusFileHandler handler;
+    private File file;
 
     @Before
     public void setUp() throws Exception {
+        file = new File("target/SimpleFileHandlerTest.data");
         PersistenceConfiguration factory = new PersistenceConfiguration();
-        handler = new SimpleFileHandler(new File("target/SimpleFileHandlerTest.data"), factory.taxiiStatusMarshaller());
+        handler = new SimpleFileHandler(file, factory.taxiiStatusMarshaller());
     }
 
     @Test
@@ -37,5 +40,12 @@ public class SimpleFileHandlerTest {
         TaxiiStatus readRoot = handler.load();
         assertThat(writeRoot, not(sameInstance(readRoot)));
         assertThat(readRoot.getFeed().get(0), is(feed));
+    }
+
+    @Test
+    public void missingFileIsEmptyStatus() throws Exception {
+        file.delete();
+        TaxiiStatus status = handler.load();
+        assertThat(status, is(notNullValue()));
     }
 }

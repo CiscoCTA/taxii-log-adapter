@@ -70,35 +70,17 @@ public class AdapterTask implements Runnable {
 
     private void downloadFeed(String feedName) {
         try {
-            TaxiiPollResponse response = null;
+            MDC.put("feed", feedName);
             TaxiiStatus.Feed feed = taxiiStatusDao.find(feedName);
+            boolean more = true;
             do {
-                String messageId = createMessageId();
-                MDC.put("messageId", messageId);
-                MDC.put("feed", feedName);
                 if (feed == null) {
                     feed = new TaxiiStatus.Feed();
                     feed.setName(feedName);
                 }
-                try {
-                    response = poll(messageId, feed);
-                }catch(IOException e) {
-                    handleIOError(feed, e);
-                    return ;
-                }
-                if (response.getResultId() != null && response.isMore()) {
-                    feed.setMore(response.isMore());
-                    feed.setResultId(response.getResultId());
-                    feed.setResultPartNumber(response.getResultPartNumber());
-                } else {
-                    feed.setMore(null);
-                    feed.setResultId(null);
-                    feed.setResultPartNumber(null);
-                }
-                feed.setIoErrorCount(null);
-                feed.setLastUpdate(getLastUpdate(response));
+                more = poll(feed);
                 taxiiStatusDao.updateOrAdd(feed);
-            } while (response.isMore());
+            } while (more);
         } catch(Exception e) {
             statistics.incrementErrors();
             LOG.error("Error while processing feed " + feedName, e);
@@ -106,6 +88,30 @@ public class AdapterTask implements Runnable {
 
         } finally {
             MDC.clear();
+        }
+    }
+
+    private boolean poll(TaxiiStatus.Feed feed) throws Exception {
+        try {
+            String messageId = createMessageId();
+            MDC.put("messageId", messageId);
+            TaxiiPollResponse response = poll(messageId, feed);
+            if (response.getResultId() != null && response.isMore()) {
+                feed.setMore(response.isMore());
+                feed.setResultId(response.getResultId());
+                feed.setResultPartNumber(response.getResultPartNumber());
+            } else {
+                feed.setMore(null);
+                feed.setResultId(null);
+                feed.setResultPartNumber(null);
+            }
+            feed.setIoErrorCount(null);
+            feed.setLastUpdate(getLastUpdate(response));
+            return response.isMore();
+
+        } catch (IOException e) {
+            handleIOError(feed, e);
+            return false;
         }
     }
 
@@ -119,9 +125,9 @@ public class AdapterTask implements Runnable {
         feed.setIoErrorCount(ioErrorCount);
         taxiiStatusDao.updateOrAdd(feed);
         if (ioErrorCount >= MAX_HTTP_CONNECTION_ATTEMPTS) {
-            throw new Exception("Exceeded maximum number of HTTP connection retries",e);
+            throw new Exception("HTTP connection problem, number of retries exceeded.", e);
         } else {
-            LOG.warn("HTTP connection problem occured.");
+            LOG.warn("HTTP connection problem, the request will be retried.", e);
         }
     }
 

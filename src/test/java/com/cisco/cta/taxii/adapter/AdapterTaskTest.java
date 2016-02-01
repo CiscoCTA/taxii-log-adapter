@@ -25,13 +25,9 @@ import org.apache.http.conn.ConnectTimeoutException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
-import org.mockito.internal.stubbing.answers.ClonesArguments;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.threeten.bp.Clock;
-import org.threeten.bp.Instant;
-import org.threeten.bp.ZoneId;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -49,7 +45,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -83,16 +78,12 @@ public class AdapterTaskTest {
 
     private DatatypeFactory datatypeFactory;
 
-    private Clock clock;
-
     private TaxiiStatus.Feed feed;
 
 
    @Before
     public void setUp() throws Exception {
        datatypeFactory = DatatypeFactory.newInstance();
-       Instant now = Instant.parse("2000-01-02T03:04:05.006Z");
-       clock = Clock.fixed(now, ZoneId.systemDefault());
        MockitoAnnotations.initMocks(this);
        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
        when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
@@ -180,7 +171,7 @@ public class AdapterTaskTest {
         verify(requestFactory).createPollRequest(anyString(), any(TaxiiStatus.Feed.class));
         verify(request).execute();
         verifyZeroInteractions(responseTransformer);
-        verifyLog(mockAppender, "HTTP connection problem occured");
+        verifyLog(mockAppender, "HTTP connection problem");
         assertThat(statistics.getPolls(), is(1L));
         assertThat(statistics.getErrors(), is(0L));
     }
@@ -206,7 +197,7 @@ public class AdapterTaskTest {
         assertThat(feed.getIoErrorCount(), is(1));
         task.run();
         assertThat(feed.getIoErrorCount(), is(2));
-        verifyLog(mockAppender, "HTTP connection problem occured");
+        verifyLog(mockAppender, "HTTP connection problem");
         assertThat(statistics.getErrors(), is(0L));
         task.run();
         assertThat(feed.getIoErrorCount(), is(3));

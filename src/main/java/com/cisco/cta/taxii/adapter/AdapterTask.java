@@ -78,7 +78,7 @@ public class AdapterTask implements Runnable {
                     feed = new TaxiiStatus.Feed();
                     feed.setName(feedName);
                 }
-                more = poll(feed);
+                more = pollAndUpdateFeed(feed);
                 taxiiStatusDao.updateOrAdd(feed);
             } while (more);
         } catch(Exception e) {
@@ -91,7 +91,7 @@ public class AdapterTask implements Runnable {
         }
     }
 
-    private boolean poll(TaxiiStatus.Feed feed) throws Exception {
+    private boolean pollAndUpdateFeed(TaxiiStatus.Feed feed) throws Exception {
         try {
             String messageId = createMessageId();
             MDC.put("messageId", messageId);

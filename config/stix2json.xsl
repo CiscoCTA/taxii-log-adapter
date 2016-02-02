@@ -99,8 +99,7 @@
         </xsl:variable>
 
         <xsl:value-of select="fn:xml-to-json($xml)"/>
-            <xsl:text>
-</xsl:text><!-- EOL -->
+        <xsl:text>&#10;</xsl:text><!-- EOL -->
 
     </xsl:template>
 

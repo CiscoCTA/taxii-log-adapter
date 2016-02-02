@@ -7,7 +7,8 @@
                 xmlns:ttp="http://stix.mitre.org/TTP-1"
                 xmlns:ind="http://stix.mitre.org/Indicator-2"
                 xmlns:sc="http://stix.mitre.org/common-1"
-                xmlns:cc="http://cybox.mitre.org/common-2">
+                xmlns:cc="http://cybox.mitre.org/common-2"
+                xmlns:f="local-functions">
 
     <xsl:output method="text" encoding="utf-8"/>
     <xsl:strip-space elements="*"/>
@@ -98,7 +99,7 @@
             </xsl:call-template>
         </xsl:variable>
 
-        <xsl:value-of select="fn:xml-to-json($xml)"/>
+        <xsl:value-of select="f:replace-doubles-ints(fn:xml-to-json($xml))"/>
         <xsl:text>&#10;</xsl:text><!-- EOL -->
 
     </xsl:template>
@@ -151,5 +152,25 @@
 
         </fn:map>
     </xsl:template>
+
+
+    <xsl:function name="f:replace-doubles-ints">
+        <xsl:param name="json"/>
+
+        <xsl:analyze-string select="$json" regex="&quot;(\w*)&quot;:(\d)\.(\d+)[eE](\d+)" flags="x">
+            <xsl:matching-substring>
+                <xsl:text>"</xsl:text>
+                <xsl:value-of select="fn:regex-group(1)"/>
+                <xsl:text>"</xsl:text>
+                <xsl:text>:</xsl:text>
+                <xsl:value-of select="fn:format-number(fn:number(fn:substring(fn:regex-group(0), fn:string-length(fn:regex-group(1)) + 4)), '#')"/>
+            </xsl:matching-substring>
+
+            <xsl:non-matching-substring>
+                <xsl:value-of select="."/>
+            </xsl:non-matching-substring>
+        </xsl:analyze-string>
+
+    </xsl:function>
 
 </xsl:stylesheet>

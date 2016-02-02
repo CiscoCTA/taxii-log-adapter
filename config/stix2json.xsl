@@ -1,4 +1,4 @@
-<xsl:stylesheet version="2.0"
+<xsl:stylesheet version="3.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
                 xmlns:t="http://taxii.mitre.org/messages/taxii_xml_binding-1.1"
@@ -81,99 +81,76 @@
         <xsl:param name="indicatorId"/>
         <xsl:param name="activity"/>
         <xsl:param name="campaign"/>
-
-        <xsl:text>{</xsl:text>
-
-        <xsl:for-each select="cc:Property">
-            <xsl:call-template name="property">
-                <xsl:with-param name="key" select="@name"/>
-                <xsl:with-param name="value" select="."/>
+        
+        <xsl:variable name="xml">
+            <xsl:call-template name="webFlowXml">
+            <xsl:with-param name="customer" select="$customer"/>
+            <xsl:with-param name="incidentId" select="$incidentId"/>
+            <xsl:with-param name="incidentTitle" select="$incidentTitle"/>
+            <xsl:with-param name="victim" select="$victim"/>
+            <xsl:with-param name="risk" select="$risk"/>
+            <xsl:with-param name="confidence" select="$confidence"/>
+            <xsl:with-param name="tool" select="$tool"/>
+            <xsl:with-param name="url" select="$url"/>
+            <xsl:with-param name="indicatorId" select="$indicatorId"/>
+            <xsl:with-param name="activity" select="$activity"/>
+            <xsl:with-param name="campaign" select="$campaign"/>
             </xsl:call-template>
-        </xsl:for-each>
+        </xsl:variable>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">customer</xsl:with-param>
-            <xsl:with-param name="value" select="$customer"/>
-        </xsl:call-template>
+        <xsl:value-of select="fn:xml-to-json($xml)"/>
+            <xsl:text>
+</xsl:text><!-- EOL -->
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">incidentId</xsl:with-param>
-            <xsl:with-param name="value" select="$incidentId"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">incidentTitle</xsl:with-param>
-            <xsl:with-param name="value" select="$incidentTitle"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">victim</xsl:with-param>
-            <xsl:with-param name="value" select="$victim"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">risk</xsl:with-param>
-            <xsl:with-param name="value" select="$risk"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">confidence</xsl:with-param>
-            <xsl:with-param name="value" select="$confidence"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">tool</xsl:with-param>
-            <xsl:with-param name="value" select="$tool"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">indicatorId</xsl:with-param>
-            <xsl:with-param name="value" select="$indicatorId"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">activity</xsl:with-param>
-            <xsl:with-param name="value" select="$activity"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">campaign</xsl:with-param>
-            <xsl:with-param name="value" select="$campaign"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">incidentUrl</xsl:with-param>
-            <xsl:with-param name="value" select="$url"/>
-            <xsl:with-param name="delimiter"/>
-        </xsl:call-template>
-
-            <xsl:text>}
-</xsl:text>
     </xsl:template>
 
 
-    <xsl:template name="property">
-        <xsl:param name="key"/>
-        <xsl:param name="value"/>
-        <xsl:param name="delimiter">true</xsl:param>
-        <xsl:text>"</xsl:text>
-        <xsl:value-of select="$key"/>
-        <xsl:text>"</xsl:text>
-        <xsl:text>:</xsl:text>
-        <xsl:choose>
-            <xsl:when test="string(number($value)) = 'NaN'">
-                <xsl:text>"</xsl:text>
-                <xsl:variable name="text" select="fn:replace($value, '(\\|&quot;)', '\\$1')"/>
-                <xsl:value-of select="$text"/>
-                <xsl:text>"</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$value"/>
-            </xsl:otherwise>
-        </xsl:choose>
-        <xsl:if test="$delimiter">
-            <xsl:text>,</xsl:text>
-        </xsl:if>
+    <xsl:template name="webFlowXml">
+
+        <xsl:param name="customer"/>
+        <xsl:param name="incidentId"/>
+        <xsl:param name="incidentTitle"/>
+        <xsl:param name="victim"/>
+        <xsl:param name="risk"/>
+        <xsl:param name="confidence"/>
+        <xsl:param name="tool"/>
+        <xsl:param name="url"/>
+        <xsl:param name="indicatorId"/>
+        <xsl:param name="activity"/>
+        <xsl:param name="campaign"/>
+
+        <fn:map>
+
+            <xsl:for-each select="cc:Property">
+                <xsl:choose>
+                    <xsl:when test="string(number(.)) = 'NaN'">
+                        <fn:string>
+                            <xsl:attribute name="key" select="@name"/>
+                            <xsl:value-of select="."/>
+                        </fn:string>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <fn:number>
+                            <xsl:attribute name="key" select="@name"/>
+                            <xsl:value-of select="."/>
+                        </fn:number>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
+
+            <fn:string key="customer"><xsl:value-of select="$customer"/></fn:string>
+            <fn:string key="incidentId"><xsl:value-of select="$incidentId"/></fn:string>
+            <fn:string key="incidentTitle"><xsl:value-of select="$incidentTitle"/></fn:string>
+            <fn:string key="victim"><xsl:value-of select="$victim"/></fn:string>
+            <fn:string key="risk"><xsl:value-of select="$risk"/></fn:string>
+            <fn:string key="confidence"><xsl:value-of select="$confidence"/></fn:string>
+            <fn:string key="tool"><xsl:value-of select="$tool"/></fn:string>
+            <fn:string key="indicatorId"><xsl:value-of select="$indicatorId"/></fn:string>
+            <fn:string key="activity"><xsl:value-of select="$activity"/></fn:string>
+            <fn:string key="campaign"><xsl:value-of select="$campaign"/></fn:string>
+            <fn:string key="incidentUrl"><xsl:value-of select="$url"/></fn:string>
+
+        </fn:map>
     </xsl:template>
 
 </xsl:stylesheet>

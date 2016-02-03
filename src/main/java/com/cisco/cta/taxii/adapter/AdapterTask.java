@@ -72,12 +72,12 @@ public class AdapterTask implements Runnable {
         try {
             MDC.put("feed", feedName);
             TaxiiStatus.Feed feed = taxiiStatusDao.find(feedName);
-            boolean more = true;
+            if (feed == null) {
+                feed = new TaxiiStatus.Feed();
+                feed.setName(feedName);
+            }
+            boolean more;
             do {
-                if (feed == null) {
-                    feed = new TaxiiStatus.Feed();
-                    feed.setName(feedName);
-                }
                 more = pollAndUpdateFeed(feed);
                 taxiiStatusDao.updateOrAdd(feed);
             } while (more);

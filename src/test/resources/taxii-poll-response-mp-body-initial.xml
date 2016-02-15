@@ -50,7 +50,7 @@
                                                 <c:Object>
                                                     <c:Properties xsi:type="co:CustomObjectType">
                                                         <cc:Custom_Properties>
-                                                            <cc:Property name="timestamp">1000</cc:Property>
+                                                            <cc:Property name="timestamp">1234567890123</cc:Property>
                                                             <cc:Property name="xElapsedTime">10</cc:Property>
                                                             <cc:Property name="scHttpStatus">200</cc:Property>
                                                             <cc:Property name="scResultCode">OK</cc:Property>
@@ -58,7 +58,7 @@
                                                             <cc:Property name="xMagicContentType">magic/1</cc:Property>
                                                             <cc:Property name="csReferer">http://ref1</cc:Property>
                                                             <cc:Property name="csUserAgent">agent001</cc:Property>
-                                                            <cc:Property name="csContentBytes">1111</cc:Property>
+                                                            <cc:Property name="csContentBytes">198765432112345</cc:Property>
                                                             <cc:Property name="scContentBytes">111</cc:Property>
                                                             <cc:Property name="csUrl">http://chuck.norris.com/1</cc:Property>
                                                             <cc:Property name="sIP">1.1.1.1</cc:Property>

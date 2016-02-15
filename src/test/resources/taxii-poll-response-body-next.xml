@@ -50,7 +50,7 @@
                                                 <c:Object>
                                                     <c:Properties xsi:type="co:CustomObjectType">
                                                         <cc:Custom_Properties>
-                                                            <cc:Property name="timestamp">2000</cc:Property>
+                                                            <cc:Property name="timestamp">1234567890456</cc:Property>
                                                             <cc:Property name="xElapsedTime">20</cc:Property>
                                                             <cc:Property name="scHttpStatus">200</cc:Property>
                                                             <cc:Property name="scResultCode">OK</cc:Property>

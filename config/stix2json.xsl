@@ -157,13 +157,13 @@
     <xsl:function name="f:replace-doubles-ints">
         <xsl:param name="json"/>
 
-        <xsl:analyze-string select="$json" regex="&quot;(\w*)&quot;:(\d)\.(\d+)[eE](\d+)" flags="x">
+        <xsl:analyze-string select="$json" regex="&quot;(\w*)&quot;:((\d)\.(\d+)[eE](\d+))" flags="x">
             <xsl:matching-substring>
                 <xsl:text>"</xsl:text>
                 <xsl:value-of select="fn:regex-group(1)"/>
                 <xsl:text>"</xsl:text>
                 <xsl:text>:</xsl:text>
-                <xsl:value-of select="fn:format-number(fn:number(fn:substring(fn:regex-group(0), fn:string-length(fn:regex-group(1)) + 4)), '#')"/>
+                <xsl:value-of select="fn:format-number(fn:number(fn:regex-group(2)), '#')"/>
             </xsl:matching-substring>
 
             <xsl:non-matching-substring>

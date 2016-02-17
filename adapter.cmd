@@ -1,4 +1,4 @@
-@echo off
+@echo on
 REM This script runs the example application.
 
 REM Usage: adapter.sh <command>
@@ -17,12 +17,13 @@ set HOME_DIR=C:\taxii\taxii-log-adapter
 REM Directory where the log files will be created
 
 set LOG_DIR=%HOME_DIR%\log
-
+mkdir %LOG_DIR%
 
 set PATH_TO_JAR=%HOME_DIR%\taxii-log-adapter.jar
 
 set PID_PATH_NAME=%HOME_DIR%\application.pid
 
+set JAVA_OPTS=-Djsse.enableSNIExtension=false -Djava.io.tmpdir=%HOME_DIR%
 
 cd %HOME_DIR%
 
@@ -33,9 +34,7 @@ GOTO %1
         echo %SERVICE_NAME% is already running ...
     ) ELSE (
         echo Triggering %SERVICE_NAME% ...
-
-        java -Djsse.enableSNIExtension=false -Dspring.profiles.active=now -jar %PATH_TO_JAR% 2>%LOG_DIR%/err.out 1>%LOG_DIR%/std.out
-
+        java %JAVA_OPTS% -Dspring.profiles.active=now -jar %PATH_TO_JAR% 2>%LOG_DIR%/err.out 1>%LOG_DIR%/std.out
         echo %SERVICE_NAME% finished
     )
 
@@ -46,8 +45,7 @@ GOTO %1
         echo %SERVICE_NAME% is already running ...
     ) ELSE (
         echo %SERVICE_NAME% starting...
-        java -Djsse.enableSNIExtension=false -Dspring.profiles.active=schedule -jar %PATH_TO_JAR% 2>%LOG_DIR%/err.out 1>%LOG_DIR%/std.out
-
+        java %JAVA_OPTS% -Dspring.profiles.active=schedule -jar %PATH_TO_JAR% 2>%LOG_DIR%/err.out 1>%LOG_DIR%/std.out
         echo %SERVICE_NAME% finished
         )
     GOTO end

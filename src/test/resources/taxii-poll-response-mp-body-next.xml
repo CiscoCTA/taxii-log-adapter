@@ -41,6 +41,9 @@
                         <inc:Victim>
                             <sc:Name>userName2</sc:Name>
                         </inc:Victim>
+                        <inc:Impact_Assessment>
+                            <inc:Impact_Qualification>Distracting</inc:Impact_Qualification>
+                        </inc:Impact_Assessment>
                         <inc:Related_Indicators>
                             <inc:Related_Indicator>
                                 <sc:Indicator xsi:type="ind:IndicatorType" id="cta:indicator-event-2">
@@ -86,10 +89,6 @@
                             </inc:Related_Indicator>
                         </inc:Related_Indicators>
                         <inc:Discovery_Method>Log Review</inc:Discovery_Method>
-                        <inc:Intended_Effect>
-                            <sc:Value>Low</sc:Value>
-                            <sc:Description>Risk</sc:Description>
-                        </inc:Intended_Effect>
                         <inc:Confidence>
                             <sc:Value>High</sc:Value>
                         </inc:Confidence>

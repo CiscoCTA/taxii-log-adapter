@@ -37,7 +37,7 @@
             <xsl:with-param name="victim" select="inc:Victim/sc:Name"/>
             <xsl:with-param name="confidence" select="inc:Confidence/sc:Value"/>
             <xsl:with-param name="tool" select="inc:Information_Source/sc:Tools/cc:Tool/@idref"/>
-            <xsl:with-param name="risk" select="inc:Intended_Effect/sc:Value"/>
+            <xsl:with-param name="impact" select="inc:Impact_Assessment/inc:Impact_Qualification"/>
             <xsl:with-param name="url" select="@URL"/>
         </xsl:apply-templates>
     </xsl:template>
@@ -50,7 +50,7 @@
         <xsl:param name="victim"/>
         <xsl:param name="confidence"/>
         <xsl:param name="tool"/>
-        <xsl:param name="risk"/>
+        <xsl:param name="impact"/>
         <xsl:param name="url"/>
         <xsl:apply-templates select="ind:Observable">
             <xsl:with-param name="customer" select="$customer"/>
@@ -59,7 +59,7 @@
             <xsl:with-param name="victim" select="$victim"/>
             <xsl:with-param name="confidence" select="$confidence"/>
             <xsl:with-param name="tool" select="$tool"/>
-            <xsl:with-param name="risk" select="$risk"/>
+            <xsl:with-param name="impact" select="$impact"/>
             <xsl:with-param name="url" select="$url"/>
             <xsl:with-param name="indicatorId" select="@id"/>
             <xsl:with-param name="activity" select="ind:Indicated_TTP/sc:TTP/ttp:Title"/>
@@ -76,15 +76,15 @@
         <xsl:param name="victim"/>
         <xsl:param name="confidence"/>
         <xsl:param name="tool"/>
-        <xsl:param name="risk"/>
+        <xsl:param name="impact"/>
         <xsl:param name="url"/>
         <xsl:param name="indicatorId"/>
         <xsl:param name="activity"/>
         <xsl:param name="campaign"/>
 
         <xsl:text>CEF:0|Cisco|Cognitive Threat Analytics|1.0|1|Web Flow|</xsl:text>
-        <xsl:call-template name="convertRisk">
-            <xsl:with-param name="risk" select="$risk"/>
+        <xsl:call-template name="convertImpact">
+            <xsl:with-param name="impact" select="$impact"/>
         </xsl:call-template>
         <xsl:text>|</xsl:text>
 
@@ -256,20 +256,26 @@
         </xsl:if>
     </xsl:template>
 
-    <xsl:template name="convertRisk">
-        <xsl:param name="risk"/>
+    <xsl:template name="convertImpact">
+        <xsl:param name="impact"/>
         <xsl:choose>
-            <xsl:when test="$risk = 'Low'">
+            <xsl:when test="$impact = 'Insignificant'">
+                <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:when test="$impact = 'Distracting'">
                 <xsl:text>5</xsl:text>
             </xsl:when>
-            <xsl:when test="$risk = 'Medium'">
+            <xsl:when test="$impact = 'Painful'">
                 <xsl:text>7</xsl:text>
             </xsl:when>
-            <xsl:when test="$risk = 'High'">
+            <xsl:when test="$impact = 'Damaging'">
                 <xsl:text>9</xsl:text>
             </xsl:when>
+            <xsl:when test="$impact = 'Catastrophic'">
+                <xsl:text>10</xsl:text>
+            </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="error(QName('http://cisco.com/td/taxii-log-adapter', 'TLA-03'), concat('Error converting risk: ',$risk))"/>
+                <xsl:value-of select="error(QName('http://cisco.com/td/taxii-log-adapter', 'TLA-03'), concat('Error converting impact: ',$impact))"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

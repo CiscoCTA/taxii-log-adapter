@@ -30,6 +30,7 @@ import com.cisco.cta.taxii.adapter.httpclient.ProxyAuthenticationType;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.core.env.PropertySource;
@@ -55,12 +56,17 @@ public class SettingsConfigurationTest {
 
     @Test
     public void acceptValidConfiguration() throws Exception {
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
-            ctx.register(SettingsConfiguration.class);
-            ctx.getEnvironment().getPropertySources().addFirst(validProperties());
-            ctx.refresh();
+        try (ConfigurableApplicationContext ctx = context(validProperties())) {
             assertThat(ctx.getBean(TaxiiServiceSettings.class).getFeeds().get(0), is("alpha-feed"));
         }
+    }
+
+    private ConfigurableApplicationContext context(PropertySource<?> source) {
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+        ctx.register(SettingsConfiguration.class);
+        ctx.getEnvironment().getPropertySources().addFirst(source);
+        ctx.refresh();
+        return ctx;
     }
 
     private MockPropertySource validProperties() {
@@ -78,10 +84,7 @@ public class SettingsConfigurationTest {
 
     @Test
     public void typeConversion() throws Exception {
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
-            ctx.register(SettingsConfiguration.class);
-            ctx.getEnvironment().getPropertySources().addFirst(validProperties());
-            ctx.refresh();
+        try (ConfigurableApplicationContext ctx = context(validProperties())) {
             assertThat(ctx.getBean(ProxySettings.class).getUrl(), is(new URL("http://localhost:8001/")));
             assertThat(ctx.getBean(ProxySettings.class).getAuthenticationType(), is(ProxyAuthenticationType.NONE));
         }
@@ -89,11 +92,7 @@ public class SettingsConfigurationTest {
 
     @Test
     public void resfuseMissingPollEndpoint() throws Exception {
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
-            ctx.register(SettingsConfiguration.class);
-            PropertySource<?> source = exclude(validProperties(), "taxiiService.pollEndpoint");
-            ctx.getEnvironment().getPropertySources().addFirst(source);
-            ctx.refresh();
+        try (ConfigurableApplicationContext ctx = context(exclude(validProperties(), "taxiiService.pollEndpoint"))) {
             fail("The context creation must fail because of invalid configuration.");
         } catch (NestedRuntimeException e) {
             BindException be = (BindException) e.getRootCause();
@@ -117,12 +116,9 @@ public class SettingsConfigurationTest {
 
     @Test
     public void loadFeedNamesFromFile() throws Exception {
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
-            ctx.register(SettingsConfiguration.class);
-            MockPropertySource source = exclude(validProperties(), "taxiiService.feeds")
-                    .withProperty("taxiiService.feedNamesFile", "src/test/resources/feed-names.txt");
-            ctx.getEnvironment().getPropertySources().addFirst(source);
-            ctx.refresh();
+        try (ConfigurableApplicationContext ctx = context(
+                exclude(validProperties(), "taxiiService.feeds")
+                .withProperty("taxiiService.feedNamesFile", "src/test/resources/feed-names.txt"))) {
             List<String> feeds = ctx.getBean(TaxiiServiceSettings.class).getFeeds();
             assertThat(feeds, contains("little-feed", "big-feed"));
         }
@@ -131,11 +127,7 @@ public class SettingsConfigurationTest {
 
     @Test
     public void refuseMissingFeedNames() throws Exception {
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
-            ctx.register(SettingsConfiguration.class);
-            MockPropertySource source = exclude(validProperties(), "taxiiService.feeds");
-            ctx.getEnvironment().getPropertySources().addFirst(source);
-            ctx.refresh();
+        try (ConfigurableApplicationContext ctx = context(exclude(validProperties(), "taxiiService.feeds"))) {
             fail("The context creation must fail because of invalid configuration.");
         } catch (BeanCreationException e) {
             assertThat(e.getRootCause(), instanceOf(IllegalStateException.class));
@@ -144,11 +136,7 @@ public class SettingsConfigurationTest {
 
     @Test
     public void statusFileDefault() throws Exception {
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
-            ctx.register(SettingsConfiguration.class);
-            MockPropertySource source = exclude(validProperties(), "taxiiService.statusFile");
-            ctx.getEnvironment().getPropertySources().addFirst(source);
-            ctx.refresh();
+        try (ConfigurableApplicationContext ctx = context(exclude(validProperties(), "taxiiService.statusFile"))) {
             TaxiiServiceSettings settings = ctx.getBean(TaxiiServiceSettings.class);
             assertThat(settings.getStatusFile().getPath(), is("taxii-status.xml"));
         }

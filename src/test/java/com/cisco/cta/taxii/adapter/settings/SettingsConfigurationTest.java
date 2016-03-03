@@ -57,37 +57,30 @@ public class SettingsConfigurationTest {
     public void acceptValidConfiguration() throws Exception {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
             ctx.register(SettingsConfiguration.class);
-            PropertySource<?> source = new MockPropertySource()
-                .withProperty("taxiiService.pollEndpoint", "http://taxii")
-                .withProperty("taxiiService.username", "smith")
-                .withProperty("taxiiService.password", "secret")
-                .withProperty("taxiiService.feeds[0]", "alpha-feed")
-                .withProperty("taxiiService.statusFile", "taxii-status.xml")
-                .withProperty("schedule.cron", "* * * * * *")
-                .withProperty("transform.stylesheet", "transform.xsl")
-                .withProperty("proxy.url", "http://localhost:8001/")
-                .withProperty("proxy.authenticationType", "NONE");
-            ctx.getEnvironment().getPropertySources().addFirst(source);
+            ctx.getEnvironment().getPropertySources().addFirst(validProperties());
             ctx.refresh();
             assertThat(ctx.getBean(TaxiiServiceSettings.class).getFeeds().get(0), is("alpha-feed"));
         }
+    }
+
+    private MockPropertySource validProperties() {
+        return new MockPropertySource()
+            .withProperty("taxiiService.pollEndpoint", "http://taxii")
+            .withProperty("taxiiService.username", "smith")
+            .withProperty("taxiiService.password", "secret")
+            .withProperty("taxiiService.feeds[0]", "alpha-feed")
+            .withProperty("taxiiService.statusFile", "taxii-status.xml")
+            .withProperty("schedule.cron", "* * * * * *")
+            .withProperty("transform.stylesheet", "transform.xsl")
+            .withProperty("proxy.url", "http://localhost:8001/")
+            .withProperty("proxy.authenticationType", "NONE");
     }
 
     @Test
     public void typeConversion() throws Exception {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
             ctx.register(SettingsConfiguration.class);
-            PropertySource<?> source = new MockPropertySource()
-                    .withProperty("taxiiService.pollEndpoint", "http://taxii")
-                    .withProperty("taxiiService.username", "smith")
-                    .withProperty("taxiiService.password", "secret")
-                    .withProperty("taxiiService.feeds[0]", "alpha-feed")
-                    .withProperty("taxiiService.statusFile", "taxii-status.xml")
-                    .withProperty("schedule.cron", "* * * * * *")
-                    .withProperty("transform.stylesheet", "transform.xsl")
-                    .withProperty("proxy.url", "http://localhost:8001/")
-                    .withProperty("proxy.authenticationType", "NONE");
-            ctx.getEnvironment().getPropertySources().addFirst(source);
+            ctx.getEnvironment().getPropertySources().addFirst(validProperties());
             ctx.refresh();
             assertThat(ctx.getBean(ProxySettings.class).getUrl(), is(new URL("http://localhost:8001/")));
             assertThat(ctx.getBean(ProxySettings.class).getAuthenticationType(), is(ProxyAuthenticationType.NONE));
@@ -98,13 +91,7 @@ public class SettingsConfigurationTest {
     public void resfuseMissingPollEndpoint() throws Exception {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
             ctx.register(SettingsConfiguration.class);
-            PropertySource<?> source = new MockPropertySource()
-                .withProperty("taxiiService.username", "smith")
-                .withProperty("taxiiService.password", "secret")
-                .withProperty("taxiiService.feeds[0]", "alpha-feed")
-                .withProperty("taxiiService.statusFile", "taxii-status.xml")
-                .withProperty("schedule.cron", "* * * * * *")
-                .withProperty("transform.stylesheet", "transform.xsl");
+            PropertySource<?> source = exclude(validProperties(), "taxiiService.pollEndpoint");
             ctx.getEnvironment().getPropertySources().addFirst(source);
             ctx.refresh();
             fail("The context creation must fail because of invalid configuration.");
@@ -118,20 +105,22 @@ public class SettingsConfigurationTest {
         }
     }
 
+    private MockPropertySource exclude(MockPropertySource all, String excludePrefix) {
+        MockPropertySource source = new MockPropertySource();
+        for (String key : all.getPropertyNames()) {
+            if (! key.startsWith(excludePrefix)) {
+                source.setProperty(key, all.getProperty(key));
+            }
+        }
+        return source;
+    }
+
     @Test
     public void loadFeedNamesFromFile() throws Exception {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
             ctx.register(SettingsConfiguration.class);
-            PropertySource<?> source = new MockPropertySource()
-                .withProperty("taxiiService.pollEndpoint", "http://taxii")
-                .withProperty("taxiiService.username", "smith")
-                .withProperty("taxiiService.password", "secret")
-                .withProperty("taxiiService.feedNamesFile", "src/test/resources/feed-names.txt")
-                .withProperty("taxiiService.statusFile", "taxii-status.xml")
-                .withProperty("schedule.cron", "* * * * * *")
-                .withProperty("transform.stylesheet", "transform.xsl")
-                .withProperty("proxy.url", "http://localhost:8001/")
-                .withProperty("proxy.authenticationType", "NONE");
+            MockPropertySource source = exclude(validProperties(), "taxiiService.feeds")
+                    .withProperty("taxiiService.feedNamesFile", "src/test/resources/feed-names.txt");
             ctx.getEnvironment().getPropertySources().addFirst(source);
             ctx.refresh();
             List<String> feeds = ctx.getBean(TaxiiServiceSettings.class).getFeeds();
@@ -144,15 +133,7 @@ public class SettingsConfigurationTest {
     public void refuseMissingFeedNames() throws Exception {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
             ctx.register(SettingsConfiguration.class);
-            PropertySource<?> source = new MockPropertySource()
-                .withProperty("taxiiService.pollEndpoint", "http://taxii")
-                .withProperty("taxiiService.username", "smith")
-                .withProperty("taxiiService.password", "secret")
-                .withProperty("taxiiService.statusFile", "taxii-status.xml")
-                .withProperty("schedule.cron", "* * * * * *")
-                .withProperty("transform.stylesheet", "transform.xsl")
-                .withProperty("proxy.url", "http://localhost:8001/")
-                .withProperty("proxy.authenticationType", "NONE");
+            MockPropertySource source = exclude(validProperties(), "taxiiService.feeds");
             ctx.getEnvironment().getPropertySources().addFirst(source);
             ctx.refresh();
             fail("The context creation must fail because of invalid configuration.");

@@ -142,4 +142,16 @@ public class SettingsConfigurationTest {
         }
     }
 
+    @Test
+    public void statusFileDefault() throws Exception {
+        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
+            ctx.register(SettingsConfiguration.class);
+            MockPropertySource source = exclude(validProperties(), "taxiiService.statusFile");
+            ctx.getEnvironment().getPropertySources().addFirst(source);
+            ctx.refresh();
+            TaxiiServiceSettings settings = ctx.getBean(TaxiiServiceSettings.class);
+            assertThat(settings.getStatusFile().getPath(), is("taxii-status.xml"));
+        }
+    }
+
 }

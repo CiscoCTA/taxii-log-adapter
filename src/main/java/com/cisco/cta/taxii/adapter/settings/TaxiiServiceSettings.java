@@ -54,8 +54,7 @@ public class TaxiiServiceSettings {
 
     private File feedNamesFile;
 
-    @NotNull
-    private File statusFile;
+    private File statusFile = new File("taxii-status.xml");
 
     @PostConstruct
     public void loadFeedNames() throws IOException {

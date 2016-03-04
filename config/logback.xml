@@ -1,19 +1,69 @@
 <configuration debug="true">
 
 <!--================= OUTPUT CONFIGURATION ================-->
+    <!-- **** SPLUNK PREPARED CONFIG ****
+    for detailed information see
+    https://github.com/CiscoCTA/taxii-log-adapter/wiki/Integration-with-Splunk
+    -->
+
+    <!--
+    <appender name="TCP" class="com.cisco.cta.taxii.adapter.NetworkAppender">
+        <host>splunk-host</host>
+        <port>9999</port>
+        <protocol>TCP</protocol>
+    </appender>
+
 
     <logger name="output" level="info" additivity="false">
-        <!-- Configure the output method(s) here by adding appenders. E.g. FILE, TCP, UDP or other -->
-        <!-- All appenders configured here must have the following encoder configuration.
-        <encoder>
-            <pattern>%msg%n</pattern>
-        </encoder>
-        -->
+    <appender-ref ref="TCP"/>
+    </logger>
+    -->
+
+    <!-- **** ARCSIGHT PREPARED CONFIGURATION ****
+    for detailed information see
+    https://github.com/CiscoCTA/taxii-log-adapter/wiki/Integration-with-ArcSight
+    -->
+
+    <!--
+        <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+            <syslogHost>arcsight-host</syslogHost>
+            <port>55056</port>
+            <facility>LOCAL0</facility>
+            <suffixPattern>%msg</suffixPattern>
+        </appender>
+        <logger name="output" level="info" additivity="false">
+            <appender-ref ref="SYSLOG"/>
+        </logger>
+    -->
+
+    <!-- **** FILE OUTPUT PREPARED CONFIGURATION ****
+    for detailed information see
+    https://github.com/CiscoCTA/taxii-log-adapter/wiki/Save-adapter-output-to-file-system-in-STIX-format-one-file-per-request
+    -->
+    <!--
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>messageId</key>
+            <defaultValue>unknown</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="OUTPUT_FILE_${messageId}" class="ch.qos.logback.core.FileAppender">
+                <file>/data/output/stix-${messageId}.xml</file>
+                <append>false</append>
+                <encoder>
+                    <pattern>%msg%n</pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+
+    <logger name="output" level="info" additivity="false">
+        <appender-ref ref="SIFT"/>
     </logger>
 
+    -->
 
-
-<!--================== LOG CONFIGURATION ==================-->
+    <!--================== LOG CONFIGURATION ==================-->
 
     <appender name="LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>log/adapter.log</file>

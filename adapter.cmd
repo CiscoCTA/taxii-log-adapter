@@ -40,6 +40,16 @@ GOTO %1
 
     GOTO end
 
+:smoketest
+    IF EXIST %PID_PATH_NAME% (
+        echo %SERVICE_NAME% is already running ...
+    ) ELSE (
+        echo Starting %SERVICE_NAME% smoke test ...
+        java %JAVA_OPTS% -Dspring.profiles.active=smoketest -jar %PATH_TO_JAR%
+    )
+
+    GOTO end
+
 :start
     IF EXIST %PID_PATH_NAME% (
         echo %SERVICE_NAME% is already running ...

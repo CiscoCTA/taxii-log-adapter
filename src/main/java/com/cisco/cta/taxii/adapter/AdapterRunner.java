@@ -19,6 +19,12 @@ package com.cisco.cta.taxii.adapter;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.NestedRuntimeException;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+
+import com.cisco.cta.taxii.adapter.settings.BindExceptionHandler;
 
 
 /**
@@ -27,19 +33,36 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class AdapterRunner {
 
     static ConfigurableApplicationContext ctx;
+    private static BindExceptionHandler bindExceptionHandler = new BindExceptionHandler(System.err);
 
     /**
      * @param args The command line arguments.
      */
     public static void main(String[] args) {
-        ctx = new SpringApplicationBuilder(
-                AdapterConfiguration.class,
-                ScheduleConfiguration.class,
-                RunNowConfiguration.class)
-            .showBanner(false)
-            .listeners(new ApplicationPidFileWriter())
-            .run(args);
-        ctx.start();
+        try {
+            ctx = new SpringApplicationBuilder(
+                    AdapterConfiguration.class,
+                    ScheduleConfiguration.class,
+                    RunNowConfiguration.class)
+                .showBanner(false)
+                .listeners(new ApplicationPidFileWriter())
+                .run(args);
+            ctx.start();
+
+        } catch (NestedRuntimeException e) {
+            try {
+                throw e.getMostSpecificCause();
+            } catch (BindException bindRootCause) {
+                bindExceptionHandler.handle(bindRootCause);
+            } catch (Throwable unknownRootCause) {
+                System.err.println("CRITICAL UNKNOWN ERROR WHILE INITIALIZING");
+                throw e;
+            }
+
+        } catch (RuntimeException e) {
+            System.err.println("CRITICAL UNKNOWN ERROR WHILE INITIALIZING");
+            throw e;
+        }
     }
 
 }

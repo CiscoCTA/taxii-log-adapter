@@ -34,6 +34,16 @@
         <appender-ref ref="LOG_FILE"/>
     </logger>
 
+    <appender name="SCREEN" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.cisco.cta.taxii.adapter.smoketest" level="info" additivity="false">
+        <appender-ref ref="SCREEN"/>
+    </logger>
+
     <root level="info">
         <appender-ref ref="LOG_FILE"/>
     </root>

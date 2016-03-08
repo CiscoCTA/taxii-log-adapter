@@ -20,7 +20,25 @@ public class SmokeTestLifecycle implements Lifecycle {
     }
 
     private void logSettingsConfig() {
+        log.info("taxiiService");
         log.info("pollEndpoint={}", settingsConfig.taxiiServiceSettings().getPollEndpoint());
+        log.info("username={}", settingsConfig.taxiiServiceSettings().getUsername());
+        log.info("password={}", settingsConfig.taxiiServiceSettings().getPassword().isEmpty() ? "" : "*****");
+        log.info("feeds");
+        for (String feed : settingsConfig.taxiiServiceSettings().getFeeds()) {
+            log.info("  {}", feed);
+        }
+        log.info("schedule");
+        log.info("cron={}", settingsConfig.scheduleSettings().getCron());
+        log.info("transform");
+        log.info("stylesheet={}", settingsConfig.transformSettings().getStylesheet());
+        if (settingsConfig.proxySettings() != null) {
+            log.info("proxy");
+            log.info("url={}", settingsConfig.proxySettings().getUrl());
+            log.info("authenticationType={}", settingsConfig.proxySettings().getAuthenticationType());
+            log.info("username={}", settingsConfig.proxySettings().getUsername());
+            log.info("password={}", settingsConfig.proxySettings().getPassword().isEmpty() ? "" : "*****");
+        }
     }
 
     @Override

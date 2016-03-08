@@ -2,6 +2,7 @@ package com.cisco.cta.taxii.adapter.smoketest;
 
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.junit.After;
@@ -50,8 +51,17 @@ public class SmokeTestLifecycleTest {
     }
 
     @Test
-    public void smokeSmokeTest() throws Exception {
+    public void logConfig() throws Exception {
         smokeTestLifecycle.start();
-        verify(appender).doAppend(argThat(containsMessage("https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService")));
-    }
+        verify(appender).doAppend(argThat(containsMessage("pollEndpoint=https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService")));
+        verify(appender).doAppend(argThat(containsMessage("username=user")));
+        verify(appender, times(2)).doAppend(argThat(containsMessage("password=*****"))); // TAXII & PROXY
+        verify(appender).doAppend(argThat(containsMessage("feeds")));
+        verify(appender).doAppend(argThat(containsMessage("collection_name")));
+        verify(appender).doAppend(argThat(containsMessage("cron=0 0 * * * *")));
+        verify(appender).doAppend(argThat(containsMessage("stylesheet=config/stix2json.xsl")));
+        verify(appender).doAppend(argThat(containsMessage("url=http://localhost:8002")));
+        verify(appender).doAppend(argThat(containsMessage("authenticationType=BASIC")));
+        verify(appender).doAppend(argThat(containsMessage("username=proxyuser")));
+      }
 }

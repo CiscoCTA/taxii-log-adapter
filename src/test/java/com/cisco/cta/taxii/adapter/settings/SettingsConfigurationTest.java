@@ -27,6 +27,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import com.cisco.cta.taxii.adapter.httpclient.ProxyAuthenticationType;
+import static com.cisco.cta.taxii.adapter.settings.PropertySourceHelper.*;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
@@ -63,19 +64,6 @@ public class SettingsConfigurationTest {
         }
     }
 
-    private MockPropertySource validProperties() {
-        return new MockPropertySource()
-            .withProperty("taxiiService.pollEndpoint", "http://taxii")
-            .withProperty("taxiiService.username", "smith")
-            .withProperty("taxiiService.password", "secret")
-            .withProperty("taxiiService.feeds[0]", "alpha-feed")
-            .withProperty("taxiiService.statusFile", "taxii-status.xml")
-            .withProperty("schedule.cron", "* * * * * *")
-            .withProperty("transform.stylesheet", "transform.xsl")
-            .withProperty("proxy.url", "http://localhost:8001/")
-            .withProperty("proxy.authenticationType", "NONE");
-    }
-
     @Test
     public void typeConversion() throws Exception {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
@@ -103,16 +91,6 @@ public class SettingsConfigurationTest {
             assertThat(be.getFieldError().getRejectedValue(), is(nullValue()));
             assertThat(be.getFieldError().getDefaultMessage(), is("may not be null"));
         }
-    }
-
-    private MockPropertySource exclude(MockPropertySource all, String excludePrefix) {
-        MockPropertySource source = new MockPropertySource();
-        for (String key : all.getPropertyNames()) {
-            if (! key.startsWith(excludePrefix)) {
-                source.setProperty(key, all.getProperty(key));
-            }
-        }
-        return source;
     }
 
     @Test

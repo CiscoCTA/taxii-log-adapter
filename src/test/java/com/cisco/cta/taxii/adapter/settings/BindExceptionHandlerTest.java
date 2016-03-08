@@ -12,9 +12,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.NestedRuntimeException;
-import org.springframework.core.env.PropertySource;
-import org.springframework.mock.env.MockPropertySource;
 import org.springframework.validation.BindException;
+
+import static com.cisco.cta.taxii.adapter.settings.PropertySourceHelper.*;
+
 
 public class BindExceptionHandlerTest {
 
@@ -33,10 +34,7 @@ public class BindExceptionHandlerTest {
     public void invalidPollEndpoint() throws Exception {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
             ctx.register(SettingsConfiguration.class);
-            PropertySource<?> source = new MockPropertySource()
-                    .withProperty("taxiiService.pollEndpoint", "invalid value")
-                    .withProperty("schedule.cron", "* * * * * *");
-            ctx.getEnvironment().getPropertySources().addFirst(source);
+            ctx.getEnvironment().getPropertySources().addFirst(exclude(validProperties(), "taxiiService.pollEndpoint"));
             ctx.refresh();
             fail("The context creation must fail because of invalid configuration.");
         } catch (NestedRuntimeException e) {

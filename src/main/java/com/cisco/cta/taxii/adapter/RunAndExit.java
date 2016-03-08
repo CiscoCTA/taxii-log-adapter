@@ -16,10 +16,8 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.context.Lifecycle;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Delegates to a #{@link java.lang.Runnable} instance, then stops the application.
@@ -33,10 +31,9 @@ public class RunAndExit implements Lifecycle {
     }
 
     @Override
-    @SuppressFBWarnings(value="DM_EXIT", justification="Spring BOOT requires use of System.exit")
     public void start() {
         delegate.run();
-        System.exit(SpringApplication.exit(AdapterRunner.ctx));
+        AdapterRunner.exit();
     }
 
     @Override

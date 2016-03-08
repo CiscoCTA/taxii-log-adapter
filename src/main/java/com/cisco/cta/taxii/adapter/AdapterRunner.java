@@ -16,16 +16,17 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.validation.BindException;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 
 import com.cisco.cta.taxii.adapter.settings.BindExceptionHandler;
 import com.cisco.cta.taxii.adapter.smoketest.SmokeTestConfiguration;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -39,7 +40,7 @@ public class AdapterRunner {
     /**
      * @param args The command line arguments.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
         try {
             ctx = new SpringApplicationBuilder(
                     AdapterConfiguration.class,
@@ -67,4 +68,8 @@ public class AdapterRunner {
         }
     }
 
+    @SuppressFBWarnings(value="DM_EXIT", justification="Spring BOOT requires use of System.exit")
+    public static void exit() {
+        System.exit(SpringApplication.exit(ctx));
+    }
 }

@@ -52,7 +52,7 @@ public class SmokeTestLifecycleTest {
 
     @Test
     public void logConfig() throws Exception {
-        smokeTestLifecycle.start();
+        smokeTestLifecycle.logSettingsConfig();
         verify(appender).doAppend(argThat(containsMessage("pollEndpoint=https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService")));
         verify(appender).doAppend(argThat(containsMessage("username=user")));
         verify(appender, times(2)).doAppend(argThat(containsMessage("password=*****"))); // TAXII & PROXY

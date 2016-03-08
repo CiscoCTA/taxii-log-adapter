@@ -42,7 +42,7 @@ public class AdapterRunnerTest {
     private int exitCode;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Throwable {
         FileUtils.deleteQuietly(PID_FILE);
         String[] args = new String[] {"--foo.param=argument-value"};
         AdapterRunner.main(args);

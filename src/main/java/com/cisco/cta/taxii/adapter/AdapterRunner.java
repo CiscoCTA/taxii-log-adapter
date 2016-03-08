@@ -16,6 +16,7 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import org.springframework.boot.Banner.Mode;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -47,7 +48,7 @@ public class AdapterRunner {
                     ScheduleConfiguration.class,
                     RunNowConfiguration.class,
                     SmokeTestConfiguration.class)
-                .showBanner(false)
+                .bannerMode(Mode.OFF)
                 .listeners(new ApplicationPidFileWriter())
                 .run(args);
             ctx.start();

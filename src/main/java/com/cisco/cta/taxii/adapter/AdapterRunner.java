@@ -25,6 +25,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import com.cisco.cta.taxii.adapter.settings.BindExceptionHandler;
+import com.cisco.cta.taxii.adapter.smoketest.SmokeTestConfiguration;
 
 
 /**
@@ -43,7 +44,8 @@ public class AdapterRunner {
             ctx = new SpringApplicationBuilder(
                     AdapterConfiguration.class,
                     ScheduleConfiguration.class,
-                    RunNowConfiguration.class)
+                    RunNowConfiguration.class,
+                    SmokeTestConfiguration.class)
                 .showBanner(false)
                 .listeners(new ApplicationPidFileWriter())
                 .run(args);

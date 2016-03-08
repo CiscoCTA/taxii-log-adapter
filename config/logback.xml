@@ -1,4 +1,4 @@
-<configuration debug="true">
+<configuration debug="false">
 
 <!--================= OUTPUT CONFIGURATION ================-->
 
@@ -44,7 +44,7 @@
         <appender-ref ref="SCREEN"/>
     </logger>
 
-    <root level="info">
+    <root level="warn">
         <appender-ref ref="LOG_FILE"/>
     </root>
 

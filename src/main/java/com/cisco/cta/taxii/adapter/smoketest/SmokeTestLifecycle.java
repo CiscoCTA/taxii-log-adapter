@@ -24,7 +24,7 @@ public class SmokeTestLifecycle implements Lifecycle {
     }
 
     void logSettingsConfig() {
-        log.info("=== CONFIGURATION PARAMETERS ===");
+        log.info("Listing configuration parameters ...");
         log.info("=== taxiiService ===");
         log.info("pollEndpoint={}", settingsConfig.taxiiServiceSettings().getPollEndpoint());
         log.info("username={}", settingsConfig.taxiiServiceSettings().getUsername());

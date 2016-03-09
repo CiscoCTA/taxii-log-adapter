@@ -49,6 +49,7 @@ public class AdapterRunner {
                     SmokeTestConfiguration.class)
                 .bannerMode(Mode.OFF)
                 .listeners(new ApplicationPidFileWriter())
+                .web(false)
                 .run(args);
             ctx.start();
 

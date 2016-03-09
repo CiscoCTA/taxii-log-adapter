@@ -1,10 +1,11 @@
 package com.cisco.cta.taxii.adapter.smoketest;
 
-import java.io.IOException;
+import java.net.URL;
 import java.net.UnknownHostException;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.Lifecycle;
+import org.springframework.http.client.ClientHttpResponse;
 
 import com.cisco.cta.taxii.adapter.AdapterRunner;
 import com.cisco.cta.taxii.adapter.RequestFactory;
@@ -67,18 +68,28 @@ public class SmokeTestLifecycle implements Lifecycle {
     }
 
     void validateTaxiiConnectivity() {
+        URL endpoint = settingsConfig.taxiiServiceSettings().getPollEndpoint();
         try {
             Feed feed = new TaxiiStatus.Feed();
             feed.setName(settingsConfig.taxiiServiceSettings().getFeeds().iterator().next());
-            requestFactory.createPollRequest("smoke-test", feed).execute();
+            ClientHttpResponse resp = requestFactory.createPollRequest("smoke-test", feed).execute();
+
+            switch (resp.getRawStatusCode()) {
+            case 200:
+                log.info("Succesfully connected to {}", endpoint);
+                return;
+            case 401:
+            case 403:
+                log.error("Authentication or authorization problem, verify your credentials in application.yml");
+                return;
+            default:
+                log.error("{} returned {} HTTP status code, check your configuration", endpoint, resp.getRawStatusCode());
+            }
+
         } catch (UnknownHostException e) {
             log.error("Unable to resolve host name {}, verify your application.yml and your DNS settings", e.getMessage());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Error connecting to " + endpoint, e);
         }
     }
 

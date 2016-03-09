@@ -1,9 +1,14 @@
 package com.cisco.cta.taxii.adapter.smoketest;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,8 +26,13 @@ import com.cisco.cta.taxii.adapter.AdapterConfiguration;
 import static com.cisco.cta.taxii.adapter.smoketest.ContainsMessageMatcher.*;
 
 import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.util.ContextInitializer;
 import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.LogbackException;
+import ch.qos.logback.core.joran.spi.JoranException;
 
 
 @ContextConfiguration(classes = {SmokeTestConfiguration.class, AdapterConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
@@ -36,6 +46,7 @@ public class SmokeTestLifecycleTest {
 
     private Logger logger;
     private Appender<ILoggingEvent> appender;
+    LoggerContext loggerContext;
 
     @Before
     @SuppressWarnings("unchecked")
@@ -43,11 +54,16 @@ public class SmokeTestLifecycleTest {
         appender = mock(Appender.class);
         logger = (Logger) LoggerFactory.getLogger(SmokeTestLifecycle.class);
         logger.addAppender(appender);
+        loggerContext = logger.getLoggerContext();
     }
 
     @After
     public void tearDown() throws Exception {
         logger.detachAppender(appender);
+        loggerContext.stop();
+        ContextInitializer logInitializer = new ContextInitializer(loggerContext);
+        logInitializer.autoConfig();
+        loggerContext.start();
     }
 
     @Test
@@ -64,4 +80,28 @@ public class SmokeTestLifecycleTest {
         verify(appender).doAppend(argThat(containsMessage("authenticationType=BASIC")));
         verify(appender).doAppend(argThat(containsMessage("username=proxyuser")));
       }
+
+    @Test
+    public void successOnValidOutputAppenders() throws Exception {
+        smokeTestLifecycle.validateOutput();
+        verify(appender).doAppend(argThat(containsMessage("logback.xml, appender-ref is OK")));
+    }
+
+    @Test
+    public void failOnMissingOutputAppenders() throws Exception {
+        loadLogConfig("/logback-missing-appenders.xml");
+        smokeTestLifecycle.validateOutput();
+        verify(appender).doAppend(argThat(containsMessage("Error in logback.xml, no appender-ref is declared")));
+    }
+
+    private void loadLogConfig(String resource) throws JoranException, Exception, IOException {
+        try (InputStream in = SmokeTestLifecycleTest.class.getResourceAsStream(resource)) {
+            loggerContext.stop();
+            JoranConfigurator logConfigurator = new JoranConfigurator();
+            logConfigurator.setContext(loggerContext);
+            logConfigurator.doConfigure(in);
+            loggerContext.start();
+            setUp(); //re-initialize logger
+        }
+    }
 }

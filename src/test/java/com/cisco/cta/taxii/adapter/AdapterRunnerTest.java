@@ -17,7 +17,6 @@
 package com.cisco.cta.taxii.adapter;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -29,7 +28,6 @@ import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.Environment;
 
-import com.cisco.cta.taxii.adapter.AdapterConfiguration;
 import com.cisco.cta.taxii.adapter.AdapterRunner;
 
 
@@ -59,7 +57,6 @@ public class AdapterRunnerTest {
     @Test
     public void runApplication() throws Exception {
         assertTrue("PID file created", PID_FILE.isFile());
-        assertThat(AdapterRunner.ctx.getBean(AdapterConfiguration.class), notNullValue());
         assertTrue(AdapterRunner.ctx.isRunning());
         Environment env = AdapterRunner.ctx.getBean(Environment.class);
         assertThat(env.getProperty("foo.param"), is("argument-value"));

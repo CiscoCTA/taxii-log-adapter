@@ -19,8 +19,10 @@ package com.cisco.cta.taxii.adapter.smoketest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
+import com.cisco.cta.taxii.adapter.AdapterConfiguration;
 import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
 
 
@@ -29,6 +31,7 @@ import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
  */
 @Configuration
 @Profile("smoketest")
+@Import(AdapterConfiguration.class)
 public class SmokeTestConfiguration {
 
     @Autowired

@@ -44,7 +44,6 @@ public class AdapterRunner {
     public static void main(String[] args) throws Throwable {
         try {
             ctx = new SpringApplicationBuilder(
-                    AdapterConfiguration.class,
                     ScheduleConfiguration.class,
                     RunNowConfiguration.class,
                     SmokeTestConfiguration.class)

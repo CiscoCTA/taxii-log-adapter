@@ -17,13 +17,28 @@
 # this section describes general setting for taxii log adapter
 # pollEndpoint is address of taxii server located in cisco cloud
 # username and password are credentials for data export account
-# and can be obtained through your CTA GUI under menu-CTA STIX/TAXII API
 # feeds is list of TAXII feeds, one collection for most cases and
 # the collection name you have received with the credentials
+
 # for detailed feeds configuration please see
 # https://github.com/CiscoCTA/taxii-log-adapter/wiki/Configuration#taxii-feed
 
-# Strings "user", "pass" and "collection_name" you have to replace with valid ones from your CTA account
+# This file must be modified to start using taxii-log-adapter.
+
+##########################################
+# Access section contains credentials for taxii server
+
+# Fill the following section.
+# Strings "user", "pass" and "collection_name" you have to replace with valid ones.
+# it matters on format and dashes before feed names, use only spaces for indentation
+
+#example section looks like
+#taxiiService:
+#pollEndpoint: https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/
+#    username: taxii-c1387d35-7197-2584-9d9d-49accf59ec64
+#    password: lGXevVpyi07HKunfv9rktF84PzH0sUMfIv4WvcvDPqWhUfMK
+#    feeds:
+#        - webflows_0000000000_v3
 
 taxiiService:
     pollEndpoint: https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/
@@ -32,16 +47,21 @@ taxiiService:
     feeds:
         - collection_name
 
-# schedule section contains cron-like expression
+##########################################
+# Schedule section contains cron-like expression
+
 # meaning of asterisk are second, minute, hour, day, month, weekday
 # configuration is also described on wiki
 # https://github.com/CiscoCTA/taxii-log-adapter/wiki/Configuration#scheduling
+# change this only if polling interval per hour is not accetable
 
 schedule:
     cron: "0 0 * * * *"
 
+##########################################
 # transform section contains path to xsl template that is applied to STIX downloaded data
-# please uncomment line with data format corresponding to your SIEM
+
+# Uncomment lines in the following sections corresponding to your SIEM
 
 transform:
 # json format suitable for SPLUNK
@@ -53,11 +73,17 @@ transform:
 # blank transformation that allows storing raw downloaded data
 #    stylesheet: config/stix2stix.xsl
 
+##########################################
+
 # The application uses the same logback configuration file to configure also its own logging.
+
 logging:
     config: config/logback.xml
 
-# Uncomment the following lines to use HTTP proxy when performing TAXII requests
+##########################################
+# Proxy settings
+
+# Uncomment and fill the following lines to use HTTP proxy when performing TAXII requests
 
 # proxy:
 #    url: http://localhost:8002/

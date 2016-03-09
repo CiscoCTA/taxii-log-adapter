@@ -15,10 +15,18 @@
 -->
 
 
+<!-- This file must be modified to start using taxii-log-adapter, uncomment and modify at least one SPLUNK/ARCSIGHT/FILE section. -->
+<!-- Use only editors supporting XML syntax to edit this file! -->
+<!-- If you want to know more about logback config files see http://logback.qos.ch/manual/ -->
+
 <configuration debug="true">
 
 <!--================= OUTPUT CONFIGURATION ================-->
-    <!-- **** SPLUNK PREPARED CONFIG ****
+
+    <!--=========== SPLUNK PREPARED CONFIGURATION ===========
+    uncomment the following appender and logger sections for integration with SPLUNK
+    fill splunk-host property
+
     for detailed information see
     https://github.com/CiscoCTA/taxii-log-adapter/wiki/Integration-with-Splunk
     -->
@@ -36,7 +44,10 @@
     </logger>
     -->
 
-    <!-- **** ARCSIGHT PREPARED CONFIGURATION ****
+    <!-- =========== ARCSIGHT PREPARED CONFIGURATION ===========
+    uncomment the following appender and logger sections for integration with ArcSight or any similar CEF channel to SIEM
+    fill arcsight-host property
+
     for detailed information see
     https://github.com/CiscoCTA/taxii-log-adapter/wiki/Integration-with-ArcSight
     -->
@@ -53,10 +64,13 @@
         </logger>
     -->
 
-    <!-- **** FILE OUTPUT PREPARED CONFIGURATION ****
+    <!-- =========== FILE OUTPUT PREPARED CONFIGURATION ===========
+    uncomment the following appender and logger sections for native STIX file output
+
     for detailed information see
     https://github.com/CiscoCTA/taxii-log-adapter/wiki/Save-adapter-output-to-file-system-in-STIX-format-one-file-per-request
     -->
+
     <!--
     <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
         <discriminator>

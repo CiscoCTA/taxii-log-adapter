@@ -1,9 +1,15 @@
 package com.cisco.cta.taxii.adapter.smoketest;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.context.Lifecycle;
 
 import com.cisco.cta.taxii.adapter.AdapterRunner;
+import com.cisco.cta.taxii.adapter.RequestFactory;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus.Feed;
 import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
 import com.google.common.base.Strings;
 
@@ -17,12 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 public class SmokeTestLifecycle implements Lifecycle {
 
     private final SettingsConfiguration settingsConfig;
+    private final RequestFactory requestFactory;
 
     @Override
     public void start() {
         // TODO do the smoke testing here
         logSettingsConfig();
         validateOutput();
+        validateTaxiiConnectivity();
         AdapterRunner.exit();
     }
 
@@ -58,6 +66,22 @@ public class SmokeTestLifecycle implements Lifecycle {
         }
     }
 
+    void validateTaxiiConnectivity() {
+        try {
+            Feed feed = new TaxiiStatus.Feed();
+            feed.setName(settingsConfig.taxiiServiceSettings().getFeeds().iterator().next());
+            requestFactory.createPollRequest("smoke-test", feed).execute();
+        } catch (UnknownHostException e) {
+            log.error("Unable to resolve host name {}, verify your application.yml and your DNS settings", e.getMessage());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void stop() {
         // do nothing
@@ -67,4 +91,5 @@ public class SmokeTestLifecycle implements Lifecycle {
     public boolean isRunning() {
         return false;
     }
+
 }

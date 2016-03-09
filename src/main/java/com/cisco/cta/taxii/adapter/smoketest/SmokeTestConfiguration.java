@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 import com.cisco.cta.taxii.adapter.AdapterConfiguration;
+import com.cisco.cta.taxii.adapter.RequestFactory;
 import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
 
 
@@ -37,9 +38,12 @@ public class SmokeTestConfiguration {
     @Autowired
     private SettingsConfiguration settingsConfig;
 
+    @Autowired
+    private RequestFactory requestFactory;
+
     @Bean
     public SmokeTestLifecycle smokeTest() throws Exception {
-        return new SmokeTestLifecycle(settingsConfig);
+        return new SmokeTestLifecycle(settingsConfig, requestFactory);
     }
 
 }

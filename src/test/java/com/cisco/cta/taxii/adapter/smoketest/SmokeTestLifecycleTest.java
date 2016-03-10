@@ -1,15 +1,17 @@
 package com.cisco.cta.taxii.adapter.smoketest;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +40,9 @@ import ch.qos.logback.core.joran.spi.JoranException;
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class SmokeTestLifecycleTest {
+
+    private static final File OUTPUT_FILE = new File("target/output.json");
+    private static final File EXPECTED_OUTPUT_FILE = new File("src/test/resources/expected-smoke-test-output.json");
 
     @Autowired
     private SmokeTestLifecycle smokeTestLifecycle;
@@ -101,5 +106,13 @@ public class SmokeTestLifecycleTest {
             loggerContext.start();
             setUp(); //re-initialize logger
         }
+    }
+
+    @Test
+    public void writeTestIncident() throws Exception {
+        smokeTestLifecycle.sendTestIncident();
+        assertThat(OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
+                FileUtils.readFileToString(OUTPUT_FILE), is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE)));
+        verify(appender).doAppend(argThat(containsMessage("Please manually validate the result in your target system.")));
     }
 }

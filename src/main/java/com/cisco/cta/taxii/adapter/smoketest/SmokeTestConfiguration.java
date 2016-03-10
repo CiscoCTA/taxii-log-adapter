@@ -16,6 +16,10 @@
 
 package com.cisco.cta.taxii.adapter.smoketest;
 
+import java.io.Writer;
+
+import javax.xml.transform.Templates;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,9 +45,15 @@ public class SmokeTestConfiguration {
     @Autowired
     private RequestFactory requestFactory;
 
+    @Autowired
+    private Templates templates;
+
+    @Autowired
+    private Writer logWriter;
+
     @Bean
     public SmokeTestLifecycle smokeTest() throws Exception {
-        return new SmokeTestLifecycle(settingsConfig, requestFactory);
+        return new SmokeTestLifecycle(settingsConfig, requestFactory, templates, logWriter);
     }
 
 }

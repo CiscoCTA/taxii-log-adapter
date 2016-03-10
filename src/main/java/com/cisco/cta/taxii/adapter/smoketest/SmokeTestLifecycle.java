@@ -1,7 +1,14 @@
 package com.cisco.cta.taxii.adapter.smoketest;
 
+import java.io.InputStream;
+import java.io.Writer;
 import java.net.URL;
 import java.net.UnknownHostException;
+
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.Lifecycle;
@@ -23,15 +30,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SmokeTestLifecycle implements Lifecycle {
 
+    private static final String RESOURCE = "/com/cisco/cta/taxii/adapter/smoketest/taxii-poll-response-smoke-test.xml";
+
     private final SettingsConfiguration settingsConfig;
     private final RequestFactory requestFactory;
+    private final Templates templates;
+    private final Writer logWriter;
 
     @Override
     public void start() {
-        // TODO do the smoke testing here
         logSettingsConfig();
         validateOutput();
         validateTaxiiConnectivity();
+        sendTestIncident();
         AdapterRunner.exit();
     }
 
@@ -92,6 +103,18 @@ public class SmokeTestLifecycle implements Lifecycle {
             log.error("Error connecting to " + endpoint, e);
         }
     }
+
+    void sendTestIncident() {
+        try (InputStream testResource = SmokeTestLifecycle.class.getResourceAsStream(RESOURCE)) {
+            log.info("Sending test-incident to the output configured in logback.xml ...");
+            Transformer transformer = templates.newTransformer();
+            transformer.transform(new StreamSource(testResource), new StreamResult(logWriter));
+            log.info("Please manually validate the result in your target system.");
+        } catch (Exception e) {
+            log.error("Error sending test incident", e);
+        }
+    }
+
 
     @Override
     public void stop() {

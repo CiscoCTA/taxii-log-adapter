@@ -1,0 +1,115 @@
+
+#   Copyright 2016 Cisco Systems
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+
+####################################################################################
+# This file MUST be modified to start using taxii-log-adapter.
+# For details please refer to
+# https://github.com/CiscoCTA/taxii-log-adapter/wiki/Configuration
+####################################################################################
+
+
+####################################################################################
+# The taxiiService section contains general settings for taxii-log-adapter
+#
+# pollEndpoint         - TAXII poll service endpoint URL
+# username, password   - Credentials for your TAXII account
+# feeds                - List of TAXII feeds, place each item on a separate line.
+#                        Each line MUST start with leading spaces, dash, space.
+#                        Do not use tabs.
+####################################################################################
+#
+# Example for the CTA TAXII service
+#
+# taxiiService:
+#    pollEndpoint: https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/
+#    username: taxii-c1387d35-7197-2584-9d9d-49accf59ec64
+#    password: lGXevVpyi07HKunfv9rktF84PzH0sUMfIv4WvcvDPqWhUfMK
+#    feeds:
+#        - webflows_0000000000_v3
+#
+####################################################################################
+
+taxiiService:
+    pollEndpoint: https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/
+    username: user
+    password: pass
+    feeds:
+        - feed_name
+
+
+
+####################################################################################
+# The schedule section contains scheduling options
+# cron    - cron-like expression with format: "second minute hour day month year"
+#           Do not change unless the your TAXII service provider instructs otherwise.
+####################################################################################
+
+schedule:
+    cron: "0 0 * * * *"
+
+
+
+####################################################################################
+# This transforms the data received from TAXII to a format suitable for your SIEM
+# stylesheet    - File containing the XSL transformation stylesheet
+####################################################################################
+
+transform:
+
+####################################################################################
+# Uncomment the following line to integrate with SPLUNK
+#    stylesheet: config/stix2json.xsl
+
+####################################################################################
+# Uncomment the following line to integrate with a CEF compliant SIEM,
+# e.g. ArcSight, Logpoint, McAfee ESM, etc.
+#    stylesheet: config/stix2cef.xsl
+
+####################################################################################
+# Uncomment the following line to perform no transformation.
+#    stylesheet: config/stix2stix.xsl
+
+
+
+####################################################################################
+# The logging section only references a config file used for logging and output
+# config   - You MUST edit the config file content to start using taxii-log-adapter.
+####################################################################################
+
+logging:
+    config: config/logback.xml
+
+
+
+####################################################################################
+# You need this section ONLY if you access Internet via a proxy
+# Some options are applicable only for certain authentication types
+# url                  - The proxy URL, including port
+# authenticationType   - none | basic | ntlm
+# username, password   - Credentials
+# domain               - Windows domain
+# workstation          - Workstation name
+####################################################################################
+#
+# Example for the basic proxy authentication
+#
+# proxy:
+#    url: http://proxy:8002/
+#    authenticationType: basic
+#    username: user
+#    password: pass
+#
+####################################################################################

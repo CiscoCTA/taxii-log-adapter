@@ -48,7 +48,7 @@ public class SmokeTestLifecycle implements Lifecycle {
 
     void logSettingsConfig() {
         log.info("Listing configuration parameters ...");
-        log.info("=== taxiiService ===");
+        log.info("---------- taxiiService ----------");
         log.info("pollEndpoint={}", settingsConfig.taxiiServiceSettings().getPollEndpoint());
         log.info("username={}", settingsConfig.taxiiServiceSettings().getUsername());
         log.info("password={}", Strings.isNullOrEmpty(settingsConfig.taxiiServiceSettings().getPassword()) ? "" : "*****");
@@ -56,23 +56,25 @@ public class SmokeTestLifecycle implements Lifecycle {
         for (String feed : settingsConfig.taxiiServiceSettings().getFeeds()) {
             log.info("  {}", feed);
         }
-        log.info("=== schedule ===");
+        log.info("---------- schedule ----------");
         log.info("cron={}", settingsConfig.scheduleSettings().getCron());
-        log.info("=== transform ===");
+        log.info("---------- transform ----------");
         log.info("stylesheet={}", settingsConfig.transformSettings().getStylesheet());
         if (settingsConfig.proxySettings() != null) {
-            log.info("=== proxy ===");
+            log.info("---------- proxy ----------");
             log.info("url={}", settingsConfig.proxySettings().getUrl());
             log.info("authenticationType={}", settingsConfig.proxySettings().getAuthenticationType());
             log.info("username={}", settingsConfig.proxySettings().getUsername());
             log.info("password={}", Strings.isNullOrEmpty(settingsConfig.proxySettings().getPassword()) ? "" : "*****");
         }
+        log.info("---------- end of configuration ----------");
     }
 
     void validateOutput() {
+        log.info("Validating the output configuration in logback.xml ...");
         Logger logger = (Logger) LoggerFactory.getLogger("output");
         if (logger.iteratorForAppenders().hasNext()) {
-            log.info("logback.xml, appender-ref is OK");
+            log.info("logback.xml: appender-ref is OK");
         } else {
             log.error("Error in logback.xml, no appender-ref is declared inside <logger name=\"output\" ...");
         }
@@ -80,6 +82,7 @@ public class SmokeTestLifecycle implements Lifecycle {
 
     void validateTaxiiConnectivity() {
         URL endpoint = settingsConfig.taxiiServiceSettings().getPollEndpoint();
+        log.info("Contacting TAXII poll service {} ...", endpoint);
         try {
             Feed feed = new TaxiiStatus.Feed();
             feed.setName(settingsConfig.taxiiServiceSettings().getFeeds().iterator().next());
@@ -106,10 +109,10 @@ public class SmokeTestLifecycle implements Lifecycle {
 
     void sendTestIncident() {
         try (InputStream testResource = SmokeTestLifecycle.class.getResourceAsStream(RESOURCE)) {
-            log.info("Sending test-incident to the output configured in logback.xml ...");
+            log.info("Sending smoke-test incident to the output configured in logback.xml ...");
             Transformer transformer = templates.newTransformer();
             transformer.transform(new StreamSource(testResource), new StreamResult(logWriter));
-            log.info("Please manually validate the result in your target system.");
+            log.info("Please manually validate the result in your target system. Tip: Search for 'smoke-test'");
         } catch (Exception e) {
             log.error("Error sending test incident", e);
         }

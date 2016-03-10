@@ -87,7 +87,7 @@ public class SmokeTestLifecycleTest {
     @Test
     public void successOnValidOutputAppenders() throws Exception {
         smokeTestLifecycle.validateOutput();
-        verify(appender).doAppend(argThat(containsMessage("logback.xml, appender-ref is OK")));
+        verify(appender).doAppend(argThat(containsMessage("logback.xml: appender-ref is OK")));
     }
 
     @Test

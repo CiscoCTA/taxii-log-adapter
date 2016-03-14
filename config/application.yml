@@ -1,92 +1,22 @@
-
-#   Copyright 2016 Cisco Systems
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-
-# this section describes general setting for taxii log adapter
-# pollEndpoint is address of taxii server located in cisco cloud
-# username and password are credentials for data export account
-# feeds is list of TAXII feeds, one collection for most cases and
-# the collection name you have received with the credentials
-
-# for detailed feeds configuration please see
-# https://github.com/CiscoCTA/taxii-log-adapter/wiki/Configuration#taxii-feed
-
-# This file must be modified to start using taxii-log-adapter.
-
-##########################################
-# Access section contains credentials for taxii server
-
-# Fill the following section.
-# Strings "user", "pass" and "collection_name" you have to replace with valid ones.
-# it matters on format and dashes before feed names, use only spaces for indentation
-
-#example section looks like
-#taxiiService:
-#pollEndpoint: https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/
-#    username: taxii-c1387d35-7197-2584-9d9d-49accf59ec64
-#    password: lGXevVpyi07HKunfv9rktF84PzH0sUMfIv4WvcvDPqWhUfMK
-#    feeds:
-#        - webflows_0000000000_v3
-
 taxiiService:
     pollEndpoint: https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/
     username: user
     password: pass
     feeds:
         - collection_name
-
-##########################################
-# Schedule section contains cron-like expression
-
-# meaning of asterisk are second, minute, hour, day, month, weekday
-# configuration is also described on wiki
-# https://github.com/CiscoCTA/taxii-log-adapter/wiki/Configuration#scheduling
-# change this only if polling interval per hour is not accetable
+    statusFile: target/taxii-status.xml
 
 schedule:
     cron: "0 0 * * * *"
 
-##########################################
-# transform section contains path to xsl template that is applied to STIX downloaded data
-
-# Uncomment lines in the following sections corresponding to your SIEM
-
 transform:
-# json format suitable for SPLUNK
-#    stylesheet: config/stix2json.xsl
-
-# cef format suitable for ArcSigh/Logpoint
-#    stylesheet: config/stix2cef.xsl
-
-# blank transformation that allows storing raw downloaded data
-#    stylesheet: config/stix2stix.xsl
-
-##########################################
-
-# The application uses the same logback configuration file to configure also its own logging.
+    stylesheet: config/stix2json.xsl
 
 logging:
     config: config/logback.xml
 
-##########################################
-# Proxy settings
-
-# Uncomment and fill the following lines to use HTTP proxy when performing TAXII requests
-
-# proxy:
-#    url: http://localhost:8002/
-#    authenticationType: basic
-#    username: user
-#    password: pass
+proxy:
+   url: http://localhost:8002/
+   authenticationType: basic
+   username: proxyuser
+   password: proxypass

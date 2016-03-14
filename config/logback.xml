@@ -1,100 +1,19 @@
-<!--
-        Copyright 2016 Cisco Systems
-
-        Licensed under the Apache License, Version 2.0 (the "License");
-        you may not use this file except in compliance with the License.
-        You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-        Unless required by applicable law or agreed to in writing, software
-        distributed under the License is distributed on an "AS IS" BASIS,
-        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        See the License for the specific language governing permissions and
-        limitations under the License.
--->
-
-
-<!-- This file must be modified to start using taxii-log-adapter, uncomment and modify at least one SPLUNK/ARCSIGHT/FILE section. -->
-<!-- Use only editors supporting XML syntax to edit this file! -->
-<!-- If you want to know more about logback config files see http://logback.qos.ch/manual/ -->
-
-<configuration debug="true">
+<configuration debug="false">
 
 <!--================= OUTPUT CONFIGURATION ================-->
 
-    <!--=========== SPLUNK PREPARED CONFIGURATION ===========
-    uncomment the following appender and logger sections for integration with SPLUNK
-    fill splunk-host property
-
-    for detailed information see
-    https://github.com/CiscoCTA/taxii-log-adapter/wiki/Integration-with-Splunk
-    -->
-
-    <!--
-    <appender name="TCP" class="com.cisco.cta.taxii.adapter.NetworkAppender">
-        <host>splunk-host</host>
-        <port>9999</port>
-        <protocol>TCP</protocol>
-    </appender>
-
-
     <logger name="output" level="info" additivity="false">
-    <appender-ref ref="TCP"/>
-    </logger>
-    -->
-
-    <!-- =========== ARCSIGHT PREPARED CONFIGURATION ===========
-    uncomment the following appender and logger sections for integration with ArcSight or any similar CEF channel to SIEM
-    fill arcsight-host property
-
-    for detailed information see
-    https://github.com/CiscoCTA/taxii-log-adapter/wiki/Integration-with-ArcSight
-    -->
-
-    <!--
-        <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
-            <syslogHost>arcsight-host</syslogHost>
-            <port>55056</port>
-            <facility>LOCAL0</facility>
-            <suffixPattern>%msg</suffixPattern>
-        </appender>
-        <logger name="output" level="info" additivity="false">
-            <appender-ref ref="SYSLOG"/>
-        </logger>
-    -->
-
-    <!-- =========== FILE OUTPUT PREPARED CONFIGURATION ===========
-    uncomment the following appender and logger sections for native STIX file output
-
-    for detailed information see
-    https://github.com/CiscoCTA/taxii-log-adapter/wiki/Save-adapter-output-to-file-system-in-STIX-format-one-file-per-request
-    -->
-
-    <!--
-    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
-        <discriminator>
-            <key>messageId</key>
-            <defaultValue>unknown</defaultValue>
-        </discriminator>
-        <sift>
-            <appender name="OUTPUT_FILE_${messageId}" class="ch.qos.logback.core.FileAppender">
-                <file>/data/output/stix-${messageId}.xml</file>
-                <append>false</append>
-                <encoder>
-                    <pattern>%msg%n</pattern>
-                </encoder>
-            </appender>
-        </sift>
-    </appender>
-
-    <logger name="output" level="info" additivity="false">
-        <appender-ref ref="SIFT"/>
+        <!-- Configure the output method(s) here by adding appenders. E.g. FILE, TCP, UDP or other -->
+        <!-- All appenders configured here must have the following encoder configuration.
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+        -->
     </logger>
 
-    -->
 
-    <!--================== LOG CONFIGURATION ==================-->
+
+<!--================== LOG CONFIGURATION ==================-->
 
     <appender name="LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>log/adapter.log</file>
@@ -115,7 +34,17 @@
         <appender-ref ref="LOG_FILE"/>
     </logger>
 
-    <root level="info">
+    <appender name="SCREEN" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.cisco.cta.taxii.adapter.smoketest" level="info" additivity="false">
+        <appender-ref ref="SCREEN"/>
+    </logger>
+
+    <root level="warn">
         <appender-ref ref="LOG_FILE"/>
     </root>
 

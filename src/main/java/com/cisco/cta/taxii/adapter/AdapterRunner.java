@@ -33,9 +33,9 @@ public class AdapterRunner {
      */
     public static void main(String[] args) {
         ctx = new SpringApplicationBuilder(
-                AdapterConfiguration.class,
                 ScheduleConfiguration.class,
-                RunNowConfiguration.class)
+                RunNowConfiguration.class,
+                RunConfigConfiguration.class)
             .showBanner(false)
             .listeners(new ApplicationPidFileWriter())
             .run(args);

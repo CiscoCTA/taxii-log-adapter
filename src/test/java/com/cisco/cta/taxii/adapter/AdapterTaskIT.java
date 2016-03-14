@@ -28,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -66,6 +67,7 @@ public class AdapterTaskIT {
     private static final File EXPECTED_OUTPUT_FILE = new File("src/test/resources/expected-output.json");
 
     @Autowired
+    @Qualifier("adapterTask")
     private Runnable task;
     
     @Autowired

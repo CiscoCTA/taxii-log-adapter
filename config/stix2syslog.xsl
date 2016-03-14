@@ -1,4 +1,5 @@
 <xsl:stylesheet version="2.0"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:fn="http://www.w3.org/2005/xpath-functions"
                 xmlns:t="http://taxii.mitre.org/messages/taxii_xml_binding-1.1"
@@ -81,17 +82,72 @@
         <xsl:param name="indicatorId"/>
         <xsl:param name="activity"/>
         <xsl:param name="campaign"/>
+        
+        <xsl:value-of select="xs:dateTime('1970-01-01T00:00:00Z') + fn:number(cc:Property[@name='timestamp']) * xs:dayTimeDuration('PT0.001S')"/>
+        <xsl:text> </xsl:text>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">customer</xsl:with-param>
+            <xsl:with-param name="value" select="$customer"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">incidentId</xsl:with-param>
+            <xsl:with-param name="value" select="$incidentId"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">incidentTitle</xsl:with-param>
+            <xsl:with-param name="value" select="$incidentTitle"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">victim</xsl:with-param>
+            <xsl:with-param name="value" select="$victim"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">confidence</xsl:with-param>
+            <xsl:with-param name="value" select="$confidence"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">tool</xsl:with-param>
+            <xsl:with-param name="value" select="$tool"/>
+        </xsl:call-template>
 
         <xsl:call-template name="property">
             <xsl:with-param name="key">risk</xsl:with-param>
             <xsl:with-param name="value" select="$risk"/>
         </xsl:call-template>
 
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">url</xsl:with-param>
+            <xsl:with-param name="value" select="$url"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">indicatorId</xsl:with-param>
+            <xsl:with-param name="value" select="$indicatorId"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">activity</xsl:with-param>
+            <xsl:with-param name="value" select="$activity"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">campaign</xsl:with-param>
+            <xsl:with-param name="value" select="$campaign"/>
+        </xsl:call-template>
+
         <xsl:for-each select="cc:Property">
-            <xsl:call-template name="property">
-                <xsl:with-param name="key" select="@name"/>
-                <xsl:with-param name="value" select="."/>
-            </xsl:call-template>
+            <xsl:if test="@name!='timestamp'">
+                <xsl:call-template name="property">
+                    <xsl:with-param name="key" select="@name"/>
+                    <xsl:with-param name="value" select="."/>
+                </xsl:call-template>
+            </xsl:if>
         </xsl:for-each>
 
         <!-- End of line -->

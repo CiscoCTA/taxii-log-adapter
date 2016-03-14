@@ -16,27 +16,22 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
-
-/**
- * Spring configuration providing factory methods for run-now beans.
- */
 @Configuration
-@Profile("now")
-@Import(AdapterConfiguration.class)
-public class RunNowConfiguration {
+@Profile("config")
+public class RunConfigConfiguration {
 
-    @Autowired
-    private AdapterConfiguration adapterConfiguration;
+    @Bean
+    public Runnable configTask() {
+        return new ConfigTask("config");
+    }
 
     @Bean
     public RunAndExit runAndExit() throws Exception {
-        return new RunAndExit(adapterConfiguration.adapterTask());
+        return new RunAndExit(configTask());
     }
-
 }

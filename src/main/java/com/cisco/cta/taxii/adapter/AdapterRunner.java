@@ -21,10 +21,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.NestedRuntimeException;
-import org.springframework.validation.BindException;
 
-import com.cisco.cta.taxii.adapter.settings.BindExceptionHandler;
+import com.cisco.cta.taxii.adapter.error.ChainHandler;
+import com.cisco.cta.taxii.adapter.error.Handler;
 import com.cisco.cta.taxii.adapter.smoketest.SmokeTestConfiguration;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,7 +35,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class AdapterRunner {
 
     static ConfigurableApplicationContext ctx;
-    private static BindExceptionHandler bindExceptionHandler = new BindExceptionHandler(System.err);
+    private static final Handler errHandler = new ChainHandler();
 
     /**
      * @param args The command line arguments.
@@ -53,19 +52,8 @@ public class AdapterRunner {
                 .run(args);
             ctx.start();
 
-        } catch (NestedRuntimeException e) {
-            try {
-                throw e.getMostSpecificCause();
-            } catch (BindException bindRootCause) {
-                bindExceptionHandler.handle(bindRootCause);
-            } catch (Throwable unknownRootCause) {
-                System.err.println("CRITICAL UNKNOWN ERROR WHILE INITIALIZING");
-                throw e;
-            }
-
-        } catch (RuntimeException e) {
-            System.err.println("CRITICAL UNKNOWN ERROR WHILE INITIALIZING");
-            throw e;
+        } catch (Throwable err) {
+            errHandler.handle(err);
         }
     }
 

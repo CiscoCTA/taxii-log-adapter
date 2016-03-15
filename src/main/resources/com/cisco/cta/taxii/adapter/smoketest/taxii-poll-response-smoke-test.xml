@@ -13,12 +13,12 @@
     xmlns:cta="http://cisco.com/td/cta"
 
     collection_name="smoke-test" in_response_to="smoke" message_id="test">
-    <Exclusive_Begin_Timestamp>2000-12-24T01:00:00.000+01:00</Exclusive_Begin_Timestamp>
-    <Inclusive_End_Timestamp>2000-12-24T02:00:00.000+01:00</Inclusive_End_Timestamp>
+    <Exclusive_Begin_Timestamp>2016-03-13T01:00:00.000+01:00</Exclusive_Begin_Timestamp>
+    <Inclusive_End_Timestamp>2016-03-13T02:00:00.000+01:00</Inclusive_End_Timestamp>
     <Content_Block>
         <Content_Binding binding_id="STIX_XML_1.1" />
         <Content>
-            <s:STIX_Package id="smoke-test" timestamp="2000-12-24T02:00:00.000+01:00" version="1.1.1">
+            <s:STIX_Package id="smoke-test" timestamp="2016-03-13T02:00:00.000+01:00" version="1.1.1">
                 <s:STIX_Header>
                     <s:Package_Intent>Incident</s:Package_Intent>
                     <s:Information_Source>
@@ -50,7 +50,7 @@
                                                 <c:Object>
                                                     <c:Properties xsi:type="co:CustomObjectType">
                                                         <cc:Custom_Properties>
-                                                            <cc:Property name="timestamp">977616000000</cc:Property>
+                                                            <cc:Property name="timestamp">1457827200000</cc:Property>
                                                             <cc:Property name="xElapsedTime">10</cc:Property>
                                                             <cc:Property name="scHttpStatus">200</cc:Property>
                                                             <cc:Property name="scResultCode">OK</cc:Property>

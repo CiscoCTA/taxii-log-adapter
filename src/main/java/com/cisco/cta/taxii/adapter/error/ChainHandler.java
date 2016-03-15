@@ -5,14 +5,11 @@ import org.springframework.validation.BindException;
 
 import com.cisco.cta.taxii.adapter.settings.BindExceptionHandler;
 
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 public class ChainHandler implements Handler<Throwable> {
 
-    //TODO private final Iterable<Handler> delegates;
-
     private final Handler<BindException> bindExceptionHandler = new BindExceptionHandler(System.err);
+    private final Handler<Throwable> fallBackHandler = new FallBackHandler(System.err);
 
     public void handle(Throwable t) throws Throwable {
         try {
@@ -24,13 +21,11 @@ public class ChainHandler implements Handler<Throwable> {
             } catch (BindException bindRootCause) {
                 bindExceptionHandler.handle(bindRootCause);
             } catch (Throwable unknownRootCause) {
-                System.err.println("CRITICAL UNKNOWN ERROR WHILE INITIALIZING");
-                throw e;
+                fallBackHandler.handle(unknownRootCause);
             }
         
         } catch (Throwable e) {
-            System.err.println("CRITICAL UNKNOWN ERROR WHILE INITIALIZING");
-            throw e;
+            fallBackHandler.handle(e);
         }
     }
     

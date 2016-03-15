@@ -11,6 +11,7 @@ public class ChainHandler implements Handler<Throwable> {
 
     private final Handler<BindException> bindExceptionHandler = new BindExceptionHandler(System.err);
     private final Handler<YAMLException> yamlExceptionHandler = new YamlExceptionHandler(System.err);
+    private final Handler<Throwable> causeHandler = new CauseHandler(System.err);
     private final Handler<Throwable> fallBackHandler = new FallBackHandler(System.err);
 
 
@@ -27,13 +28,16 @@ public class ChainHandler implements Handler<Throwable> {
             } catch (Throwable unknownRootCause) {
                 fallBackHandler.handle(unknownRootCause);
             }
-        
+
         } catch (YAMLException target) {
             yamlExceptionHandler.handle(target);
+
+        } catch (IllegalStateException illegal) {
+            causeHandler.handle(illegal);
 
         } catch (Throwable e) {
             fallBackHandler.handle(e);
         }
     }
-    
+
 }

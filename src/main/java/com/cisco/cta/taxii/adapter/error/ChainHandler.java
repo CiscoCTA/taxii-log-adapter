@@ -13,7 +13,9 @@ public class ChainHandler implements Handler<Throwable> {
     private final Handler<YAMLException> yamlExceptionHandler = new YamlExceptionHandler(System.err);
     private final Handler<Throwable> fallBackHandler = new FallBackHandler(System.err);
 
-    public void handle(Throwable t) throws Throwable {
+
+    @Override
+    public void handle(Throwable t) {
         try {
             throw t;
 

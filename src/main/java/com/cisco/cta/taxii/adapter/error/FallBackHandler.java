@@ -10,9 +10,9 @@ public class FallBackHandler implements Handler<Throwable> {
     private final PrintStream err;
 
     @Override
-    public void handle(Throwable t) throws Throwable {
+    public void handle(Throwable t) {
         err.println("CRITICAL UNKNOWN ERROR WHILE INITIALIZING");
-        throw t;
+        t.printStackTrace(err);
     }
 
 }

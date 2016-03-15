@@ -12,7 +12,7 @@ public class YamlExceptionHandler implements Handler<YAMLException> {
     private final PrintStream err;
 
     @Override
-    public void handle(YAMLException e) throws Throwable {
+    public void handle(YAMLException e) {
         err.println("Error parsing application.yml: " + e.getMessage());
     }
 

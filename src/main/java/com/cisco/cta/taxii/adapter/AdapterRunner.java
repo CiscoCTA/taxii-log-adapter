@@ -40,7 +40,7 @@ public class AdapterRunner {
     /**
      * @param args The command line arguments.
      */
-    public static void main(String[] args) throws Throwable {
+    public static void main(String[] args) {
         try {
             ctx = new SpringApplicationBuilder(
                     ScheduleConfiguration.class,

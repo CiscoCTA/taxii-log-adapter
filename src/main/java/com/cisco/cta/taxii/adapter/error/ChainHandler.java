@@ -8,7 +8,7 @@ import com.cisco.cta.taxii.adapter.settings.BindExceptionHandler;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ChainHandler implements Handler {
+public class ChainHandler implements Handler<Throwable> {
 
     //TODO private final Iterable<Handler> delegates;
 

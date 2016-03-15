@@ -1,6 +1,6 @@
 package com.cisco.cta.taxii.adapter.error;
 
-public interface Handler {
+public interface Handler<T extends Throwable> {
 
-    void handle(Throwable t) throws Throwable;
+    void handle(T t) throws Throwable;
 }

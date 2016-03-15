@@ -35,7 +35,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class AdapterRunner {
 
     static ConfigurableApplicationContext ctx;
-    private static final Handler errHandler = new ChainHandler();
+    private static final Handler<Throwable> errHandler = new ChainHandler();
 
     /**
      * @param args The command line arguments.

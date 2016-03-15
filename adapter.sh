@@ -61,7 +61,7 @@ function config {
 
 }
 
-if [ -f $PATH_TO_CONFIG ]
+if [ -d $PATH_TO_CONFIG ]
 then
   case $1 in
     now)

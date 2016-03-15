@@ -16,6 +16,8 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import java.io.PrintStream;
+
 import org.springframework.boot.Banner.Mode;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
@@ -25,6 +27,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import com.cisco.cta.taxii.adapter.error.ChainHandler;
 import com.cisco.cta.taxii.adapter.error.Handler;
 import com.cisco.cta.taxii.adapter.smoketest.SmokeTestConfiguration;
+import com.google.common.io.ByteStreams;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -40,8 +43,11 @@ public class AdapterRunner {
     /**
      * @param args The command line arguments.
      */
+    @SuppressFBWarnings(value="DM_DEFAULT_ENCODING", justification="DEV-NULL encoding is irrelevant")
     public static void main(String[] args) {
-        try {
+        try (PrintStream devNull = new PrintStream(ByteStreams.nullOutputStream()))
+        {
+            System.setErr(devNull);
             ctx = new SpringApplicationBuilder(
                     ScheduleConfiguration.class,
                     RunNowConfiguration.class,
@@ -52,8 +58,8 @@ public class AdapterRunner {
                 .run(args);
             ctx.start();
 
-        } catch (Throwable err) {
-            errHandler.handle(err);
+        } catch (Throwable t) {
+            errHandler.handle(t);
         }
     }
 

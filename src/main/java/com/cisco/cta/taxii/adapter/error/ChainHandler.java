@@ -12,7 +12,7 @@ public class ChainHandler implements Handler<Throwable> {
 
     //TODO private final Iterable<Handler> delegates;
 
-    private final BindExceptionHandler bindExceptionHandler = new BindExceptionHandler(System.err);
+    private final Handler<BindException> bindExceptionHandler = new BindExceptionHandler(System.err);
 
     public void handle(Throwable t) throws Throwable {
         try {

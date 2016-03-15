@@ -6,13 +6,16 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
+import com.cisco.cta.taxii.adapter.error.Handler;
+
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class BindExceptionHandler {
+public class BindExceptionHandler implements Handler<BindException> {
 
     private final PrintStream err;
 
+    @Override
     public void handle(BindException e) {
         for(ObjectError error : e.getAllErrors()) {
             StringBuilder b = new StringBuilder()

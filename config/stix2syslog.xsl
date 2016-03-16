@@ -82,7 +82,7 @@
         <xsl:param name="indicatorId"/>
         <xsl:param name="activity"/>
         <xsl:param name="campaign"/>
-        
+
         <xsl:value-of select="xs:dateTime('1970-01-01T00:00:00Z') + fn:number(cc:Property[@name='timestamp']) * xs:dayTimeDuration('PT0.001S')"/>
         <xsl:text> </xsl:text>
 
@@ -162,13 +162,7 @@
         <xsl:param name="delimiter">true</xsl:param>
         <xsl:value-of select="$key"/>
         <xsl:text>=</xsl:text>
-        <xsl:value-of select="
-            fn:replace(
-            fn:replace(
-            fn:replace($value,
-            '\\', '\\\\'),
-            '\|', '\\|'),
-            '=', '\\=')"/>
+        <xsl:value-of select="fn:replace($value, '[ \|,;]', '_')"/>
         <xsl:if test="$delimiter">
             <xsl:text> </xsl:text>
         </xsl:if>

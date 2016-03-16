@@ -16,6 +16,7 @@ mkdir -p $LOG_DIR
 
 PATH_TO_JAR=$HOME_DIR/taxii-log-adapter.jar
 PID_PATH_NAME=$HOME_DIR/application.pid
+PATH_TO_CONFIG=$HOME_DIR/config
 
 JAVA_OPTS="-Djsse.enableSNIExtension=false -Djava.io.tmpdir=$HOME_DIR"
 
@@ -63,7 +64,16 @@ function stop {
     fi
 }
 
-case $1 in
+function config {
+    java $JAVA_OPTS -Dspring.profiles.active=config -jar $PATH_TO_JAR
+    echo "No configuration directory found - created new"
+    echo "YOU MUST CONFIGURE FILES config/application.yml config/logback.xml MANUALLY"
+
+}
+
+if [ -d $PATH_TO_CONFIG ]
+then
+  case $1 in
     now)
         now
     ;;
@@ -81,4 +91,7 @@ case $1 in
         sleep 5
         start
     ;;
-esac
+  esac
+else
+  config
+fi

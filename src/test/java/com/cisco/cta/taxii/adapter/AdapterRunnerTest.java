@@ -28,8 +28,6 @@ import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.Environment;
 
-import com.cisco.cta.taxii.adapter.AdapterRunner;
-
 
 public class AdapterRunnerTest {
     

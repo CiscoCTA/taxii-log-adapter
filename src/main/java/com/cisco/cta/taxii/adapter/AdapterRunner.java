@@ -51,7 +51,8 @@ public class AdapterRunner {
             ctx = new SpringApplicationBuilder(
                     ScheduleConfiguration.class,
                     RunNowConfiguration.class,
-                    SmokeTestConfiguration.class)
+                    SmokeTestConfiguration.class,
+                    RunConfigConfiguration.class)
                 .bannerMode(Mode.OFF)
                 .listeners(new ApplicationPidFileWriter())
                 .web(false)

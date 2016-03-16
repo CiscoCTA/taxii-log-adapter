@@ -23,11 +23,27 @@ set PATH_TO_JAR=%HOME_DIR%\taxii-log-adapter.jar
 
 set PID_PATH_NAME=%HOME_DIR%\application.pid
 
+set CONFIG_PATH_NAME=%HOME_DIR%\config
+
 set JAVA_OPTS=-Djsse.enableSNIExtension=false -Djava.io.tmpdir=%HOME_DIR%
 
 cd %HOME_DIR%
 
-GOTO %1
+IF EXIST %CONFIG_PATH_NAME% (
+    GOTO config
+) ELSE (
+    GOTO %1
+)
+
+:config
+
+        java %JAVA_OPTS% -Dspring.profiles.active=config -jar %PATH_TO_JAR%
+        echo No configuration directory found - created new
+        echo YOU MUST CONFIGURE FILES config\application.yml config\logback.xml MANUALLY
+
+
+    GOTO end
+
 
 :now
     IF EXIST %PID_PATH_NAME% (

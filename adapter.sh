@@ -30,6 +30,16 @@ function now {
     fi
 }
 
+function smoketest {
+    echo "Starting $SERVICE_NAME smoke test ..."
+    if [ ! -f $PID_PATH_NAME ]; then
+        cd $HOME_DIR
+        java $JAVA_OPTS -Dspring.profiles.active=smoketest -jar $PATH_TO_JAR
+    else
+        echo "$SERVICE_NAME is already running ..."
+    fi
+}
+
 function start {
     echo "Starting $SERVICE_NAME ..."
     if [ ! -f $PID_PATH_NAME ]; then
@@ -56,6 +66,9 @@ function stop {
 case $1 in
     now)
         now
+    ;;
+    smoketest)
+        smoketest
     ;;
     start)
         start

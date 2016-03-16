@@ -16,10 +16,12 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import java.net.URI;
 import java.net.URL;
 
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
+
+import lombok.AllArgsConstructor;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -30,24 +32,14 @@ import com.cisco.cta.taxii.adapter.httpclient.HttpHeadersAppender;
 /**
  * Factory to create complete TAXII requests.
  */
+@AllArgsConstructor
 public class RequestFactory {
 
-    private final URI pollEndpoint;
+    private final URL pollEndpoint;
     private final ClientHttpRequestFactory httpRequestFactory;
     private final HttpHeadersAppender httpHeadersAppender;
     private final HttpBodyWriter httpBodyWriter;
 
-    public RequestFactory(
-            URL pollEndpoint,
-            ClientHttpRequestFactory httpRequestFactory,
-            HttpHeadersAppender httpHeadersAppender,
-            HttpBodyWriter httpBodyWriter
-            ) throws Exception {
-        this.pollEndpoint = pollEndpoint.toURI();
-        this.httpRequestFactory = httpRequestFactory;
-        this.httpHeadersAppender = httpHeadersAppender;
-        this.httpBodyWriter = httpBodyWriter;
-    }
 
     /**
      * Create the TAXII request.
@@ -57,7 +49,7 @@ public class RequestFactory {
      * @throws Exception When any error occurs.
      */
     public ClientHttpRequest createPollRequest(String messageId, TaxiiStatus.Feed feed) throws Exception {
-        ClientHttpRequest req = httpRequestFactory.createRequest(pollEndpoint, HttpMethod.POST);
+        ClientHttpRequest req = httpRequestFactory.createRequest(pollEndpoint.toURI(), HttpMethod.POST);
         httpHeadersAppender.appendTo(req.getHeaders());
         httpBodyWriter.write(messageId, feed, req.getBody());
         return req;
@@ -71,7 +63,7 @@ public class RequestFactory {
      * @throws Exception When any error occurs.
      */
     public ClientHttpRequest createFulfillmentRequest(String messageId, TaxiiStatus.Feed feed, String resultId, Integer resultPartNumber) throws Exception {
-        ClientHttpRequest req = httpRequestFactory.createRequest(pollEndpoint, HttpMethod.POST);
+        ClientHttpRequest req = httpRequestFactory.createRequest(pollEndpoint.toURI(), HttpMethod.POST);
         httpHeadersAppender.appendTo(req.getHeaders());
         httpBodyWriter.write(messageId, feed, resultId, resultPartNumber, req.getBody());
         return req;

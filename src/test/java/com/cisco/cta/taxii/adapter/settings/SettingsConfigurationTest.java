@@ -27,6 +27,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import com.cisco.cta.taxii.adapter.httpclient.ProxyAuthenticationType;
+import static com.cisco.cta.taxii.adapter.settings.PropertySourceHelper.*;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;

@@ -16,34 +16,22 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import org.springframework.context.Lifecycle;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
-/**
- * Delegates to a #{@link java.lang.Runnable} instance, then stops the application.
- */
-public class RunAndExit implements Lifecycle {
+@Configuration
+@Profile("config")
+public class RunConfigConfiguration {
 
-    private final Runnable delegate;
-    
-    public RunAndExit(Runnable delegate) {
-        this.delegate = delegate;
+    @Bean
+    public Runnable configTask() {
+        return new ConfigTask("config");
     }
 
-    @Override
-    public void start() {
-        delegate.run();
-        AdapterRunner.exit();
+    @Bean
+    public RunAndExit runAndExit() throws Exception {
+        return new RunAndExit(configTask());
     }
-
-    @Override
-    public void stop() {
-        // do nothing
-    }
-
-    @Override
-    public boolean isRunning() {
-        return false;
-    }
-
 }

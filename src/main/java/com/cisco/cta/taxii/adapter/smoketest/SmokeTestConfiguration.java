@@ -14,45 +14,46 @@
    limitations under the License.
 */
 
-package com.cisco.cta.taxii.adapter;
+package com.cisco.cta.taxii.adapter.smoketest;
 
-import java.util.concurrent.ScheduledFuture;
+import java.io.Writer;
+
+import javax.xml.transform.Templates;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.scheduling.support.CronTrigger;
 
-import com.cisco.cta.taxii.adapter.settings.ScheduleSettings;
+import com.cisco.cta.taxii.adapter.AdapterConfiguration;
+import com.cisco.cta.taxii.adapter.RequestFactory;
+import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
+
 
 /**
- * Spring configuration providing factory methods for scheduling beans.
+ * Spring configuration providing factory methods for run-now beans.
  */
 @Configuration
-@Profile("schedule")
+@Profile("smoketest")
 @Import(AdapterConfiguration.class)
-public class ScheduleConfiguration {
+public class SmokeTestConfiguration {
 
     @Autowired
-    private AdapterConfiguration adapterConfiguration;
+    private SettingsConfiguration settingsConfig;
 
     @Autowired
-    private ScheduleSettings scheduleSettings;
-    
+    private RequestFactory requestFactory;
+
+    @Autowired
+    private Templates templates;
+
+    @Autowired
+    private Writer logWriter;
+
     @Bean
-    public TaskScheduler taskScheduler() throws Exception {
-        return new ThreadPoolTaskScheduler();
+    public SmokeTestLifecycle smokeTest() throws Exception {
+        return new SmokeTestLifecycle(settingsConfig, requestFactory, templates, logWriter);
     }
-    
-    @Bean
-    public ScheduledFuture<?> scheduleAdapterTask() throws Exception {
-        return taskScheduler().schedule(
-            adapterConfiguration.adapterTask(),
-            new CronTrigger(scheduleSettings.getCron()));
-    }
-    
+
 }

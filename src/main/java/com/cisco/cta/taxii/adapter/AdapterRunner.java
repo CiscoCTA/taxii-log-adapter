@@ -16,9 +16,20 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import java.io.PrintStream;
+
+import org.springframework.boot.Banner.Mode;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import com.cisco.cta.taxii.adapter.error.ChainHandler;
+import com.cisco.cta.taxii.adapter.error.Handler;
+import com.cisco.cta.taxii.adapter.smoketest.SmokeTestConfiguration;
+import com.google.common.io.ByteStreams;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -27,19 +38,34 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class AdapterRunner {
 
     static ConfigurableApplicationContext ctx;
+    private static final Handler<Throwable> errHandler = new ChainHandler();
 
     /**
      * @param args The command line arguments.
      */
+    @SuppressFBWarnings(value="DM_DEFAULT_ENCODING", justification="DEV-NULL encoding is irrelevant")
     public static void main(String[] args) {
-        ctx = new SpringApplicationBuilder(
-                AdapterConfiguration.class,
-                ScheduleConfiguration.class,
-                RunNowConfiguration.class)
-            .showBanner(false)
-            .listeners(new ApplicationPidFileWriter())
-            .run(args);
-        ctx.start();
+        try (PrintStream devNull = new PrintStream(ByteStreams.nullOutputStream()))
+        {
+            System.setErr(devNull);
+            ctx = new SpringApplicationBuilder(
+                    ScheduleConfiguration.class,
+                    RunNowConfiguration.class,
+                    SmokeTestConfiguration.class,
+                    RunConfigConfiguration.class)
+                .bannerMode(Mode.OFF)
+                .listeners(new ApplicationPidFileWriter())
+                .web(false)
+                .run(args);
+            ctx.start();
+
+        } catch (Throwable t) {
+            errHandler.handle(t);
+        }
     }
 
+    @SuppressFBWarnings(value="DM_EXIT", justification="Spring BOOT requires use of System.exit")
+    public static void exit() {
+        System.exit(SpringApplication.exit(ctx));
+    }
 }

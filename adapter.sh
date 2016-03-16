@@ -16,6 +16,7 @@ mkdir -p $LOG_DIR
 
 PATH_TO_JAR=$HOME_DIR/taxii-log-adapter.jar
 PID_PATH_NAME=$HOME_DIR/application.pid
+PATH_TO_CONFIG=$HOME_DIR/config
 
 JAVA_OPTS="-Djsse.enableSNIExtension=false -Djava.io.tmpdir=$HOME_DIR"
 
@@ -25,6 +26,16 @@ function now {
         cd $HOME_DIR
         java $JAVA_OPTS -Dspring.profiles.active=now -jar $PATH_TO_JAR 2> $LOG_DIR/err.out > $LOG_DIR/std.out
         echo "$SERVICE_NAME finished"
+    else
+        echo "$SERVICE_NAME is already running ..."
+    fi
+}
+
+function smoketest {
+    echo "Starting $SERVICE_NAME smoke test ..."
+    if [ ! -f $PID_PATH_NAME ]; then
+        cd $HOME_DIR
+        java $JAVA_OPTS -Dspring.profiles.active=smoketest -jar $PATH_TO_JAR
     else
         echo "$SERVICE_NAME is already running ..."
     fi
@@ -53,9 +64,21 @@ function stop {
     fi
 }
 
-case $1 in
+function config {
+    java $JAVA_OPTS -Dspring.profiles.active=config -jar $PATH_TO_JAR
+    echo "No configuration directory found - created new"
+    echo "YOU MUST CONFIGURE FILES config/application.yml config/logback.xml MANUALLY"
+
+}
+
+if [ -d $PATH_TO_CONFIG ]
+then
+  case $1 in
     now)
         now
+    ;;
+    smoketest)
+        smoketest
     ;;
     start)
         start
@@ -68,4 +91,7 @@ case $1 in
         sleep 5
         start
     ;;
-esac
+  esac
+else
+  config
+fi

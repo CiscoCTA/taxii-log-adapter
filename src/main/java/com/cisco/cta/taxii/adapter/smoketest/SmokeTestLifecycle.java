@@ -127,7 +127,7 @@ public class SmokeTestLifecycle implements Lifecycle {
             log.info("Sending smoke-test incident to the output configured in logback.xml ...");
             Transformer transformer = templates.newTransformer();
             transformer.transform(new StreamSource(testResource), new StreamResult(logWriter));
-            log.info("Please manually validate the result in your target system. Tip: Search for 'smoke-test'");
+            log.info("Please manually validate the result in your target system. Tip: Search your final data destination (SIEM or file) for the word 'smoke-test'.");
         } catch (Exception e) {
             log.error("Error sending test incident", e);
         }

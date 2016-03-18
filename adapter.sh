@@ -65,7 +65,7 @@ function stop {
 }
 
 function config {
-    java $JAVA_OPTS -Dspring.profiles.active=config -jar $PATH_TO_JAR
+    java $JAVA_OPTS -Dspring.profiles.active=config -Dlogback.configurationFile=classpath:/config/template/logback.xml -jar $PATH_TO_JAR
     echo "No configuration directory found - created new"
     echo "YOU MUST CONFIGURE FILES config/application.yml config/logback.xml MANUALLY"
 

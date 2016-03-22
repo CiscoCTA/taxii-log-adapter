@@ -1,9 +1,8 @@
-@echo on
-REM This script runs the example application.
+@echo off
 
-REM Usage: adapter.sh <command>
+REM Usage: adapter.cmd <command>
 
-REM <command> is one of: start, stop, now
+REM <command> is one of: start, stop, now, smoketest
 
 REM The name to be displayed when starting/stopping the application
 
@@ -30,9 +29,9 @@ set JAVA_OPTS=-Djsse.enableSNIExtension=false -Djava.io.tmpdir=%HOME_DIR%
 cd %HOME_DIR%
 
 IF EXIST %CONFIG_PATH_NAME% (
-    GOTO config
-) ELSE (
     GOTO %1
+) ELSE (
+    GOTO config
 )
 
 :config

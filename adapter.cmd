@@ -36,7 +36,7 @@ IF EXIST %CONFIG_PATH_NAME% (
 
 :config
 
-        java %JAVA_OPTS% -Dspring.profiles.active=config -jar %PATH_TO_JAR%
+        java %JAVA_OPTS% -Dspring.profiles.active=config -Dlogging.config=classpath:config/template/logback.xml -jar %PATH_TO_JAR%
         echo No configuration directory found - created new
         echo YOU MUST CONFIGURE FILES config\application.yml config\logback.xml MANUALLY
 

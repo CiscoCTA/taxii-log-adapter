@@ -65,6 +65,16 @@ IF EXIST %CONFIG_PATH_NAME% (
 
     GOTO end
 
+:smoketestssl
+    IF EXIST %PID_PATH_NAME% (
+        echo %SERVICE_NAME% is already running ...
+    ) ELSE (
+        echo Starting %SERVICE_NAME% smoke test ...
+        java %JAVA_OPTS% -Dspring.profiles.active=smoketest -Djavax.net.debug=ssl -jar %PATH_TO_JAR%
+    )
+
+    GOTO end
+
 :start
     IF EXIST %PID_PATH_NAME% (
         echo %SERVICE_NAME% is already running ...

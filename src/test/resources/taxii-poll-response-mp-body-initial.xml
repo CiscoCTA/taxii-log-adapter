@@ -89,6 +89,14 @@
                             </inc:Related_Indicator>
                         </inc:Related_Indicators>
                         <inc:Discovery_Method>Log Review</inc:Discovery_Method>
+                        <inc:Intended_Effect>
+                            <sc:Value>5</sc:Value>
+                            <sc:Description>Risk</sc:Description>
+                        </inc:Intended_Effect>
+                        <inc:Intended_Effect>
+                            <sc:Value>Low</sc:Value>
+                            <sc:Description>Risk category</sc:Description>
+                        </inc:Intended_Effect>
                         <inc:Confidence>
                             <sc:Value>Low</sc:Value>
                         </inc:Confidence>

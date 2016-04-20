@@ -71,7 +71,7 @@ transform:
 
 ####################################################################################
 # Uncomment the following line to integrate with SPLUNK
-#    stylesheet: config/stix2splunk.xsl
+#    stylesheet: config/stix2json.xsl
 
 ####################################################################################
 # Uncomment the following line to integrate with a CEF compliant SIEM,

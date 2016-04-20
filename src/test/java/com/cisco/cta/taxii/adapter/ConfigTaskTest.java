@@ -37,7 +37,7 @@ public class ConfigTaskTest {
         assertTrue(Files.exists(Paths.get(configDir.toString(),"application.yml")));
         assertTrue(Files.exists(Paths.get(configDir.toString(),"logback.xml")));
         assertTrue(Files.exists(Paths.get(configDir.toString(),"stix2cef.xsl")));
-        assertTrue(Files.exists(Paths.get(configDir.toString(),"stix2splunk.xsl")));
+        assertTrue(Files.exists(Paths.get(configDir.toString(),"stix2json.xsl")));
         assertTrue(Files.exists(Paths.get(configDir.toString(),"stix2stix.xsl")));
         assertTrue(Files.exists(Paths.get(configDir.toString(),"taxii-response.xsl")));
 

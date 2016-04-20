@@ -51,6 +51,7 @@
             <xsl:with-param name="incidentId" select="@id"/>
             <xsl:with-param name="incidentTitle" select="inc:Title"/>
             <xsl:with-param name="victim" select="inc:Victim/sc:Name"/>
+            <xsl:with-param name="riskCategory" select="inc:Intended_Effect[sc:Description='Risk category']/sc:Value"/>
             <xsl:with-param name="risk" select="inc:Intended_Effect[sc:Description='Risk']/sc:Value"/>
             <xsl:with-param name="confidence" select="inc:Confidence/sc:Value"/>
             <xsl:with-param name="tool" select="inc:Information_Source/sc:Tools/cc:Tool/@idref"/>
@@ -65,6 +66,7 @@
         <xsl:param name="incidentTitle"/>
         <xsl:param name="victim"/>
         <xsl:param name="risk"/>
+        <xsl:param name="riskCategory"/>
         <xsl:param name="confidence"/>
         <xsl:param name="tool"/>
         <xsl:param name="url"/>
@@ -74,6 +76,7 @@
             <xsl:with-param name="incidentTitle" select="$incidentTitle"/>
             <xsl:with-param name="victim" select="$victim"/>
             <xsl:with-param name="risk" select="$risk"/>
+            <xsl:with-param name="riskCategory" select="$riskCategory"/>
             <xsl:with-param name="confidence" select="$confidence"/>
             <xsl:with-param name="tool" select="$tool"/>
             <xsl:with-param name="url" select="$url"/>
@@ -91,6 +94,7 @@
         <xsl:param name="incidentTitle"/>
         <xsl:param name="victim"/>
         <xsl:param name="risk"/>
+        <xsl:param name="riskCategory"/>
         <xsl:param name="confidence"/>
         <xsl:param name="tool"/>
         <xsl:param name="url"/>
@@ -105,6 +109,7 @@
                 <xsl:with-param name="incidentTitle" select="$incidentTitle"/>
                 <xsl:with-param name="victim" select="$victim"/>
                 <xsl:with-param name="risk" select="$risk"/>
+                <xsl:with-param name="riskCategory" select="$riskCategory"/>
                 <xsl:with-param name="confidence" select="$confidence"/>
                 <xsl:with-param name="tool" select="$tool"/>
                 <xsl:with-param name="url" select="$url"/>
@@ -127,6 +132,7 @@
         <xsl:param name="incidentTitle"/>
         <xsl:param name="victim"/>
         <xsl:param name="risk"/>
+        <xsl:param name="riskCategory"/>
         <xsl:param name="confidence"/>
         <xsl:param name="tool"/>
         <xsl:param name="url"/>
@@ -158,6 +164,7 @@
             <fn:string key="incidentTitle"><xsl:value-of select="$incidentTitle"/></fn:string>
             <fn:string key="victim"><xsl:value-of select="$victim"/></fn:string>
             <fn:string key="risk"><xsl:value-of select="$risk"/></fn:string>
+            <fn:string key="riskCategory"><xsl:value-of select="$riskCategory"/></fn:string>
             <fn:string key="confidence"><xsl:value-of select="$confidence"/></fn:string>
             <fn:string key="tool"><xsl:value-of select="$tool"/></fn:string>
             <fn:string key="indicatorId"><xsl:value-of select="$indicatorId"/></fn:string>

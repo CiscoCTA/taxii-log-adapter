@@ -52,7 +52,7 @@
             <xsl:with-param name="victim" select="inc:Victim/sc:Name"/>
             <xsl:with-param name="confidence" select="inc:Confidence/sc:Value"/>
             <xsl:with-param name="tool" select="inc:Information_Source/sc:Tools/cc:Tool/@idref"/>
-            <xsl:with-param name="risk" select="inc:Intended_Effect/sc:Value"/>
+            <xsl:with-param name="risk" select="inc:Intended_Effect[sc:Description='Risk']/sc:Value"/>
             <xsl:with-param name="url" select="@URL"/>
         </xsl:apply-templates>
     </xsl:template>
@@ -98,9 +98,7 @@
         <xsl:param name="campaign"/>
 
         <xsl:text>CEF:0|Cisco|Cognitive Threat Analytics|1.0|1|Web Flow|</xsl:text>
-        <xsl:call-template name="convertRisk">
-            <xsl:with-param name="risk" select="$risk"/>
-        </xsl:call-template>
+        <xsl:value-of select="$risk"/>
         <xsl:text>|</xsl:text>
 
         <xsl:call-template name="property">
@@ -269,24 +267,6 @@
         <xsl:if test="$delimiter">
             <xsl:text> </xsl:text>
         </xsl:if>
-    </xsl:template>
-
-    <xsl:template name="convertRisk">
-        <xsl:param name="risk"/>
-        <xsl:choose>
-            <xsl:when test="$risk = 'Low'">
-                <xsl:text>5</xsl:text>
-            </xsl:when>
-            <xsl:when test="$risk = 'Medium'">
-                <xsl:text>7</xsl:text>
-            </xsl:when>
-            <xsl:when test="$risk = 'High'">
-                <xsl:text>9</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="error(QName('http://cisco.com/td/taxii-log-adapter', 'TLA-03'), concat('Error converting risk: ',$risk))"/>
-            </xsl:otherwise>
-        </xsl:choose>
     </xsl:template>
 
     <xsl:template name="user-property">

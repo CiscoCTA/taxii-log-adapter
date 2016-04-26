@@ -41,7 +41,7 @@ public class ConfigTask implements Runnable {
                 Paths.get(configDirectory,"logback.xml"),
                 Paths.get(configDirectory,"taxii-response.xsl"),
                 Paths.get(configDirectory,"stix2stix.xsl"),
-                Paths.get(configDirectory,"stix2json.xsl"),
+                Paths.get(configDirectory,"stix2splunk.xsl"),
                 Paths.get(configDirectory,"stix2cef.xsl")
         };
         try {

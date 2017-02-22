@@ -102,8 +102,17 @@
         <xsl:param name="activity"/>
         <xsl:param name="campaign"/>
 
-        <xsl:value-of select="xs:dateTime('1970-01-01T00:00:00Z') + fn:number(cc:Property[@name='timestamp']) * xs:dayTimeDuration('PT0.001S')"/>
+
+        <xsl:if test="cc:Property[@name='timestamp']">
+            <xsl:value-of
+                    select="xs:dateTime('1970-01-01T00:00:00Z') + fn:number(cc:Property[@name='timestamp']) * xs:dayTimeDuration('PT0.001S')"/>
+        </xsl:if>
+        <xsl:if test="cc:Property[@name='endTime']">
+            <xsl:value-of
+                    select="xs:dateTime('1970-01-01T00:00:00Z') + fn:number(cc:Property[@name='endTime']) * xs:dayTimeDuration('PT0.001S')"/>
+        </xsl:if>
         <xsl:text> </xsl:text>
+
 
         <xsl:call-template name="property">
             <xsl:with-param name="key">customer</xsl:with-param>
@@ -167,10 +176,14 @@
 
         <xsl:for-each select="cc:Property">
             <xsl:if test="@name!='timestamp'">
-                <xsl:call-template name="property">
-                    <xsl:with-param name="key" select="@name"/>
-                    <xsl:with-param name="value" select="."/>
-                </xsl:call-template>
+                <xsl:if test="@name!='endTime'">
+                    <xsl:if test="@name!='startTime'">
+                        <xsl:call-template name="property">
+                            <xsl:with-param name="key" select="@name"/>
+                            <xsl:with-param name="value" select="."/>
+                        </xsl:call-template>
+                    </xsl:if>
+                </xsl:if>
             </xsl:if>
         </xsl:for-each>
 

@@ -22,7 +22,8 @@
                 xmlns:ttp="http://stix.mitre.org/TTP-1"
                 xmlns:ind="http://stix.mitre.org/Indicator-2"
                 xmlns:sc="http://stix.mitre.org/common-1"
-                xmlns:cc="http://cybox.mitre.org/common-2">
+                xmlns:cc="http://cybox.mitre.org/common-2"
+                xmlns:c="http://cybox.mitre.org/cybox-2">
 
     <xsl:output method="text" encoding="utf-8"/>
     <xsl:strip-space elements="*"/>
@@ -82,8 +83,7 @@
         </xsl:apply-templates>
     </xsl:template>
 
-
-    <xsl:template match="cc:Custom_Properties">
+    <xsl:template match="c:Properties">
 
         <xsl:param name="customer"/>
         <xsl:param name="incidentId"/>
@@ -97,97 +97,173 @@
         <xsl:param name="activity"/>
         <xsl:param name="campaign"/>
 
-        <xsl:text>CEF:0|Cisco|Cognitive Threat Analytics|1.0|1|Web Flow|</xsl:text>
+        <xsl:if test=".[@custom_name='cta:webflow']">
+            <xsl:text>CEF:0|Cisco|Cognitive Threat Analytics|1.0|1|Web Flow|</xsl:text>
+        </xsl:if>
+
+        <xsl:if test=".[@custom_name='cta:netflow']">
+            <xsl:text>CEF:0|Cisco|Cognitive Threat Analytics|1.0|1|Net Flow|</xsl:text>
+        </xsl:if>
+
         <xsl:value-of select="$risk"/>
         <xsl:text>|</xsl:text>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">start</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='timestamp']"/>
-        </xsl:call-template>
+        <xsl:if test="cc:Custom_Properties/cc:Property[@name='timestamp']">
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">start</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='timestamp']"/>
+            </xsl:call-template>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">end</xsl:with-param>
-            <xsl:with-param name="value" select="
+            <xsl:if test="cc:Custom_Properties/cc:Property[@name='xElapsedTime']">
+                <xsl:call-template name="property">
+                    <xsl:with-param name="key">end</xsl:with-param>
+                    <xsl:with-param name="value" select="
             format-number(
-            number(cc:Property[@name='timestamp']) +
-            number(cc:Property[@name='xElapsedTime']),
+            number(cc:Custom_Properties/cc:Property[@name='timestamp']) +
+            number(cc:Custom_Properties/cc:Property[@name='xElapsedTime']),
             '0')"/>
-        </xsl:call-template>
+                </xsl:call-template>
+            </xsl:if>
+        </xsl:if>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">outcome</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='scHttpStatus']"/>
-        </xsl:call-template>
+        <xsl:if test="cc:Custom_Properties/cc:Property[@name='startTime']">
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">start</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='startTime']"/>
+            </xsl:call-template>
+        </xsl:if>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">requestClientApplication</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='csUserAgent']"/>
-        </xsl:call-template>
+        <xsl:if test="cc:Custom_Properties/cc:Property[@name='endTime']">
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">end</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='endTime']"/>
+            </xsl:call-template>
+        </xsl:if>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">out</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='csContentBytes']"/>
-        </xsl:call-template>
+        <xsl:if test=".[@custom_name='cta:webflow']">
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">outcome</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='scHttpStatus']"/>
+            </xsl:call-template>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">in</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='scContentBytes']"/>
-        </xsl:call-template>
-                            
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">request</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='csUrl']"/>
-        </xsl:call-template>
-                            
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">src</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='cIP']"/>
-        </xsl:call-template>
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">requestClientApplication</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='csUserAgent']"/>
+            </xsl:call-template>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">dst</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='sIP']"/>
-        </xsl:call-template>
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">out</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='csContentBytes']"/>
+            </xsl:call-template>
 
-        <xsl:call-template name="user-property">
-            <xsl:with-param name="value" select="cc:Property[@name='cUsername']"/>
-        </xsl:call-template>
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">in</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='scContentBytes']"/>
+            </xsl:call-template>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">cn1Label</xsl:with-param>
-            <xsl:with-param name="value">Server Reputation</xsl:with-param>
-        </xsl:call-template>
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">request</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='csUrl']"/>
+            </xsl:call-template>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">cn1</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='sReputation']"/>
-        </xsl:call-template>
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">src</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='cIP']"/>
+            </xsl:call-template>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">cat</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='sCategory']"/>
-        </xsl:call-template>
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">dst</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='sIP']"/>
+            </xsl:call-template>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">fname</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='scFileName']"/>
-        </xsl:call-template>
+            <xsl:call-template name="user-property">
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='cUsername']"/>
+            </xsl:call-template>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">oldFileType</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='scContentType']"/>
-        </xsl:call-template>
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">cn1Label</xsl:with-param>
+                <xsl:with-param name="value">Server Reputation</xsl:with-param>
+            </xsl:call-template>
 
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">fileType</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='xMagicContentType']"/>
-        </xsl:call-template>
-                            
-        <xsl:call-template name="property">
-            <xsl:with-param name="key">fileHash</xsl:with-param>
-            <xsl:with-param name="value" select="cc:Property[@name='scMD5']"/>
-        </xsl:call-template>
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">cn1</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='sReputation']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">cat</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='sCategory']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">fname</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='scFileName']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">oldFileType</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='scContentType']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">fileType</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='xMagicContentType']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">fileHash</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='scMD5']"/>
+            </xsl:call-template>
+        </xsl:if>
+
+        <xsl:if test=".[@custom_name='cta:netflow']">
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">proto</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='networkProtocol']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">src</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='client.ip']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">dst</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='server.ip']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">out</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='client.totalBytes']"/>
+            </xsl:call-template>
+
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">smac</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='client.macAddress']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">spt</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='client.firstSeenPort']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">dpt</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='server.firstSeenPort']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">dmac</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='server.macAddress']"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">in</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='server.totalBytes']"/>
+            </xsl:call-template>
+        </xsl:if>
 
         <xsl:call-template name="property">
             <xsl:with-param name="key">deviceFacility</xsl:with-param>

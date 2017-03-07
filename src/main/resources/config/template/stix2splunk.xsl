@@ -105,11 +105,11 @@
 
         <xsl:if test="cc:Property[@name='timestamp']">
             <xsl:value-of
-                    select="xs:dateTime('1970-01-01T00:00:00Z') + fn:number(cc:Property[@name='timestamp']) * xs:dayTimeDuration('PT0.001S')"/>
+                    select="fn:format-dateTime(xs:dateTime('1970-01-01T00:00:00Z') + fn:number(cc:Property[@name='timestamp']) * xs:dayTimeDuration('PT0.001S'), '[Y0001]-[M01]-[D01]T[H01]:[m01]:[s01].[f001]')"/>
         </xsl:if>
         <xsl:if test="cc:Property[@name='endTime']">
             <xsl:value-of
-                    select="xs:dateTime('1970-01-01T00:00:00Z') + fn:number(cc:Property[@name='endTime']) * xs:dayTimeDuration('PT0.001S')"/>
+                    select="fn:format-dateTime(xs:dateTime('1970-01-01T00:00:00Z') + fn:number(cc:Property[@name='endTime']) * xs:dayTimeDuration('PT0.001S'), '[Y0001]-[M01]-[D01]T[H01]:[m01]:[s01].[f001]')"/>
         </xsl:if>
         <xsl:text> </xsl:text>
 

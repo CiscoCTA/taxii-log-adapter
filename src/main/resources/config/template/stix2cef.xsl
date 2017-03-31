@@ -101,8 +101,8 @@
             <xsl:text>CEF:0|Cisco|Cognitive Threat Analytics|1.0|1|Web Flow|</xsl:text>
         </xsl:if>
 
-        <xsl:if test=".[@custom_name='cta:netflow']">
-            <xsl:text>CEF:0|Cisco|Cognitive Threat Analytics|1.0|1|Net Flow|</xsl:text>
+        <xsl:if test=".[@custom_name='cta:swflow']">
+            <xsl:text>CEF:0|Cisco|Cognitive Threat Analytics|1.0|1|SW Flow|</xsl:text>
         </xsl:if>
 
         <xsl:value-of select="$risk"/>
@@ -216,7 +216,7 @@
             </xsl:call-template>
         </xsl:if>
 
-        <xsl:if test=".[@custom_name='cta:netflow']">
+        <xsl:if test=".[@custom_name='cta:swflow']">
 
             <xsl:call-template name="property">
                 <xsl:with-param name="key">proto</xsl:with-param>

@@ -25,10 +25,10 @@ schedule:
     cron: "0 0 * * * *"
 
 transform:
-    stylesheet: config/stix2json.xsl
+    stylesheet: src/test/resources/config/stix2json.xsl
 
 logging:
-    config: config/logback.xml
+    config: src/test/resources/config/logback.xml
 
 proxy:
    url: http://localhost:8002/

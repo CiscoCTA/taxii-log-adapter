@@ -28,13 +28,14 @@ import javax.management.ObjectName;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
-@ContextConfiguration(classes = AdapterConfiguration.class, initializers = ConfigFileApplicationContextInitializer.class)
+@ContextConfiguration(classes = AdapterConfiguration.class, initializers = YamlFileApplicationContextInitializer.class)
+@TestPropertySource(properties = "spring.config.location=config/template")
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AdapterConfigurationTest {

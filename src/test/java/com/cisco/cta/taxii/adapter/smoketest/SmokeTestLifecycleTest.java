@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.cisco.cta.taxii.adapter.YamlFileApplicationContextInitializer;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -33,7 +34,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,7 +50,7 @@ import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.joran.spi.JoranException;
 
 
-@ContextConfiguration(classes = {SmokeTestConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
+@ContextConfiguration(classes = {SmokeTestConfiguration.class}, initializers = YamlFileApplicationContextInitializer.class)
 @ActiveProfiles("smoketest")
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -93,7 +93,7 @@ public class SmokeTestLifecycleTest {
         verify(appender).doAppend(argThat(containsMessage("feeds")));
         verify(appender).doAppend(argThat(containsMessage("collection_name")));
         verify(appender).doAppend(argThat(containsMessage("cron=0 0 * * * *")));
-        verify(appender).doAppend(argThat(containsMessage("stylesheet=config/stix2json.xsl")));
+        verify(appender).doAppend(argThat(containsMessage("stylesheet=src/test/resources/config/stix2json.xsl")));
         verify(appender).doAppend(argThat(containsMessage("url=http://localhost:8002")));
         verify(appender).doAppend(argThat(containsMessage("authenticationType=BASIC")));
         verify(appender).doAppend(argThat(containsMessage("username=proxyuser")));

@@ -20,8 +20,8 @@ import java.io.PrintStream;
 
 import org.springframework.boot.Banner.Mode;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import com.cisco.cta.taxii.adapter.error.ChainHandler;

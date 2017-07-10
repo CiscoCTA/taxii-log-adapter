@@ -15,30 +15,29 @@
 */
 package com.cisco.cta.taxii.adapter.smoketest;
 
-import static com.cisco.cta.taxii.adapter.smoketest.ContainsMessageMatcher.containsMessage;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+import com.cisco.cta.taxii.adapter.YamlFileApplicationContextInitializer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
+import static com.cisco.cta.taxii.adapter.smoketest.ContainsMessageMatcher.containsMessage;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 
-@ContextConfiguration(classes = {SmokeTestConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
+@ContextConfiguration(classes = {SmokeTestConfiguration.class}, initializers = YamlFileApplicationContextInitializer.class)
 @ActiveProfiles("smoketest")
 @TestPropertySource(properties={
     "taxiiService.pollEndpoint=http://nosuchsite",
@@ -71,6 +70,6 @@ public class DetectUnreachableTaxiiTest {
     @Test
     public void failOnUnreachableTaxiiEndpoint() throws Exception {
         smokeTestLifecycle.validateTaxiiConnectivity();
-        verify(appender).doAppend(argThat(containsMessage("Unable to resolve host name nosuchsite, verify your application.yml and your DNS settings")));
+        verify(appender).doAppend(argThat(containsMessage("Unable to resolve host name http://nosuchsite, verify your application.yml and your DNS settings")));
     }
 }

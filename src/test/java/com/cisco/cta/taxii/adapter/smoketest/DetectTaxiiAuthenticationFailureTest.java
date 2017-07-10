@@ -53,7 +53,7 @@ import ch.qos.logback.core.Appender;
     "taxiiService.password=secret",
     "taxiiService.feeds[0]=secured-feed",
     "taxiiService.statusFile=target/auth-fail-status.xml",
-    "transform.stylesheet=config/stix2stix.xsl",
+    "transform.stylesheet=src/test/resources/config/stix2stix.xsl",
     "schedule.cron=0 0 * * * *"
 })
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -116,7 +116,7 @@ public class SmokeTestLifecycle implements Lifecycle {
             }
 
         } catch (UnknownHostException e) {
-            log.error("Unable to resolve host name {}, verify your application.yml and your DNS settings", e.getMessage());
+            log.error("Unable to resolve host name {}, verify your application.yml and your DNS settings", endpoint.toString());
         } catch (Exception e) {
             log.error("Error connecting to " + endpoint, e);
         }

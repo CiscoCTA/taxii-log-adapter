@@ -51,7 +51,7 @@ public class ConfigTask implements Runnable {
             }
             for (Path template : templates) {
                 if (!Files.exists(template)) {
-                    try (InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream("config/template/" + template.getFileName())) {
+                    try (InputStream stream = getClass().getResourceAsStream("/config/template/" + template.getFileName())) {
                         Files.copy(stream, template);
                     }
                 }

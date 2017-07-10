@@ -18,10 +18,10 @@ package com.cisco.cta.taxii.adapter.httpclient;
 
 import static org.junit.Assert.assertNotNull;
 
+import com.cisco.cta.taxii.adapter.YamlFileApplicationContextInitializer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,7 +30,7 @@ import com.cisco.cta.taxii.adapter.RequestFactory;
 import com.cisco.cta.taxii.adapter.persistence.PersistenceConfiguration;
 
 
-@ContextConfiguration(classes = {HttpClientConfiguration.class, PersistenceConfiguration.class}, initializers = ConfigFileApplicationContextInitializer.class)
+@ContextConfiguration(classes = {HttpClientConfiguration.class, PersistenceConfiguration.class}, initializers = YamlFileApplicationContextInitializer.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class HttpClientConfigurationTest {

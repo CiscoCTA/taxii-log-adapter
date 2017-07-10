@@ -28,7 +28,6 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
@@ -55,7 +54,7 @@ import static org.mockito.Mockito.when;
 
 @ContextConfiguration(
         classes = MockAdapterConfiguration.class,
-        initializers = {ConfigFileApplicationContextInitializer.class, StatusFileContextInitializer.class})
+        initializers = {YamlFileApplicationContextInitializer.class, StatusFileContextInitializer.class})
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AdapterTaskMultipartIT {

@@ -17,12 +17,12 @@
 package com.cisco.cta.taxii.adapter.persistence;
 
 
+import com.cisco.cta.taxii.adapter.YamlFileApplicationContextInitializer;
 import org.dellroad.stuff.pobj.PersistentObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,7 +39,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 
-@ContextConfiguration(classes = PersistenceConfiguration.class, initializers = ConfigFileApplicationContextInitializer.class)
+@ContextConfiguration(classes = PersistenceConfiguration.class, initializers = YamlFileApplicationContextInitializer.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TaxiiStatusDaoTest {

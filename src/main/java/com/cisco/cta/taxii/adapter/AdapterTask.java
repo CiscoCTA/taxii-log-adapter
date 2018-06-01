@@ -61,11 +61,10 @@ public class AdapterTask implements Runnable {
     /**
      * Invoked by the scheduler.
      */
+    @Override
     public void run() {
         LOG.trace("triggering task...");
-        for (String feed : feeds) {
-            downloadFeed(feed);
-        }
+        feeds.parallelStream().forEach(this::downloadFeed);
     }
 
     private void downloadFeed(String feedName) {

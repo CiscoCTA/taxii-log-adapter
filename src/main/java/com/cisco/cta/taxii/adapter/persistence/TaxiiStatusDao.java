@@ -51,7 +51,7 @@ public class TaxiiStatusDao {
         return null;
     }
 
-    public void updateOrAdd(Feed feed) {
+    public synchronized void updateOrAdd(Feed feed) {
         Feed savedFeed = find(feed.getName());
         if (savedFeed != null) {
             savedFeed.setMore(feed.getMore());

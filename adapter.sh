@@ -18,7 +18,7 @@ PATH_TO_JAR=$HOME_DIR/taxii-log-adapter.jar
 PID_PATH_NAME=$HOME_DIR/application.pid
 PATH_TO_CONFIG=$HOME_DIR/config
 
-JAVA_OPTS="-Djsse.enableSNIExtension=false -Djava.io.tmpdir=$HOME_DIR"
+JAVA_OPTS="-Djava.io.tmpdir=$HOME_DIR"
 
 function now {
     echo "Triggering $SERVICE_NAME ..."

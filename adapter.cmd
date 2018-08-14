@@ -24,7 +24,7 @@ set PID_PATH_NAME=%HOME_DIR%\application.pid
 
 set CONFIG_PATH_NAME=%HOME_DIR%\config
 
-set JAVA_OPTS=-Djsse.enableSNIExtension=false -Djava.io.tmpdir=%HOME_DIR%
+set JAVA_OPTS=-Djava.io.tmpdir=%HOME_DIR%
 
 cd %HOME_DIR%
 

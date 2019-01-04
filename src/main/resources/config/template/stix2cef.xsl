@@ -263,6 +263,11 @@
                 <xsl:with-param name="key">in</xsl:with-param>
                 <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='server.totalBytes']"/>
             </xsl:call-template>
+
+            <xsl:call-template name="property">
+                <xsl:with-param name="key">eta</xsl:with-param>
+                <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='eta']"/>
+            </xsl:call-template>
         </xsl:if>
 
         <xsl:call-template name="property">
@@ -313,6 +318,16 @@
         <xsl:call-template name="property">
             <xsl:with-param name="key">cs3Label</xsl:with-param>
             <xsl:with-param name="value">IncidentURL</xsl:with-param>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">pDNSHostname</xsl:with-param>
+            <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='pDNSHostname']"/>
+        </xsl:call-template>
+
+        <xsl:call-template name="property">
+            <xsl:with-param name="key">pDNSProbability</xsl:with-param>
+            <xsl:with-param name="value" select="cc:Custom_Properties/cc:Property[@name='pDNSProbability']"/>
         </xsl:call-template>
 
         <xsl:call-template name="property">

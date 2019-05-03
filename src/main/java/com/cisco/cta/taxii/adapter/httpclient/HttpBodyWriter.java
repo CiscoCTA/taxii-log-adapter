@@ -52,6 +52,7 @@ public class HttpBodyWriter {
     /**
      * Write the TAXII poll request to an {@link OutputStream}.
      *
+     * @param messageId TAXII message id.
      * @param feed The TAXII feed.
      * @param body The {@link OutputStream} to write the body to.
      * @throws Exception When any error occurs.
@@ -72,6 +73,7 @@ public class HttpBodyWriter {
     /**
      * Write the TAXII poll fulfillment request to an {@link OutputStream}.
      *
+     * @param messageId        TAXII message id.
      * @param feed             The TAXII feed.
      * @param resultId         result id.
      * @param resultPartNumber result part number.

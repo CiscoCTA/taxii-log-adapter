@@ -298,6 +298,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.1.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                </configuration>
                 <reportSets>
                     <reportSet>
                         <reports>

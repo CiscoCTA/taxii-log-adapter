@@ -16,18 +16,15 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import java.net.URL;
-
+import com.cisco.cta.taxii.adapter.httpclient.HttpBodyWriter;
+import com.cisco.cta.taxii.adapter.httpclient.HttpHeadersAppender;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
-
 import lombok.AllArgsConstructor;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 
-import com.cisco.cta.taxii.adapter.httpclient.HttpBodyWriter;
-import com.cisco.cta.taxii.adapter.httpclient.HttpHeadersAppender;
+import java.net.URL;
 
 /**
  * Factory to create complete TAXII requests.
@@ -43,7 +40,8 @@ public class RequestFactory {
 
     /**
      * Create the TAXII request.
-     * 
+     *
+     * @param messageId TAXII message id.
      * @param feed The TAXII feed.
      * @return TAXII poll request.
      * @throws Exception When any error occurs.
@@ -58,7 +56,10 @@ public class RequestFactory {
     /**
      * Create the TAXII request.
      *
+     * @param messageId TAXII message id.
      * @param feed The TAXII feed name.
+     * @param resultId TAXII result id.
+     * @param resultPartNumber TAXII result part number.
      * @return TAXII poll request.
      * @throws Exception When any error occurs.
      */

@@ -16,6 +16,8 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -51,6 +53,10 @@ class TcpOutputStream extends OutputStream {
      * Make a network connection and send all buffered data.
      * The connection is closed before this method exits.
      */
+    @SuppressFBWarnings(
+            value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE",
+            justification = "try with resources - false positive if compiled with Java 11"
+    )
     @Override
     public void flush() throws IOException {
         try (

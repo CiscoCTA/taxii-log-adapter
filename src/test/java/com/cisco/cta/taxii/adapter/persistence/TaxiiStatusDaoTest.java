@@ -26,11 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.threeten.bp.DateTimeUtils;
-import org.threeten.bp.Instant;
-import org.threeten.bp.ZoneId;
 
 import javax.xml.datatype.DatatypeFactory;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
@@ -67,7 +67,7 @@ public class TaxiiStatusDaoTest {
     private TaxiiStatus.Feed createNormalFeed() {
         TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
         feed.setName(UUID.randomUUID().toString());
-        GregorianCalendar gregorianCal = DateTimeUtils.toGregorianCalendar(now.atZone(ZoneId.systemDefault()));
+        GregorianCalendar gregorianCal = instantToGregorianCalendar(now);
         feed.setLastUpdate(datatypeFactory.newXMLGregorianCalendar(gregorianCal));
         return feed;
     }
@@ -78,7 +78,7 @@ public class TaxiiStatusDaoTest {
         feed.setMore(true);
         feed.setResultId("1000#2000");
         feed.setResultPartNumber(1);
-        GregorianCalendar gregorianCal = DateTimeUtils.toGregorianCalendar(now.atZone(ZoneId.systemDefault()));
+        GregorianCalendar gregorianCal = instantToGregorianCalendar(now);
         feed.setLastUpdate(datatypeFactory.newXMLGregorianCalendar(gregorianCal));
         return feed;
     }
@@ -117,6 +117,11 @@ public class TaxiiStatusDaoTest {
         dao.updateOrAdd(feed);
         TaxiiStatus.Feed loadedFeed = dao.find(feed.getName());
         assertThat(loadedFeed.getResultPartNumber(), is(2));
+    }
+
+    private static GregorianCalendar instantToGregorianCalendar(Instant instant) {
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return GregorianCalendar.from(zdt);
     }
 
 }

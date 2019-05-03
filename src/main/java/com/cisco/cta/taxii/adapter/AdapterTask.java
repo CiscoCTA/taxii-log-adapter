@@ -19,6 +19,7 @@ package com.cisco.cta.taxii.adapter;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.log4j.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,6 +139,10 @@ public class AdapterTask implements Runnable {
         }
     }
 
+    @SuppressFBWarnings(
+            value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE",
+            justification = "try with resources - false positive if compiled with Java 11"
+    )
     private TaxiiPollResponse poll(String messageId, TaxiiStatus.Feed lastSuccessfulFeed) throws Exception {
         statistics.incrementPolls();
         ClientHttpRequest request;

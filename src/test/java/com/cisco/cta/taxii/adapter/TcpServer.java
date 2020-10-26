@@ -27,7 +27,7 @@ import org.springframework.util.StreamUtils;
 
 class TcpServer extends Thread implements AutoCloseable {
 
-    private static int port = 9000;
+    private static int port = 19000;
     private static final Charset CHARSET = Charset.forName("UTF-8");
 
     private final ServerSocket serverSocket;

@@ -63,7 +63,7 @@ public class SmokeTestLifecycle implements Lifecycle {
 
     void logSettingsConfig() {
         log.info("Listing configuration parameters ...");
-        log.info("---------- taxiiService ----------");
+        log.info("---------- taxii-service ----------");
         log.info("pollEndpoint={}", settingsConfig.taxiiServiceSettings().getPollEndpoint());
         log.info("username={}", settingsConfig.taxiiServiceSettings().getUsername());
         log.info("password={}", Strings.isNullOrEmpty(settingsConfig.taxiiServiceSettings().getPassword()) ? "" : "*****");
@@ -105,7 +105,7 @@ public class SmokeTestLifecycle implements Lifecycle {
 
             switch (resp.getRawStatusCode()) {
             case 200:
-                log.info("Succesfully connected to {}", endpoint);
+                log.info("Successfully connected to {}", endpoint);
                 return;
             case 401:
             case 403:

@@ -16,7 +16,8 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
+import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -31,12 +32,9 @@ import org.springframework.context.annotation.Profile;
 @Import(AdapterConfiguration.class)
 public class RunNowConfiguration {
 
-    @Autowired
-    private AdapterConfiguration adapterConfiguration;
-
     @Bean
-    public RunAndExit runAndExit() throws Exception {
-        return new RunAndExit(adapterConfiguration.adapterTask());
+    public RunAndExit runAndExit(AdapterConfiguration adapterConfiguration, RequestFactory requestFactory, TaxiiServiceSettings taxiiServiceSettings, TaxiiStatusDao taxiiStatusDao) throws Exception {
+        return new RunAndExit(adapterConfiguration.adapterTask(requestFactory, taxiiServiceSettings, taxiiStatusDao));
     }
 
 }

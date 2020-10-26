@@ -16,8 +16,8 @@
 package com.cisco.cta.taxii.adapter;
 
 public class TaxiiStatusException extends Exception {
-    private String statusType;
-    private String statusMessage;
+    private final String statusType;
+    private final String statusMessage;
 
     public TaxiiStatusException(String statusType, String statusMessage) {
         super("Taxii status type: " + statusType + ", status message: " + statusMessage);

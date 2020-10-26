@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.dellroad.stuff.pobj.PersistentObject;
 import org.dellroad.stuff.pobj.PersistentObjectDelegate;
+import org.dellroad.stuff.pobj.PersistentObjectException;
 
 import java.io.File;
 
@@ -32,11 +33,11 @@ public class PersistenceObjectFactory {
     public PersistentObject<TaxiiStatus> build() {
         PersistentObject<TaxiiStatus> persistentObject = new PersistentObject<>(delegate, statusFile);
         persistentObject.setAllowEmptyStart(true);
-        persistentObject.start();
-        if (!statusFile.exists()) {
-            throw new RuntimeException("Cannot create status file: " + statusFile.getPath() + ". Please check that the given path is correct and writable.");
+        try {
+            persistentObject.start();
+            return persistentObject;
+        } catch (PersistentObjectException persistentObjectException) {
+            throw new RuntimeException("Cannot create status file: " + statusFile.getPath() + ". Please check that the given path is correct and writable.", persistentObjectException);
         }
-        return persistentObject;
     }
-
 }

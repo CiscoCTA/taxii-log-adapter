@@ -13,7 +13,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-taxiiService:
+taxii-service:
     pollEndpoint: https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/
     username: user
     password: pass

@@ -55,7 +55,6 @@ public class BasicAuthHttpRequestFactoryTest {
     private ClientHttpRequestFactory factory;
     private HttpClient httpClient;
     private TaxiiServiceSettings connSettings;
-    private ProxySettings proxySettings;
     private CredentialsProvider credentialsProvider;
 
     @Mock
@@ -66,9 +65,8 @@ public class BasicAuthHttpRequestFactoryTest {
         httpClient = HttpClients.createDefault();
         credentialsProvider = Mockito.mock(CredentialsProvider.class);
         connSettings = TaxiiServiceSettingsFactory.createDefaults();
-        proxySettings = new ProxySettings();
         credentialsProvider = Mockito.mock(CredentialsProvider.class);
-        factory = new BasicAuthHttpRequestFactory(httpClient, connSettings, proxySettings, credentialsProvider);
+        factory = new BasicAuthHttpRequestFactory(httpClient, connSettings, credentialsProvider);
         MockitoAnnotations.initMocks(this);
         when(mockAppender.getName()).thenReturn("MOCK");
         Logger authCacheLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(RequestAuthCache.class.getCanonicalName());

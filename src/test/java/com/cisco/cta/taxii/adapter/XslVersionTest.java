@@ -43,12 +43,18 @@ public class XslVersionTest {
         xsltSource = new StreamSource(XslVersionTest.class.getResourceAsStream("/xsl-version.xsl"));
     }
 
+    /*
+        https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/system-property
+        xsl:version - a number giving the version of XSLT implemented by the processor; for XSLT processors implementing
+                      the version of XSLT specified by this document
+        Quite arguable what this test actually tests
+     */
     @Test
-    public void xslVersionIs2() throws Exception {
+    public void xslProcessorVersionIs3() throws Exception {
         Transformer transformer = TransformerFactory.newInstance().newTransformer(xsltSource);
         StringWriter versionWriter = new StringWriter();
         Result versionResult = new StreamResult(versionWriter);
         transformer.transform(dummyXmlSource, versionResult);
-        assertThat(versionWriter.toString(), is("2.0"));
+        assertThat(versionWriter.toString(), is("3.0"));
     }
 }

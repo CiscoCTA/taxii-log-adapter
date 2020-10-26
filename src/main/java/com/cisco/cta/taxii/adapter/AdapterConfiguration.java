@@ -24,6 +24,7 @@ import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import com.cisco.cta.taxii.adapter.settings.TransformSettings;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,10 +33,12 @@ import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.context.annotation.Import;
 import org.springframework.jmx.support.RegistrationPolicy;
 
+import javax.xml.XMLConstants;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamSource;
@@ -49,21 +52,13 @@ import java.time.Clock;
 @EnableMBeanExport(registration=RegistrationPolicy.FAIL_ON_EXISTING)
 @Import({HttpClientConfiguration.class, SettingsConfiguration.class, PersistenceConfiguration.class})
 public class AdapterConfiguration {
-
-    @Autowired
-    private RequestFactory requestFactory;
-
-    @Autowired
-    private TaxiiServiceSettings taxiiServiceSettings;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdapterConfiguration.class);
 
     @Autowired
     private TransformSettings transformSettings;
 
-    @Autowired
-    private TaxiiStatusDao taxiiStatusDao;
-
     @Bean
-    public Runnable adapterTask() throws Exception {
+    public Runnable adapterTask(RequestFactory requestFactory, TaxiiServiceSettings taxiiServiceSettings, TaxiiStatusDao taxiiStatusDao) throws Exception {
         return new AdapterTask(
             requestFactory,
             responseTransformer(),
@@ -99,7 +94,10 @@ public class AdapterConfiguration {
 
     @Bean
     public XMLInputFactory inputFactory() {
-        return XMLInputFactory.newFactory();
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false); // This disables DTDs entirely for that factory
+        xmlInputFactory.setProperty("javax.xml.stream.isSupportingExternalEntities", false); // disable external entities
+        return xmlInputFactory;
     }
 
     @Bean
@@ -110,8 +108,20 @@ public class AdapterConfiguration {
     }
 
     @Bean
-    public TransformerFactory transformerFactory() throws TransformerFactoryConfigurationError {
-        return TransformerFactory.newInstance();
+    public TransformerFactory transformerFactory() throws TransformerFactoryConfigurationError, TransformerConfigurationException {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        try {
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("ACCESS_EXTERNAL_DTD configuration is not supported: " + e.getMessage());
+        }
+        try {
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("ACCESS_EXTERNAL_STYLESHEET configuration is not supported: " + e.getMessage());
+        }
+        return transformerFactory;
     }
 
     @Bean

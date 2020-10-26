@@ -20,8 +20,8 @@ import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.spi.FilterReply;
 import com.cisco.cta.taxii.adapter.OutputValidationException;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.MDC;
 import org.junit.Test;
+import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.io.InputStream;

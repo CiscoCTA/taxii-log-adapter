@@ -45,8 +45,7 @@ public class TaxiiPollResponseReaderFactory {
      */
     public TaxiiPollResponseReader create(InputStream body) throws XMLStreamException {
         XMLStreamReader xmlReader = inputFactory.createXMLStreamReader(body);
-        TaxiiPollResponseReader responseReader = new TaxiiPollResponseReader(xmlReader, datatypeFactory);
-        return responseReader;
+        return new TaxiiPollResponseReader(xmlReader, datatypeFactory);
     }
 
 }

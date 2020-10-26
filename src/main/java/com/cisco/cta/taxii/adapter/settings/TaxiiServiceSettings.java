@@ -31,12 +31,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Holds taxiiService configuration parameters.
  */
-@ConfigurationProperties(prefix="taxiiService")
+@ConfigurationProperties(prefix="taxii-service")
 @Data
+@Validated
 public class TaxiiServiceSettings {
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
@@ -60,7 +62,7 @@ public class TaxiiServiceSettings {
     public void loadFeedNames() throws IOException {
         Preconditions.checkState(
             feeds != null ^ feedNamesFile != null,
-            "taxiiService.feeds or taxiiService.feedNamesFile must be set");
+            "taxii-service.feeds or taxii-service.feedNamesFile must be set");
         if (feedNamesFile != null) {
             feeds = Files.readLines(feedNamesFile, UTF8);
         }

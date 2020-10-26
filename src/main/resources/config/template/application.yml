@@ -22,7 +22,7 @@
 
 
 ####################################################################################
-# The taxiiService section contains general settings for taxii-log-adapter
+# The taxii-service section contains general settings for taxii-log-adapter
 #
 # pollEndpoint         - TAXII poll service endpoint URL
 # username, password   - Credentials for your TAXII account
@@ -33,7 +33,7 @@
 #
 # Example for the CTA TAXII service
 #
-# taxiiService:
+# taxii-service:
 #    pollEndpoint: https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/
 #    username: taxii-c1387d35-7197-2584-9d9d-49accf59ec64
 #    password: lGXevVpyi07HKunfv9rktF84PzH0sUMfIv4WvcvDPqWhUfMK
@@ -42,7 +42,7 @@
 #
 ####################################################################################
 
-taxiiService:
+taxii-service:
     pollEndpoint: https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/
     username: user
     password: pass

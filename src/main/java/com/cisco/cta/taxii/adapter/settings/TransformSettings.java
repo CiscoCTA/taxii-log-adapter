@@ -23,12 +23,14 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Holds transform configuration parameters.
  */
 @ConfigurationProperties(prefix="transform")
 @Data
+@Validated
 public class TransformSettings {
 
     @NotNull

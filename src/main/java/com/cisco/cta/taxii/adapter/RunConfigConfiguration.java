@@ -31,7 +31,7 @@ public class RunConfigConfiguration {
     }
 
     @Bean
-    public RunAndExit runAndExit() throws Exception {
+    public RunAndExit runAndExit() {
         return new RunAndExit(configTask());
     }
 }

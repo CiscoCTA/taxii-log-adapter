@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
@@ -83,7 +84,7 @@ public class NetworkAppender extends AppenderBase<ILoggingEvent> {
     @Override
     public void start() {
         try {
-          out = new OutputStreamWriter(createOutputStream(), "UTF-8");
+          out = new OutputStreamWriter(createOutputStream(), StandardCharsets.UTF_8);
         } catch (Exception e) {
           addError("Error while creating connection", e);
         }

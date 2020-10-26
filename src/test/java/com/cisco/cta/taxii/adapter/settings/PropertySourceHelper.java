@@ -22,11 +22,11 @@ class PropertySourceHelper {
 
     public static MockPropertySource validProperties() {
         return new MockPropertySource()
-            .withProperty("taxiiService.pollEndpoint", "http://taxii")
-            .withProperty("taxiiService.username", "smith")
-            .withProperty("taxiiService.password", "secret")
-            .withProperty("taxiiService.feeds[0]", "alpha-feed")
-            .withProperty("taxiiService.statusFile", "taxii-status.xml")
+            .withProperty("taxii-service.pollEndpoint", "http://taxii")
+            .withProperty("taxii-service.username", "smith")
+            .withProperty("taxii-service.password", "secret")
+            .withProperty("taxii-service.feeds[0]", "alpha-feed")
+            .withProperty("taxii-service.statusFile", "taxii-status.xml")
             .withProperty("schedule.cron", "* * * * * *")
             .withProperty("transform.stylesheet", "transform.xsl")
             .withProperty("proxy.url", "http://localhost:8001/")

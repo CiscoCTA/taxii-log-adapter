@@ -57,8 +57,8 @@ public class HttpClientConfiguration {
     }
 
     @Bean
-    public HttpBodyWriter httpBodyWriter(TaxiiStatusDao taxiiStatusDao) throws Exception {
-        return new HttpBodyWriter(taxiiStatusDao);
+    public HttpBodyWriter httpBodyWriter() throws Exception {
+        return new HttpBodyWriter();
     }
 
     @Bean
@@ -67,13 +67,13 @@ public class HttpClientConfiguration {
                 taxiiServiceSettings.getPollEndpoint(),
                 httpRequestFactory(),
                 httpHeadersAppender(),
-                httpBodyWriter(taxiiStatusDao));
+                httpBodyWriter());
     }
 
     @Bean
     public ClientHttpRequestFactory httpRequestFactory() {
         HttpComponentsClientHttpRequestFactory factory = new BasicAuthHttpRequestFactory(
-                httpClient(), taxiiServiceSettings, proxySettings, credentialsProvider());
+                httpClient(), taxiiServiceSettings, credentialsProvider());
         factory.setConnectTimeout(300000); //5min
         factory.setConnectionRequestTimeout(300000); //5min
         factory.setReadTimeout(300000); //5min

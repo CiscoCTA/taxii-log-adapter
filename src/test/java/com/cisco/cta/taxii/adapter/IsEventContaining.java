@@ -27,7 +27,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 
 
-public class IsEventContaining extends ArgumentMatcher<ILoggingEvent> {
+public class IsEventContaining implements ArgumentMatcher<ILoggingEvent> {
     
     private final String substring;
 
@@ -45,14 +45,7 @@ public class IsEventContaining extends ArgumentMatcher<ILoggingEvent> {
     }
 
     @Override
-    public boolean matches(Object argument) {
-        return ((ILoggingEvent)argument).getMessage().contains(substring);
+    public boolean matches(ILoggingEvent iLoggingEvent) {
+        return iLoggingEvent.getMessage().contains(substring);
     }
-
-    @Override
-    public void describeTo(Description description) {
-        description.appendText("log message containing ");
-        description.appendValue(substring);
-    }
-    
 }

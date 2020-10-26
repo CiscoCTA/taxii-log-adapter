@@ -17,7 +17,7 @@ package com.cisco.cta.taxii.adapter.settings;
 
 import java.io.PrintStream;
 
-import org.springframework.validation.BindException;
+import org.springframework.boot.context.properties.bind.validation.BindValidationException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
@@ -26,13 +26,13 @@ import com.cisco.cta.taxii.adapter.error.Handler;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class BindExceptionHandler implements Handler<BindException> {
+public class BindExceptionHandler implements Handler<BindValidationException> {
 
     private final PrintStream err;
 
     @Override
-    public void handle(BindException e) {
-        for(ObjectError error : e.getAllErrors()) {
+    public void handle(BindValidationException e) {
+        for(ObjectError error : e.getValidationErrors()) {
             StringBuilder b = new StringBuilder()
                 .append("Error in application.yml")
                 .append(", section ").append(error.getObjectName());

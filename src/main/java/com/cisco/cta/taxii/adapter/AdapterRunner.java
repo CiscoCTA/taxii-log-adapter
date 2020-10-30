@@ -20,8 +20,9 @@ import java.io.PrintStream;
 
 import org.springframework.boot.Banner.Mode;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.system.ApplicationPidFileWriter;
+import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import com.cisco.cta.taxii.adapter.error.ChainHandler;
@@ -55,7 +56,7 @@ public class AdapterRunner {
                     RunConfigConfiguration.class)
                 .bannerMode(Mode.OFF)
                 .listeners(new ApplicationPidFileWriter())
-                .web(false)
+                .web(WebApplicationType.NONE)
                 .run(args);
             ctx.start();
 

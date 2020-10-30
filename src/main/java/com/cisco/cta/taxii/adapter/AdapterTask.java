@@ -20,9 +20,9 @@ import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.log4j.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 
@@ -83,9 +83,7 @@ public class AdapterTask implements Runnable {
             } while (more);
         } catch(Exception e) {
             statistics.incrementErrors();
-            LOG.error("Error while processing feed " + feedName, e);
-            return ;
-
+            LOG.error(String.format("Error while processing feed %s", feedName), e);
         } finally {
             MDC.clear();
         }
@@ -115,27 +113,27 @@ public class AdapterTask implements Runnable {
         }
     }
 
-    private void handleIOError(TaxiiStatus.Feed feed, Throwable e) throws Exception {
+    private void handleIOError(TaxiiStatus.Feed feed, Throwable e) {
         Integer ioErrorCount = feed.getIoErrorCount();
         if (ioErrorCount == null) {
             ioErrorCount = 1;
         } else {
-            ioErrorCount = ioErrorCount + 1;
+            ioErrorCount += 1;
         }
         feed.setIoErrorCount(ioErrorCount);
         taxiiStatusDao.updateOrAdd(feed);
         if (ioErrorCount >= MAX_HTTP_CONNECTION_ATTEMPTS) {
-            throw new Exception("HTTP connection problem, number of retries exceeded.", e);
+            throw new RuntimeException("HTTP connection problem, number of retries exceeded.", e);
         } else {
             LOG.warn("HTTP connection problem, the request will be retried.", e);
         }
     }
 
-    private XMLGregorianCalendar getLastUpdate(TaxiiPollResponse response) throws Exception {
+    private XMLGregorianCalendar getLastUpdate(TaxiiPollResponse response) {
         if (response.getInclusiveEndTime() != null) {
             return response.getInclusiveEndTime();
         } else {
-            throw new Exception("InclusiveEndTime must be present in TAXII Poll Response if the named data collection is a data feed.");
+            throw new RuntimeException("InclusiveEndTime must be present in TAXII Poll Response if the named data collection is a data feed.");
         }
     }
 

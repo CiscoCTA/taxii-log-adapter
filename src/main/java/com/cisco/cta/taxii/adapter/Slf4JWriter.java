@@ -61,6 +61,11 @@ public class Slf4JWriter extends Writer {
         return this;
     }
 
+    @Override
+    public void flush() {
+        LOG.trace("flush {}", lineBuffer);
+    }
+
 
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
@@ -70,11 +75,7 @@ public class Slf4JWriter extends Writer {
     }
 
     @Override
-    public void flush() throws IOException {
-    }
-
-    @Override
-    public void close() throws IOException {
+    public void close() {
         if (lineBuffer.length() > 0) {
             LOG.error("unfinished {}", lineBuffer);
         }

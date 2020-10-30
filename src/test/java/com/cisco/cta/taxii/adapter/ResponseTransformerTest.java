@@ -113,10 +113,10 @@ public class ResponseTransformerTest {
         return argThat(new StaxSourceWrappingBodyReader());
     }
 
-    private class StaxSourceWrappingBodyReader extends ArgumentMatcher<Source>{
+    private class StaxSourceWrappingBodyReader implements ArgumentMatcher<Source>{
 
         @Override
-        public boolean matches(Object argument) {
+        public boolean matches(Source argument) {
             StAXSource source = (StAXSource) argument;
             TaxiiPollResponseReader sourceReader = (TaxiiPollResponseReader) source.getXMLStreamReader();
             return sourceReader == responseReader;
@@ -128,10 +128,10 @@ public class ResponseTransformerTest {
         return argThat(new StreamResultWrappingLogWriter());
     }
 
-    private class StreamResultWrappingLogWriter extends ArgumentMatcher<Result>{
+    private class StreamResultWrappingLogWriter implements ArgumentMatcher<Result>{
 
         @Override
-        public boolean matches(Object argument) {
+        public boolean matches(Result argument) {
             StreamResult result = (StreamResult) argument;
             return result.getWriter() == logWriter;
         }

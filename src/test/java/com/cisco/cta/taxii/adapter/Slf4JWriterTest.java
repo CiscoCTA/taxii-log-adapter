@@ -25,8 +25,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.Writer;
 
-import com.cisco.cta.taxii.adapter.filter.JsonValidationFilter;
-import org.jboss.logging.MDC;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -36,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.core.Appender;
+import org.slf4j.MDC;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class Slf4JWriterTest {
@@ -64,6 +63,7 @@ public class Slf4JWriterTest {
         writer.write(chars);
         verifyZeroInteractions(logger);
         verifyZeroInteractions(statistics);
+        writer.close();
     }
 
     @Test
@@ -72,6 +72,7 @@ public class Slf4JWriterTest {
         writer.write(chars);
         verify(logger, only()).info("PAYLOAD");
         assertThat(statistics.getLogs(), is(1L));
+        writer.close();
     }
 
     @Test
@@ -80,6 +81,7 @@ public class Slf4JWriterTest {
         writer.write(chars, 6, 8);
         verify(logger, only()).info("PAYLOAD");
         assertThat(statistics.getLogs(), is(1L));
+        writer.close();
     }
 
     @Test
@@ -104,6 +106,7 @@ public class Slf4JWriterTest {
         writer.flush();
         verifyZeroInteractions(logger);
         verifyZeroInteractions(statistics);
+        writer.close();
     }
 
     @Test(expected = OutputValidationException.class)
@@ -111,6 +114,7 @@ public class Slf4JWriterTest {
         char[] chars = "PAYLOAD\n".toCharArray();
         MDC.put(OutputValidationException.MDC_KEY, "test error");
         writer.write(chars);
+        writer.close();
     }
 
 }

@@ -16,7 +16,6 @@
 
 package com.cisco.cta.taxii.adapter.httpclient;
 
-import com.cisco.cta.taxii.adapter.settings.ProxySettings;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 
 import org.apache.http.HttpHost;
@@ -43,7 +42,7 @@ public class BasicAuthHttpRequestFactory extends HttpComponentsClientHttpRequest
     private final CredentialsProvider credsProvider;
     private final AuthCache authCache;
 
-    public BasicAuthHttpRequestFactory(HttpClient httpClient, TaxiiServiceSettings settings, ProxySettings proxySettings, CredentialsProvider credsProvider) {
+    public BasicAuthHttpRequestFactory(HttpClient httpClient, TaxiiServiceSettings settings, CredentialsProvider credsProvider) {
         super(httpClient);
         this.credsProvider = credsProvider;
 

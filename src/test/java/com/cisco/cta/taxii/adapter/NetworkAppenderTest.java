@@ -19,6 +19,7 @@ package com.cisco.cta.taxii.adapter;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +27,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.cisco.cta.taxii.adapter.NetworkAppender;
 import com.cisco.cta.taxii.adapter.NetworkAppender.Protocol;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -51,6 +51,7 @@ public class NetworkAppenderTest {
     @Test
     public void start() throws Exception {
         appender.start();
+        assertTrue(appender.isStarted());
     }
 
     @Test(timeout=5000)

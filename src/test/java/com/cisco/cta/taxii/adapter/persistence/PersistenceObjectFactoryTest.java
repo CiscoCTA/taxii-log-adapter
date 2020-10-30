@@ -15,6 +15,7 @@
 */
 package com.cisco.cta.taxii.adapter.persistence;
 
+import org.dellroad.stuff.pobj.PersistentObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,6 +25,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import java.io.File;
+
+import static org.junit.Assert.assertTrue;
 
 public class PersistenceObjectFactoryTest {
 
@@ -38,16 +41,11 @@ public class PersistenceObjectFactoryTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void buildFailsOnWrongStatusFilePath() throws Exception {
-        File file = new File("/nonexistent/path");
-        new PersistenceObjectFactory(file, new TaxiiStatusDelegate(marshaller)).build();
-    }
-
     @Test
-    public void buildSuceedsOnCorrectStatusFilePath() throws Exception {
+    public void buildSucceedsOnCorrectStatusFilePath() throws Exception {
         File file = folder.newFile("taxii-status-"+System.currentTimeMillis()+".tmp");
-        new PersistenceObjectFactory(file, new TaxiiStatusDelegate(marshaller)).build();
+        PersistentObject<TaxiiStatus> persistentObject = new PersistenceObjectFactory(file, new TaxiiStatusDelegate(marshaller)).build();
+        assertTrue(persistentObject.isStarted());
     }
 
 }

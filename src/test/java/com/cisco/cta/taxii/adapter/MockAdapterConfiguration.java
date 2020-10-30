@@ -25,8 +25,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 
-import com.cisco.cta.taxii.adapter.AdapterConfiguration;
-
 @Configuration
 @EnableConfigurationProperties
 public class MockAdapterConfiguration extends AdapterConfiguration {
@@ -40,7 +38,7 @@ public class MockAdapterConfiguration extends AdapterConfiguration {
      * Cancel scheduling.
      */
     @Bean
-    public ScheduledFuture<?> scheduleAdapterTask() throws Exception {
+    public ScheduledFuture<?> scheduleAdapterTask() {
         return null;
     }
 }

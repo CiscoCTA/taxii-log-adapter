@@ -16,9 +16,6 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
@@ -32,7 +29,6 @@ import javax.xml.stream.util.StreamReaderDelegate;
  * providing the same data to its client (e.g. XSL transformation).
  */
 public class TaxiiPollResponseReader extends StreamReaderDelegate {
-    private static final Logger LOG = LoggerFactory.getLogger(TaxiiPollResponseReader.class);
 
     private static final String TAXII_NAMESPACE_URI = "http://taxii.mitre.org/messages/taxii_xml_binding-1.1";
 

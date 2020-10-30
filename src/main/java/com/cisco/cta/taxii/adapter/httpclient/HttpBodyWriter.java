@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Writes an HTTP request body to an {@link OutputStream}.
@@ -35,15 +36,15 @@ import java.util.HashMap;
  */
 public class HttpBodyWriter {
 
+    private static final String UTF_8 = "UTF-8";
+
     private final Configuration cfg;
     private final Template template;
     private final Template templateFulfillment;
-    private final TaxiiStatusDao taxiiStatusDao;
 
-    public HttpBodyWriter(TaxiiStatusDao taxiiStatusDao) throws IOException {
-        this.taxiiStatusDao = taxiiStatusDao;
+    public HttpBodyWriter() throws IOException {
         cfg = new Configuration(new Version(2, 3, 21));
-        cfg.setDefaultEncoding("UTF-8");
+        cfg.setDefaultEncoding(UTF_8);
         cfg.setTemplateLoader(new ClassTemplateLoader(HttpBodyWriter.class, "templates"));
         template = cfg.getTemplate("poll-request.ftl");
         templateFulfillment = cfg.getTemplate("poll-fulfillment-request.ftl");
@@ -58,8 +59,8 @@ public class HttpBodyWriter {
      * @throws Exception When any error occurs.
      */
     public void write(String messageId, TaxiiStatus.Feed feed, OutputStream body) throws Exception {
-        try (OutputStreamWriter out = new OutputStreamWriter(body, "UTF-8")) {
-            HashMap<String, Object> data = new HashMap<>();
+        try (OutputStreamWriter out = new OutputStreamWriter(body, UTF_8)) {
+            Map<String, Object> data = new HashMap<>();
             data.put("messageId", messageId);
             data.put("collection", feed.getName());
             XMLGregorianCalendar lastUpdate = getLastUpdate(feed);
@@ -81,8 +82,8 @@ public class HttpBodyWriter {
      * @throws Exception When any error occurs.
      */
     public void write(String messageId, TaxiiStatus.Feed feed, String resultId, Integer resultPartNumber, OutputStream body) throws Exception {
-        try (OutputStreamWriter out = new OutputStreamWriter(body, "UTF-8")) {
-            HashMap<String, Object> data = new HashMap<>();
+        try (OutputStreamWriter out = new OutputStreamWriter(body, UTF_8)) {
+            Map<String, Object> data = new HashMap<>();
             data.put("messageId", messageId);
             data.put("collection", feed.getName());
             data.put("resultId", resultId);

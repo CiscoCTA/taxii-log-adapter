@@ -16,28 +16,24 @@
 
 package com.cisco.cta.taxii.adapter.settings;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import com.cisco.cta.taxii.adapter.httpclient.ProxyAuthenticationType;
-import static com.cisco.cta.taxii.adapter.settings.PropertySourceHelper.*;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.boot.context.properties.bind.validation.BindValidationException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.core.env.PropertySource;
 import org.springframework.mock.env.MockPropertySource;
-import org.springframework.validation.BindException;
-import org.springframework.validation.FieldError;
 
 import java.net.URL;
 import java.util.List;
@@ -50,8 +46,8 @@ public class SettingsConfigurationTest {
         try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SettingsConfiguration.class)) {
             fail("The context creation must fail because of missing configuration.");
         } catch (NestedRuntimeException e) {
-            BindException be = (BindException) e.getRootCause();
-            assertThat(be.getFieldErrors(), is(not(emptyCollectionOf(FieldError.class))));
+            BeanCreationException be = (BeanCreationException) e;
+            assertThat(be.getMessage(), containsString("taxiiServiceSettings"));
         }
     }
 
@@ -72,11 +68,11 @@ public class SettingsConfigurationTest {
 
     private MockPropertySource validProperties() {
         return new MockPropertySource()
-            .withProperty("taxiiService.pollEndpoint", "http://taxii")
-            .withProperty("taxiiService.username", "smith")
-            .withProperty("taxiiService.password", "secret")
-            .withProperty("taxiiService.feeds[0]", "alpha-feed")
-            .withProperty("taxiiService.statusFile", "taxii-status.xml")
+            .withProperty("taxii-service.pollEndpoint", "http://taxii")
+            .withProperty("taxii-service.username", "smith")
+            .withProperty("taxii-service.password", "secret")
+            .withProperty("taxii-service.feeds[0]", "alpha-feed")
+            .withProperty("taxii-service.statusFile", "taxii-status.xml")
             .withProperty("schedule.cron", "* * * * * *")
             .withProperty("transform.stylesheet", "transform.xsl")
             .withProperty("proxy.url", "http://localhost:8001/")
@@ -92,16 +88,14 @@ public class SettingsConfigurationTest {
     }
 
     @Test
-    public void resfuseMissingPollEndpoint() throws Exception {
-        try (ConfigurableApplicationContext ctx = context(exclude(validProperties(), "taxiiService.pollEndpoint"))) {
+    public void refuseMissingPollEndpoint() throws Exception {
+        try (ConfigurableApplicationContext ctx = context(exclude(validProperties(), "taxii-service.pollEndpoint"))) {
             fail("The context creation must fail because of invalid configuration.");
         } catch (NestedRuntimeException e) {
-            BindException be = (BindException) e.getRootCause();
-            assertThat(be.getFieldErrors(), hasSize(1));
-            assertThat(be.getFieldError().getObjectName(), is("taxiiService"));
-            assertThat(be.getFieldError().getField(), is("pollEndpoint"));
-            assertThat(be.getFieldError().getRejectedValue(), is(nullValue()));
-            assertThat(be.getFieldError().getDefaultMessage(), is("may not be null"));
+            BindValidationException be = (BindValidationException) e.getRootCause();
+            assertThat(be.getValidationErrors().getAllErrors(), hasSize(1));
+            assertThat(be.getValidationErrors().getAllErrors().get(0).getCodes()[0], is("NotNull.taxii-service.pollEndpoint"));
+            assertThat(be.getValidationErrors().getAllErrors().get(0).getDefaultMessage(), is("must not be null"));
         }
     }
 
@@ -118,8 +112,8 @@ public class SettingsConfigurationTest {
     @Test
     public void loadFeedNamesFromFile() throws Exception {
         try (ConfigurableApplicationContext ctx = context(
-                exclude(validProperties(), "taxiiService.feeds")
-                .withProperty("taxiiService.feedNamesFile", "src/test/resources/feed-names.txt"))) {
+                exclude(validProperties(), "taxii-service.feeds")
+                .withProperty("taxii-service.feedNamesFile", "src/test/resources/feed-names.txt"))) {
             List<String> feeds = ctx.getBean(TaxiiServiceSettings.class).getFeeds();
             assertThat(feeds, contains("little-feed", "big-feed"));
         }
@@ -128,7 +122,7 @@ public class SettingsConfigurationTest {
 
     @Test
     public void refuseMissingFeedNames() throws Exception {
-        try (ConfigurableApplicationContext ctx = context(exclude(validProperties(), "taxiiService.feeds"))) {
+        try (ConfigurableApplicationContext ctx = context(exclude(validProperties(), "taxii-service.feeds"))) {
             fail("The context creation must fail because of invalid configuration.");
         } catch (BeanCreationException e) {
             assertThat(e.getRootCause(), instanceOf(IllegalStateException.class));
@@ -137,7 +131,7 @@ public class SettingsConfigurationTest {
 
     @Test
     public void statusFileDefault() throws Exception {
-        try (ConfigurableApplicationContext ctx = context(exclude(validProperties(), "taxiiService.statusFile"))) {
+        try (ConfigurableApplicationContext ctx = context(exclude(validProperties(), "taxii-service.statusFile"))) {
             TaxiiServiceSettings settings = ctx.getBean(TaxiiServiceSettings.class);
             assertThat(settings.getStatusFile().getPath(), is("taxii-status.xml"));
         }

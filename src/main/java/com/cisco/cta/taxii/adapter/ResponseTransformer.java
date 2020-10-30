@@ -16,8 +16,6 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
-import org.apache.log4j.MDC;
 import org.springframework.http.client.ClientHttpResponse;
 
 import javax.xml.transform.Templates;

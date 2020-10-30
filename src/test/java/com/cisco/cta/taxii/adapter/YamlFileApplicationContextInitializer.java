@@ -7,6 +7,7 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.util.List;
 
 public class YamlFileApplicationContextInitializer  implements ApplicationContextInitializer<ConfigurableApplicationContext> {
     @Override
@@ -14,8 +15,8 @@ public class YamlFileApplicationContextInitializer  implements ApplicationContex
         try {
             Resource resource = applicationContext.getResource("classpath:/config/application.yml");
             YamlPropertySourceLoader sourceLoader = new YamlPropertySourceLoader();
-            PropertySource<?> yamlTestProperties = sourceLoader.load("application.yml", resource, null);
-            applicationContext.getEnvironment().getPropertySources().addLast(yamlTestProperties);
+            List<PropertySource<?>> yamlTestPropertiesList = sourceLoader.load("application.yml", resource);
+            yamlTestPropertiesList.forEach(yamlTestProperties -> applicationContext.getEnvironment().getPropertySources().addLast(yamlTestProperties));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -16,6 +16,7 @@
 
 package com.cisco.cta.taxii.adapter;
 
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.core.Appender;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
@@ -24,7 +25,12 @@ import com.google.common.collect.ImmutableList;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.Answers;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
@@ -34,16 +40,16 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
 
 import static com.cisco.cta.taxii.adapter.IsEventContaining.verifyLog;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 
@@ -52,10 +58,10 @@ public class AdapterTaskTest {
 
     private Runnable task;
     
-    @Mock
+    @Mock(answer = Answers.RETURNS_MOCKS)
     private RequestFactory requestFactory;
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_MOCKS)
     private ClientHttpRequest request;
     
     @Mock
@@ -85,7 +91,7 @@ public class AdapterTaskTest {
     public void setUp() throws Exception {
        datatypeFactory = DatatypeFactory.newInstance();
        MockitoAnnotations.initMocks(this);
-       ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
+       ((Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
        when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
        task = new AdapterTask(requestFactory, responseTransformer, settings, statistics, taxiiStatusDao);
        when(requestFactory.createPollRequest(anyString(), any(TaxiiStatus.Feed.class))).thenReturn(request);
@@ -170,7 +176,7 @@ public class AdapterTaskTest {
         task.run();
         verify(requestFactory).createPollRequest(anyString(), any(TaxiiStatus.Feed.class));
         verify(request).execute();
-        verifyZeroInteractions(responseTransformer);
+        verifyNoInteractions(responseTransformer);
         verifyLog(mockAppender, "HTTP connection problem");
         assertThat(statistics.getPolls(), is(1L));
         assertThat(statistics.getErrors(), is(0L));

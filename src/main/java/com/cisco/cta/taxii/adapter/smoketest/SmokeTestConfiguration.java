@@ -52,7 +52,7 @@ public class SmokeTestConfiguration {
     private Writer logWriter;
 
     @Bean
-    public SmokeTestLifecycle smokeTest() throws Exception {
+    public SmokeTestLifecycle smokeTest() {
         return new SmokeTestLifecycle(settingsConfig, requestFactory, templates, logWriter);
     }
 

@@ -48,11 +48,11 @@ import ch.qos.logback.core.Appender;
 @ContextConfiguration(classes = {SmokeTestConfiguration.class})
 @ActiveProfiles("smoketest")
 @TestPropertySource(properties={
-    "taxiiService.pollEndpoint=http://localhost:8098/taxii/service",
-    "taxiiService.username=user",
-    "taxiiService.password=secret",
-    "taxiiService.feeds[0]=secured-feed",
-    "taxiiService.statusFile=target/auth-fail-status.xml",
+    "taxii-service.pollEndpoint=http://localhost:8098/taxii/service",
+    "taxii-service.username=user",
+    "taxii-service.password=secret",
+    "taxii-service.feeds[0]=secured-feed",
+    "taxii-service.statusFile=target/auth-fail-status.xml",
     "transform.stylesheet=src/test/resources/config/stix2stix.xsl",
     "schedule.cron=0 0 * * * *"
 })

@@ -59,7 +59,6 @@ import static org.mockito.Mockito.when;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AdapterTaskMultipartIT {
 
-
     private static final File OUTPUT_FILE = new File("target/output.json");
     private static final File EXPECTED_OUTPUT_FILE = new File("src/test/resources/expected-output.json");
 

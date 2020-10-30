@@ -17,11 +17,10 @@
 package com.cisco.cta.taxii.adapter.httpclient;
 
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
-import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -35,13 +34,9 @@ import static com.cisco.cta.taxii.adapter.PollFulfillmentMatcher.pollFulfillment
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpBodyWriterTest {
-
-    @Mock
-    private TaxiiStatusDao taxiiStatusDao;
 
     @InjectMocks
     private HttpBodyWriter writer;
@@ -55,7 +50,7 @@ public class HttpBodyWriterTest {
     private XMLGregorianCalendar cal;
 
 
-    @org.junit.Before
+    @Before
     public void setUp() throws Exception {
         feed = new TaxiiStatus.Feed();
         feed.setName("my-feed");
@@ -73,7 +68,6 @@ public class HttpBodyWriterTest {
     @Test
     public void writeNextPollRequest() throws Exception {
         feed.setLastUpdate(cal);
-        when(taxiiStatusDao.find("my-feed")).thenReturn(feed);
         writer.write("tla-123", feed, out);
         assertThat(out, is(nextPollRequest("tla-123", "my-feed", "2015-01-01T00:00:00")));
         verify(out).close();
@@ -82,8 +76,6 @@ public class HttpBodyWriterTest {
     @Test
     public void resultPartNumberFormattedCorrectly() throws Exception {
         feed.setLastUpdate(cal);
-        feed.setResultPartNumber(1000);
-        when(taxiiStatusDao.find("my-feed")).thenReturn(feed);
         writer.write("tla-123", feed, "123#456", 1000, out);
         assertThat(out, is(pollFulfillment("tla-123", "my-feed", "123#456", "1000")));
         verify(out).close();

@@ -16,15 +16,7 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import static com.cisco.cta.taxii.adapter.IsEventContaining.verifyLog;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.only;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-
-import java.io.Writer;
-
+import ch.qos.logback.core.Appender;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -32,9 +24,16 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.core.Appender;
 import org.slf4j.MDC;
+
+import java.io.Writer;
+
+import static com.cisco.cta.taxii.adapter.IsEventContaining.verifyLog;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.only;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class Slf4JWriterTest {
@@ -43,7 +42,7 @@ public class Slf4JWriterTest {
     private Logger logger;
 
     private Writer writer;
-    
+
     @Spy
     private AdapterStatistics statistics = new AdapterStatistics();
 
@@ -61,8 +60,8 @@ public class Slf4JWriterTest {
     public void doNotWriteUnfinishedLine() throws Exception {
         char[] chars = "PAYLOAD".toCharArray();
         writer.write(chars);
-        verifyZeroInteractions(logger);
-        verifyZeroInteractions(statistics);
+        verifyNoInteractions(logger);
+        verifyNoInteractions(statistics);
         writer.close();
     }
 
@@ -104,8 +103,8 @@ public class Slf4JWriterTest {
     @Test
     public void flushDoesNothing() throws Exception {
         writer.flush();
-        verifyZeroInteractions(logger);
-        verifyZeroInteractions(statistics);
+        verifyNoInteractions(logger);
+        verifyNoInteractions(statistics);
         writer.close();
     }
 

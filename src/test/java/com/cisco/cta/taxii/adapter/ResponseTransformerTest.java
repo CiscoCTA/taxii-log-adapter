@@ -37,9 +37,9 @@ import java.io.InputStream;
 import java.io.Writer;
 
 import static org.mockito.Answers.RETURNS_MOCKS;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class ResponseTransformerTest {
@@ -97,16 +97,16 @@ public class ResponseTransformerTest {
         when(responseReader.isPollResponse()).thenReturn(false);
         responseTransformer.transform(resp);
         verify(transformer).transform(isExpectedXmlSource(), isExpectedOutputTarget());
-        verifyZeroInteractions(taxiiStatusDao);
+        verifyNoInteractions(taxiiStatusDao);
     }
 
     @Test(expected=IOException.class)
     public void reportErrorHttpStatus() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(300);
         responseTransformer.transform(resp);
-        verifyZeroInteractions(readerFactory);
-        verifyZeroInteractions(templates);
-        verifyZeroInteractions(taxiiStatusDao);
+        verifyNoInteractions(readerFactory);
+        verifyNoInteractions(templates);
+        verifyNoInteractions(taxiiStatusDao);
     }
 
     private Source isExpectedXmlSource() {

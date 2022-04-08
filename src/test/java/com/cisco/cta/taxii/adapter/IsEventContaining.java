@@ -16,15 +16,13 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.atLeastOnce;
-
-import org.hamcrest.Description;
-import org.mockito.ArgumentMatcher;
-
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
+import org.mockito.ArgumentMatcher;
+
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.atLeastOnce;
 
 
 public class IsEventContaining implements ArgumentMatcher<ILoggingEvent> {

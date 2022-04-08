@@ -22,17 +22,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.ByteArrayOutputStream;
 
+import static com.cisco.cta.taxii.adapter.PollFulfillmentMatcher.pollFulfillment;
 import static com.cisco.cta.taxii.adapter.PollRequestMatcher.initialPollRequest;
 import static com.cisco.cta.taxii.adapter.PollRequestMatcher.nextPollRequest;
-import static com.cisco.cta.taxii.adapter.PollFulfillmentMatcher.pollFulfillment;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)

@@ -37,7 +37,7 @@ public class SimpleFileHandlerTest {
     @Before
     public void setUp() throws Exception {
         file = new File("target/SimpleFileHandlerTest.data");
-        PersistenceConfiguration factory = new PersistenceConfiguration();
+        CommonPersistenceConfiguration factory = new CommonPersistenceConfiguration();
         handler = new SimpleFileHandler(file, factory.taxiiStatusMarshaller());
     }
 

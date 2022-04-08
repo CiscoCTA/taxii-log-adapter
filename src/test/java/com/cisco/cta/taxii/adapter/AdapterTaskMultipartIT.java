@@ -47,7 +47,7 @@ import static com.cisco.cta.taxii.adapter.PollFulfillmentMatcher.pollFulfillment
 import static com.cisco.cta.taxii.adapter.PollRequestMatcher.initialPollRequest;
 import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -136,7 +136,8 @@ public class AdapterTaskMultipartIT {
         assertThat(statistics.getLogs(), is(2L));
         assertThat(statistics.getErrors(), is(0L));
         assertThat(OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
-                FileUtils.readFileToString(OUTPUT_FILE), is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE)));
+                FileUtils.readFileToString(OUTPUT_FILE), is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE))
+        );
     }
 
     private void initialMultipartRequestResponse() throws IOException {

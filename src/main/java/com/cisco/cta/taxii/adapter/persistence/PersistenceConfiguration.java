@@ -16,12 +16,10 @@
 
 package com.cisco.cta.taxii.adapter.persistence;
 
-import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
@@ -31,7 +29,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 @Configuration
 @Import({LinuxPersistenceConfiguration.class, WindowsPersistenceConfiguration.class})
 public class PersistenceConfiguration {
-
     @Autowired
     private TaxiiStatusFileHandler taxiiStatusFileHandler;
 
@@ -39,14 +36,4 @@ public class PersistenceConfiguration {
     public TaxiiStatusDao taxiiStatusDao() throws DatatypeConfigurationException {
         return new TaxiiStatusDao(taxiiStatusFileHandler);
     }
-
-    @Bean
-    public Jaxb2Marshaller taxiiStatusMarshaller() {
-        Jaxb2Marshaller jaxb2Marshaller = new Jaxb2Marshaller();
-        jaxb2Marshaller.setClassesToBeBound(TaxiiStatus.class);
-        jaxb2Marshaller.setMarshallerProperties(ImmutableMap.of(
-                javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true));
-        return jaxb2Marshaller;
-    }
-
 }

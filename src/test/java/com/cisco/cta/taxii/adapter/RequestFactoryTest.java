@@ -42,8 +42,6 @@ import static org.mockito.Mockito.when;
 public class RequestFactoryTest {
 
     private RequestFactory requestFactory;
-    private URL pollEndpoint;
-    private HttpHeadersAppender headersAppender;
     private HttpHeaders headers;
 
     @Mock
@@ -62,9 +60,9 @@ public class RequestFactoryTest {
 
     @Before
     public void setUp() throws Exception {
-        pollEndpoint = new URL("http://somehost/service");
+        URL pollEndpoint = new URL("http://somehost/service");
         headers = new HttpHeaders();
-        headersAppender = new HttpHeadersAppender();
+        HttpHeadersAppender headersAppender = new HttpHeadersAppender();
         initMocks();
         requestFactory = new RequestFactory(pollEndpoint, httpRequestFactory, headersAppender, bodyWriter);
         feed = new TaxiiStatus.Feed();

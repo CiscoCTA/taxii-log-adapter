@@ -16,12 +16,10 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.client.ClientHttpResponse;
@@ -62,17 +60,15 @@ public class ResponseTransformerTest {
 
     @Mock
     private ClientHttpResponse resp;
-    
+
     @Mock
     private InputStream body;
-    
+
     @Mock
     private Transformer transformer;
 
-    @Mock(answer=RETURNS_MOCKS)
+    @Mock(answer = RETURNS_MOCKS)
     private TaxiiPollResponseReader responseReader;
-
-    private TaxiiStatus.Feed feed;
 
     @Before
     public void setUp() throws Exception {
@@ -81,8 +77,6 @@ public class ResponseTransformerTest {
         when(readerFactory.create(body)).thenReturn(responseReader);
         when(responseReader.getEventType()).thenReturn(XMLStreamConstants.START_DOCUMENT);
         responseTransformer = new ResponseTransformer(templates, logWriter, readerFactory);
-        feed = new TaxiiStatus.Feed();
-        feed.setName("my-feed");
     }
 
     @Test
@@ -100,7 +94,7 @@ public class ResponseTransformerTest {
         verifyNoInteractions(taxiiStatusDao);
     }
 
-    @Test(expected=IOException.class)
+    @Test(expected = IOException.class)
     public void reportErrorHttpStatus() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(300);
         responseTransformer.transform(resp);
@@ -110,30 +104,17 @@ public class ResponseTransformerTest {
     }
 
     private Source isExpectedXmlSource() {
-        return argThat(new StaxSourceWrappingBodyReader());
-    }
-
-    private class StaxSourceWrappingBodyReader implements ArgumentMatcher<Source>{
-
-        @Override
-        public boolean matches(Source argument) {
+        return argThat(argument -> {
             StAXSource source = (StAXSource) argument;
             TaxiiPollResponseReader sourceReader = (TaxiiPollResponseReader) source.getXMLStreamReader();
-            return sourceReader == responseReader;
-        }
-        
+            return sourceReader.equals(responseReader);
+        });
     }
 
     private Result isExpectedOutputTarget() {
-        return argThat(new StreamResultWrappingLogWriter());
-    }
-
-    private class StreamResultWrappingLogWriter implements ArgumentMatcher<Result>{
-
-        @Override
-        public boolean matches(Result argument) {
+        return argThat(argument -> {
             StreamResult result = (StreamResult) argument;
-            return result.getWriter() == logWriter;
-        }
+            return result.getWriter().equals(logWriter);
+        });
     }
 }

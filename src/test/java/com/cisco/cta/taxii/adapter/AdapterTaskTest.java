@@ -54,16 +54,16 @@ import static org.mockito.Mockito.when;
 public class AdapterTaskTest {
 
     private Runnable task;
-    
+
     @Mock(answer = Answers.RETURNS_MOCKS)
     private RequestFactory requestFactory;
 
     @Mock(answer = Answers.RETURNS_MOCKS)
     private ClientHttpRequest request;
-    
+
     @Mock
     private ClientHttpResponse response;
-    
+
     @Mock
     private ResponseTransformer responseTransformer;
 
@@ -84,15 +84,15 @@ public class AdapterTaskTest {
     private TaxiiStatus.Feed feed;
 
 
-   @Before
+    @Before
     public void setUp() throws Exception {
-       datatypeFactory = DatatypeFactory.newInstance();
-       ((Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
-       when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
-       task = new AdapterTask(requestFactory, responseTransformer, settings, statistics, taxiiStatusDao);
-       when(requestFactory.createPollRequest(anyString(), any(TaxiiStatus.Feed.class))).thenReturn(request);
-       feed = new TaxiiStatus.Feed();
-       feed.setName("my-collection");
+        datatypeFactory = DatatypeFactory.newInstance();
+        ((Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
+        when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
+        task = new AdapterTask(requestFactory, responseTransformer, settings, statistics, taxiiStatusDao);
+        when(requestFactory.createPollRequest(anyString(), any(TaxiiStatus.Feed.class))).thenReturn(request);
+        feed = new TaxiiStatus.Feed();
+        feed.setName("my-collection");
     }
 
     @Test
@@ -118,10 +118,10 @@ public class AdapterTaskTest {
         TaxiiPollResponse secondResponse = TaxiiPollResponse.builder().more(false).resultPartNumber(2).inclusiveEndTime(cal2).build();
         when(responseTransformer.transform(any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
         when(requestFactory.createFulfillmentRequest(anyString(), any(TaxiiStatus.Feed.class), anyString(), anyInt())).thenReturn(request);
-        TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
-        feed.setLastUpdate(cal);
-        feed.setResultPartNumber(1);
-        when(taxiiStatusDao.find("my-collection")).thenReturn(null, feed);
+        TaxiiStatus.Feed feed2 = new TaxiiStatus.Feed();
+        feed2.setLastUpdate(cal);
+        feed2.setResultPartNumber(1);
+        when(taxiiStatusDao.find("my-collection")).thenReturn(null, feed2);
         task.run();
         verify(responseTransformer, times(2)).transform(any(ClientHttpResponse.class));
         verify(requestFactory).createPollRequest(anyString(), any(TaxiiStatus.Feed.class));
@@ -133,7 +133,7 @@ public class AdapterTaskTest {
     public void doNotWriteLastUpdateIfMultipartFails() throws Exception {
         XMLGregorianCalendar cal = datatypeFactory.newXMLGregorianCalendar("2000-01-02T03:04:05.006+00:00");
         TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().more(true).resultPartNumber(1).inclusiveEndTime(cal).build();
-        when(responseTransformer.transform(any(ClientHttpResponse.class))).thenReturn(firstResponse).thenThrow(new Exception());
+        when(responseTransformer.transform(any(ClientHttpResponse.class))).thenReturn(firstResponse).thenThrow(new Exception("broken"));
         task.run();
         TaxiiStatus.Feed expectedFeed = new TaxiiStatus.Feed();
         expectedFeed.setName("my-collection");
@@ -182,7 +182,7 @@ public class AdapterTaskTest {
         doThrow(new Exception("Dummy response")).when(responseTransformer).transform(response);
         task.run();
         verify(requestFactory).createPollRequest(anyString(), any(TaxiiStatus.Feed.class));
-                verify(request).execute();
+        verify(request).execute();
         verifyLog(mockAppender, "Error");
         assertThat(statistics.getPolls(), is(1L));
         assertThat(statistics.getErrors(), is(1L));
@@ -191,16 +191,16 @@ public class AdapterTaskTest {
     @Test
     public void exceedMaxConnectionAttempts() throws Exception {
         when(request.execute()).thenThrow(new ConnectTimeoutException("error"));
-        TaxiiStatus.Feed feed = new TaxiiStatus.Feed();
-        when(taxiiStatusDao.find("my-collection")).thenReturn(feed);
+        TaxiiStatus.Feed anotherFeed = new TaxiiStatus.Feed();
+        when(taxiiStatusDao.find("my-collection")).thenReturn(anotherFeed);
         task.run();
-        assertThat(feed.getIoErrorCount(), is(1));
+        assertThat(anotherFeed.getIoErrorCount(), is(1));
         task.run();
-        assertThat(feed.getIoErrorCount(), is(2));
+        assertThat(anotherFeed.getIoErrorCount(), is(2));
         verifyLog(mockAppender, "HTTP connection problem");
         assertThat(statistics.getErrors(), is(0L));
         task.run();
-        assertThat(feed.getIoErrorCount(), is(3));
+        assertThat(anotherFeed.getIoErrorCount(), is(3));
         verifyLog(mockAppender, "Error");
         assertThat(statistics.getErrors(), is(1L));
     }

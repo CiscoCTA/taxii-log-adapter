@@ -51,7 +51,10 @@ import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.joran.spi.JoranException;
 
 
-@ContextConfiguration(classes = {SmokeTestConfiguration.class}, initializers = YamlFileApplicationContextInitializer.class)
+@ContextConfiguration(
+        classes = SmokeTestConfiguration.class,
+        initializers = YamlFileApplicationContextInitializer.class
+)
 @ActiveProfiles("smoketest")
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -65,7 +68,7 @@ public class SmokeTestLifecycleTest {
 
     private Logger logger;
     private Appender<ILoggingEvent> appender;
-    LoggerContext loggerContext;
+    private LoggerContext loggerContext;
 
     @Before
     @SuppressWarnings("unchecked")
@@ -113,7 +116,7 @@ public class SmokeTestLifecycleTest {
         verify(appender).doAppend(argThat(containsMessage("Error in logback.xml, no appender-ref is declared")));
     }
 
-    private void loadLogConfig(String resource) throws JoranException, Exception, IOException {
+    private void loadLogConfig(String resource) throws Exception {
         try (InputStream in = SmokeTestLifecycleTest.class.getResourceAsStream(resource)) {
             loggerContext.stop();
             JoranConfigurator logConfigurator = new JoranConfigurator();

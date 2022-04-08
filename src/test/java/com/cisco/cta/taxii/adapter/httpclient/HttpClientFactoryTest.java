@@ -22,8 +22,10 @@ import com.cisco.cta.taxii.adapter.settings.ProxySettings;
 import org.apache.http.client.HttpClient;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,6 +33,7 @@ import java.net.URL;
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class HttpClientFactoryTest {
 
     @Mock
@@ -40,7 +43,6 @@ public class HttpClientFactoryTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         httpClientFactory = new HttpClientFactory(proxySettings);
     }
 

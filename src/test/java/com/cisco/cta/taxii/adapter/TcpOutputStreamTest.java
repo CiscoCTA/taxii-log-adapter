@@ -17,19 +17,17 @@
 package com.cisco.cta.taxii.adapter;
 
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
-
-import java.io.OutputStreamWriter;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.cisco.cta.taxii.adapter.TcpOutputStream;
+import java.io.OutputStreamWriter;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TcpOutputStreamTest {
-    
+
     private TcpOutputStream out;
     private TcpServer tcpServer;
 
@@ -45,12 +43,12 @@ public class TcpOutputStreamTest {
         tcpServer.close();
     }
 
-    @Test(timeout=5000)
+    @Test(timeout = 5000)
     public void sendMessage() throws Exception {
         try (OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8")) {
             writer.append("Hello TCP!");
         }
-        while(tcpServer.getConnectionCount() == 0) {
+        while (tcpServer.getConnectionCount() == 0) {
             Thread.sleep(10);
         }
         assertThat(tcpServer.getErrorCount(), is(0));
@@ -64,7 +62,7 @@ public class TcpOutputStreamTest {
             writer.flush();
             writer.append("Beta");
         }
-        while(tcpServer.getConnectionCount() < 2) {
+        while (tcpServer.getConnectionCount() < 2) {
             Thread.sleep(10);
         }
         assertThat(tcpServer.getErrorCount(), is(0));

@@ -25,6 +25,7 @@ import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,7 +38,7 @@ public class JsonValidationFilterTest {
 
     private String readFirstLine(String resource) throws IOException {
         try(InputStream istream = getClass().getResourceAsStream(resource)) {
-            List<String> lines = IOUtils.readLines(istream);
+            List<String> lines = IOUtils.readLines(istream, StandardCharsets.UTF_8);
             return lines.get(0);
         }
     }

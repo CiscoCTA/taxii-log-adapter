@@ -17,20 +17,16 @@
 package com.cisco.cta.taxii.adapter;
 
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.io.InputStream;
-
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.stream.XMLInputFactory;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.cisco.cta.taxii.adapter.TaxiiPollResponseReader;
-import com.cisco.cta.taxii.adapter.TaxiiPollResponseReaderFactory;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.stream.XMLInputFactory;
+import java.io.InputStream;
+
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TaxiiPollResponseReaderFactoryTest {
 

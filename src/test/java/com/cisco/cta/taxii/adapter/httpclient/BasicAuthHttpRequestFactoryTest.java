@@ -19,7 +19,6 @@ package com.cisco.cta.taxii.adapter.httpclient;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.core.Appender;
-import com.cisco.cta.taxii.adapter.settings.ProxySettings;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettingsFactory;
 import org.apache.http.client.CredentialsProvider;
@@ -29,9 +28,10 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
@@ -43,12 +43,11 @@ import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
 
 import static com.cisco.cta.taxii.adapter.IsEventContaining.verifyLog;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
 
-
+@RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("all")
 public class BasicAuthHttpRequestFactoryTest {
 
@@ -67,8 +66,6 @@ public class BasicAuthHttpRequestFactoryTest {
         connSettings = TaxiiServiceSettingsFactory.createDefaults();
         credentialsProvider = Mockito.mock(CredentialsProvider.class);
         factory = new BasicAuthHttpRequestFactory(httpClient, connSettings, credentialsProvider);
-        MockitoAnnotations.initMocks(this);
-        when(mockAppender.getName()).thenReturn("MOCK");
         Logger authCacheLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(RequestAuthCache.class.getCanonicalName());
         authCacheLogger.setLevel(Level.DEBUG);
         authCacheLogger.addAppender(mockAppender);

@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import com.cisco.cta.taxii.adapter.YamlFileApplicationContextInitializer;
 import org.apache.commons.io.FileUtils;
@@ -126,8 +127,11 @@ public class SmokeTestLifecycleTest {
     @Test
     public void writeTestIncident() throws Exception {
         smokeTestLifecycle.sendTestIncident();
-        assertThat(OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
-                FileUtils.readFileToString(OUTPUT_FILE), is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE)));
+        assertThat(
+                OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
+                FileUtils.readFileToString(OUTPUT_FILE, StandardCharsets.UTF_8),
+                is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE, StandardCharsets.UTF_8))
+        );
         verify(appender).doAppend(argThat(containsMessage("Please manually validate the result in your target system.")));
     }
 }

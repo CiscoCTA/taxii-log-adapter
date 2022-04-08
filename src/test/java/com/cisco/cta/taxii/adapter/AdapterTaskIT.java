@@ -45,19 +45,22 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import static com.cisco.cta.taxii.adapter.PollRequestMatcher.initialPollRequest;
 import static com.cisco.cta.taxii.adapter.PollRequestMatcher.nextPollRequest;
 import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 @ContextConfiguration(
-    classes = MockAdapterConfiguration.class,
-    initializers = {YamlFileApplicationContextInitializer.class, StatusFileContextInitializer.class})
+        classes = MockAdapterConfiguration.class,
+        initializers = {YamlFileApplicationContextInitializer.class, StatusFileContextInitializer.class})
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AdapterTaskIT {
@@ -68,7 +71,7 @@ public class AdapterTaskIT {
     @Autowired
     @Qualifier("adapterTask")
     private Runnable task;
-    
+
     @Autowired
     private ClientHttpRequestFactory httpRequestFactory;
 
@@ -84,7 +87,7 @@ public class AdapterTaskIT {
 
     @Autowired
     private Unmarshaller taxiiRequestMarshaller;
-    
+
     private InputStream taxiiPollRespBodyInitial;
     private InputStream taxiiPollRespBodyNext;
     private InputStream taxiiStatusMsgBody;
@@ -95,10 +98,12 @@ public class AdapterTaskIT {
     @Autowired
     private AdapterStatistics statistics;
 
+    private AutoCloseable openMocks;
+
     @Before
     public void setUp() throws Exception {
         initLogbackOutput();
-        MockitoAnnotations.initMocks(this);
+        openMocks = MockitoAnnotations.openMocks(this);
         pollServiceUri = new URI("https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/");
         when(httpRequestFactory.createRequest(pollServiceUri, HttpMethod.POST)).thenReturn(httpReq);
         httpReqHeaders = new HttpHeaders();
@@ -128,6 +133,7 @@ public class AdapterTaskIT {
         taxiiPollRespBodyInitial.close();
         taxiiPollRespBodyNext.close();
         taxiiStatusMsgBody.close();
+        openMocks.close();
     }
 
     @Test
@@ -137,8 +143,11 @@ public class AdapterTaskIT {
         assertThat(statistics.getPolls(), is(2L));
         assertThat(statistics.getLogs(), is(2L));
         assertThat(statistics.getErrors(), is(0L));
-        assertThat(OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
-                FileUtils.readFileToString(OUTPUT_FILE), is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE)));
+        assertThat(
+                OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
+                FileUtils.readFileToString(OUTPUT_FILE, StandardCharsets.UTF_8),
+                is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE, StandardCharsets.UTF_8))
+        );
     }
 
     @Test
@@ -151,7 +160,8 @@ public class AdapterTaskIT {
         assertThat(statistics.getErrors(), is(1L));
         assertTrue(
                 OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
-                FileUtils.contentEquals(OUTPUT_FILE, EXPECTED_OUTPUT_FILE));
+                FileUtils.contentEquals(OUTPUT_FILE, EXPECTED_OUTPUT_FILE)
+        );
     }
 
     private void initialRequestResponse() throws IOException {
@@ -172,9 +182,11 @@ public class AdapterTaskIT {
         verify(httpRequestFactory, times(count)).createRequest(pollServiceUri, HttpMethod.POST);
         verify(httpReq, times(count)).execute();
         assertThat(httpReqHeaders, hasAllTaxiiHeaders());
-        assertThat(httpReqBody, is(nextPollRequest("123",
+        assertThat(httpReqBody, is(nextPollRequest(
+                "123",
                 "collection_name",
-                "2000-12-24T01:02:03.004+01:00")));
+                "2000-12-24T01:02:03.004+01:00"
+        )));
         httpReqBody.reset();
     }
 
@@ -185,9 +197,11 @@ public class AdapterTaskIT {
         verify(httpRequestFactory, times(count)).createRequest(pollServiceUri, HttpMethod.POST);
         verify(httpReq, times(count)).execute();
         assertThat(httpReqHeaders, hasAllTaxiiHeaders());
-        assertThat(httpReqBody, is(nextPollRequest("123",
+        assertThat(httpReqBody, is(nextPollRequest(
+                "123",
                 "collection_name",
-                "2000-12-24T01:02:03.004+01:00")));
+                "2000-12-24T01:02:03.004+01:00"
+        )));
         httpReqBody.reset();
     }
 

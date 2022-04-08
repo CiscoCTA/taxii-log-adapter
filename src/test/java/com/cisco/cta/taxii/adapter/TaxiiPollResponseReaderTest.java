@@ -17,26 +17,23 @@
 package com.cisco.cta.taxii.adapter;
 
 
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.cisco.cta.taxii.adapter.TaxiiPollResponseReader;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class TaxiiPollResponseReaderTest {
 
@@ -94,7 +91,7 @@ public class TaxiiPollResponseReaderTest {
         assertThat(reader.getResponse().getInclusiveEndTime(), is(nullValue()));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void errorOnInvalidInclusiveEndTime() throws Exception {
         Reader in = new StringReader("<Poll_Response xmlns=\"http://taxii.mitre.org/messages/taxii_xml_binding-1.1\"><Inclusive_End_Timestamp>INVALID</Inclusive_End_Timestamp></Poll_Response>");
         XMLStreamReader xmlReader = inputFactory.createXMLStreamReader(in);
@@ -102,7 +99,7 @@ public class TaxiiPollResponseReaderTest {
         readFully(reader);
     }
 
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void errorOnUnexpectedElementInInclusiveEndTime() throws Exception {
         Reader in = new StringReader("<Poll_Response xmlns=\"http://taxii.mitre.org/messages/taxii_xml_binding-1.1\"><Inclusive_End_Timestamp><UNEXPECTED/></Inclusive_End_Timestamp></Poll_Response>");
         XMLStreamReader xmlReader = inputFactory.createXMLStreamReader(in);

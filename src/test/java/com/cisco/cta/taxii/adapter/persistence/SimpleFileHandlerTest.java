@@ -15,18 +15,17 @@
 */
 package com.cisco.cta.taxii.adapter.persistence;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.*;
-
-import java.io.File;
-
-import javax.xml.datatype.DatatypeFactory;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.xml.datatype.DatatypeFactory;
+import java.io.File;
+
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 
 public class SimpleFileHandlerTest {
@@ -50,7 +49,7 @@ public class SimpleFileHandlerTest {
         feed.setLastUpdate(DatatypeFactory.newInstance().newXMLGregorianCalendar("2000-01-02T03:04:05.006+07:00"));
         writeRoot.getFeed().add(feed);
         handler.save(writeRoot);
-        
+
         //read
         TaxiiStatus readRoot = handler.load();
         assertThat(writeRoot, not(sameInstance(readRoot)));

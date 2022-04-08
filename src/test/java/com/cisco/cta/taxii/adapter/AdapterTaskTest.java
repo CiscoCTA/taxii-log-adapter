@@ -25,12 +25,9 @@ import com.google.common.collect.ImmutableList;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Answers;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.junit.runner.RunWith;
+import org.mockito.*;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
@@ -52,7 +49,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-
+@RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class AdapterTaskTest {
 
@@ -90,7 +87,6 @@ public class AdapterTaskTest {
    @Before
     public void setUp() throws Exception {
        datatypeFactory = DatatypeFactory.newInstance();
-       MockitoAnnotations.initMocks(this);
        ((Logger) LoggerFactory.getLogger(AdapterTask.class)).addAppender(mockAppender);
        when(settings.getFeeds()).thenReturn(ImmutableList.of("my-collection"));
        task = new AdapterTask(requestFactory, responseTransformer, settings, statistics, taxiiStatusDao);
@@ -137,7 +133,6 @@ public class AdapterTaskTest {
     public void doNotWriteLastUpdateIfMultipartFails() throws Exception {
         XMLGregorianCalendar cal = datatypeFactory.newXMLGregorianCalendar("2000-01-02T03:04:05.006+00:00");
         TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().more(true).resultPartNumber(1).inclusiveEndTime(cal).build();
-        when(requestFactory.createFulfillmentRequest(anyString(), any(TaxiiStatus.Feed.class), anyString(), anyInt())).thenReturn(request);
         when(responseTransformer.transform(any(ClientHttpResponse.class))).thenReturn(firstResponse).thenThrow(new Exception());
         task.run();
         TaxiiStatus.Feed expectedFeed = new TaxiiStatus.Feed();
@@ -152,7 +147,6 @@ public class AdapterTaskTest {
         TaxiiPollResponse firstResponse = TaxiiPollResponse.builder().more(true).resultId("123#456").resultPartNumber(1).inclusiveEndTime(cal).build();
         XMLGregorianCalendar cal2 = datatypeFactory.newXMLGregorianCalendar("2000-01-10T03:04:06.006+00:00");
         TaxiiPollResponse secondResponse = TaxiiPollResponse.builder().more(false).resultId("123#456").resultPartNumber(2).inclusiveEndTime(cal2).build();
-        when(requestFactory.createFulfillmentRequest(anyString(), any(TaxiiStatus.Feed.class), anyString(), anyInt())).thenReturn(request);
         when(responseTransformer.transform(any(ClientHttpResponse.class))).thenReturn(firstResponse, secondResponse);
         TaxiiStatus.Feed feedMock = mock(TaxiiStatus.Feed.class);
         when(taxiiStatusDao.find("my-collection")).thenReturn(feedMock);

@@ -16,11 +16,6 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-
-import java.io.File;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -28,9 +23,15 @@ import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.Environment;
 
+import java.io.File;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
+
 
 public class AdapterRunnerTest {
-    
+
     private static final File PID_FILE = new File("application.pid");
 
     private static final int RUNNING = -1_000_000;
@@ -40,7 +41,7 @@ public class AdapterRunnerTest {
     @Before
     public void setUp() throws Throwable {
         FileUtils.deleteQuietly(PID_FILE);
-        String[] args = new String[] {"--foo.param=argument-value"};
+        String[] args = {"--foo.param=argument-value"};
         AdapterRunner.main(args);
         exitCode = RUNNING;
     }

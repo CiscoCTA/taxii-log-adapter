@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import static com.cisco.cta.taxii.adapter.PollFulfillmentMatcher.pollFulfillment;
 import static com.cisco.cta.taxii.adapter.PollRequestMatcher.initialPollRequest;
@@ -89,11 +90,12 @@ public class AdapterTaskMultipartIT {
 
     @Autowired
     private AdapterStatistics statistics;
+    private AutoCloseable openMocks;
 
     @Before
     public void setUp() throws Exception {
         initLogbackOutput();
-        MockitoAnnotations.initMocks(this);
+        openMocks = MockitoAnnotations.openMocks(this);
         pollServiceUri = new URI("https://taxii.cloudsec.sco.cisco.com/skym-taxii-ws/PollService/");
         when(httpRequestFactory.createRequest(pollServiceUri, HttpMethod.POST)).thenReturn(httpReq, httpReq2);
         httpReqHeaders = new HttpHeaders();
@@ -127,6 +129,7 @@ public class AdapterTaskMultipartIT {
     public void tearDown() throws Exception {
         taxiiPollRespBodyInitial.close();
         taxiiPollRespBodyNext.close();
+        openMocks.close();
     }
 
     @Test
@@ -135,8 +138,10 @@ public class AdapterTaskMultipartIT {
         assertThat(statistics.getPolls(), is(2L));
         assertThat(statistics.getLogs(), is(2L));
         assertThat(statistics.getErrors(), is(0L));
-        assertThat(OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
-                FileUtils.readFileToString(OUTPUT_FILE), is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE))
+        assertThat(
+                OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
+                FileUtils.readFileToString(OUTPUT_FILE, StandardCharsets.UTF_8),
+                is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE, StandardCharsets.UTF_8))
         );
     }
 

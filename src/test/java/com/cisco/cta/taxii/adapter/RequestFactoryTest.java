@@ -21,8 +21,9 @@ import com.cisco.cta.taxii.adapter.httpclient.HttpHeadersAppender;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
@@ -33,11 +34,11 @@ import java.net.URI;
 import java.net.URL;
 
 import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class RequestFactoryTest {
 
     private RequestFactory requestFactory;
@@ -71,7 +72,6 @@ public class RequestFactoryTest {
     }
 
     private void initMocks() throws Exception {
-        MockitoAnnotations.initMocks(this);
         when(httpRequestFactory
             .createRequest(
                 new URI("http://somehost/service"),

@@ -16,11 +16,8 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.io.StringReader;
-import java.io.StringWriter;
+import org.junit.Before;
+import org.junit.Test;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -28,12 +25,14 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import java.io.StringReader;
+import java.io.StringWriter;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class XslVersionTest {
-    
+
     private Source xsltSource;
     private Source dummyXmlSource;
 

@@ -17,16 +17,14 @@
 package com.cisco.cta.taxii.adapter;
 
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 
-import com.cisco.cta.taxii.adapter.AdapterStatistics;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class AdapterStatisticsTest {
-    
+
     private AdapterStatistics statistics;
 
     @Before

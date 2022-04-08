@@ -20,9 +20,10 @@ import com.cisco.cta.taxii.adapter.persistence.TaxiiStatus;
 import com.cisco.cta.taxii.adapter.persistence.TaxiiStatusDao;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.client.ClientHttpResponse;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ResponseTransformerTest {
 
     private ResponseTransformer responseTransformer;
@@ -74,7 +76,6 @@ public class ResponseTransformerTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         when(resp.getBody()).thenReturn(body);
         when(templates.newTransformer()).thenReturn(transformer);
         when(readerFactory.create(body)).thenReturn(responseReader);
@@ -94,7 +95,6 @@ public class ResponseTransformerTest {
     @Test
     public void handleNonPollResponseMessage() throws Exception {
         when(resp.getRawStatusCode()).thenReturn(200);
-        when(responseReader.isPollResponse()).thenReturn(false);
         responseTransformer.transform(resp);
         verify(transformer).transform(isExpectedXmlSource(), isExpectedOutputTarget());
         verifyNoInteractions(taxiiStatusDao);

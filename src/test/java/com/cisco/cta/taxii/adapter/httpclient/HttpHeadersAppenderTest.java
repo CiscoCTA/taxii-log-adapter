@@ -16,15 +16,13 @@
 
 package com.cisco.cta.taxii.adapter.httpclient;
 
-import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
-import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasUserAgentHeader;
-import static org.junit.Assert.assertThat;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
 
-import com.cisco.cta.taxii.adapter.httpclient.HttpHeadersAppender;
+import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasAllTaxiiHeaders;
+import static com.cisco.cta.taxii.adapter.httpclient.HasHeaderMatcher.hasUserAgentHeader;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class HttpHeadersAppenderTest {
 

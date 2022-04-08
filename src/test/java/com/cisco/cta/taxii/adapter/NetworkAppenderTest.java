@@ -17,23 +17,21 @@
 package com.cisco.cta.taxii.adapter;
 
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import com.cisco.cta.taxii.adapter.NetworkAppender.Protocol;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.cisco.cta.taxii.adapter.NetworkAppender.Protocol;
-
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.spi.ILoggingEvent;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class NetworkAppenderTest {
-    
+
     private NetworkAppender appender;
 
     @Before
@@ -54,7 +52,7 @@ public class NetworkAppenderTest {
         assertTrue(appender.isStarted());
     }
 
-    @Test(timeout=5000)
+    @Test(timeout = 5000)
     public void sendViaUdp() throws Exception {
         try (DatagramServer datagramServer = new DatagramServer()) {
             datagramServer.start();
@@ -64,7 +62,7 @@ public class NetworkAppenderTest {
             ILoggingEvent event = mock(ILoggingEvent.class);
             when(event.getFormattedMessage()).thenReturn("Hello message!");
             appender.doAppend(event);
-            while(datagramServer.getDatagramCount() == 0) {
+            while (datagramServer.getDatagramCount() == 0) {
                 Thread.sleep(10);
             }
             assertThat(datagramServer.getErrorCount(), is(0));
@@ -72,7 +70,7 @@ public class NetworkAppenderTest {
         }
     }
 
-    @Test(timeout=5000)
+    @Test(timeout = 5000)
     public void sendViaTcp() throws Exception {
         try (TcpServer tcpServer = new TcpServer()) {
             tcpServer.start();
@@ -82,7 +80,7 @@ public class NetworkAppenderTest {
             ILoggingEvent event = mock(ILoggingEvent.class);
             when(event.getFormattedMessage()).thenReturn("Hello message!");
             appender.doAppend(event);
-            while(tcpServer.getConnectionCount() == 0) {
+            while (tcpServer.getConnectionCount() == 0) {
                 Thread.sleep(10);
             }
             assertThat(tcpServer.getErrorCount(), is(0));

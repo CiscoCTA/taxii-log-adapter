@@ -15,23 +15,24 @@
 */
 package com.cisco.cta.taxii.adapter.settings;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.verify;
-
-import java.io.PrintStream;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.context.properties.bind.validation.BindValidationException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.NestedRuntimeException;
 
-import static com.cisco.cta.taxii.adapter.settings.PropertySourceHelper.*;
+import java.io.PrintStream;
 
+import static com.cisco.cta.taxii.adapter.settings.PropertySourceHelper.exclude;
+import static com.cisco.cta.taxii.adapter.settings.PropertySourceHelper.validProperties;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.verify;
 
+@RunWith(MockitoJUnitRunner.class)
 public class BindExceptionHandlerTest {
 
     private BindExceptionHandler handler;
@@ -41,7 +42,6 @@ public class BindExceptionHandlerTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         handler = new BindExceptionHandler(err);
     }
 

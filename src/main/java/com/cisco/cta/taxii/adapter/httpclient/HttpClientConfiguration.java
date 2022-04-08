@@ -35,9 +35,6 @@ public class HttpClientConfiguration {
     private TaxiiServiceSettings taxiiServiceSettings;
 
     @Autowired
-    private TaxiiStatusDao taxiiStatusDao;
-
-    @Autowired
     private ProxySettings proxySettings;
 
     @Bean

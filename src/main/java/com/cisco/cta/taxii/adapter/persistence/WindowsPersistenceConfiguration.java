@@ -27,12 +27,14 @@ import com.cisco.cta.taxii.adapter.WindowsCondition;
 import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+
 /**
  * Unix/Linux specific part of the {@link PersistenceConfiguration}.
  */
 @Configuration
 @Conditional(WindowsCondition.class)
-@Import(SettingsConfiguration.class)
+@Import({SettingsConfiguration.class, CommonPersistenceConfiguration.class})
 public class WindowsPersistenceConfiguration {
 
     @Autowired
@@ -42,8 +44,7 @@ public class WindowsPersistenceConfiguration {
     private Jaxb2Marshaller taxiiStatusMarshaller;
     
     @Bean
-    public TaxiiStatusFileHandler simpleFileHandler() {
+    public TaxiiStatusFileHandler taxiiStatusFileHandler() {
         return new SimpleFileHandler(taxiiServiceSettings.getStatusFile(), taxiiStatusMarshaller);
     }
-
 }

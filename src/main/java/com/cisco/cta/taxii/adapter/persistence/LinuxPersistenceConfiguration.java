@@ -29,12 +29,14 @@ import com.cisco.cta.taxii.adapter.NonWindowsCondition;
 import com.cisco.cta.taxii.adapter.settings.SettingsConfiguration;
 import com.cisco.cta.taxii.adapter.settings.TaxiiServiceSettings;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+
 /**
  * Unix/Linux specific part of the {@link PersistenceConfiguration}.
  */
 @Configuration
 @Conditional(NonWindowsCondition.class)
-@Import(SettingsConfiguration.class)
+@Import({SettingsConfiguration.class, CommonPersistenceConfiguration.class})
 public class LinuxPersistenceConfiguration {
 
     @Autowired

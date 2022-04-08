@@ -16,21 +16,20 @@
 
 package com.cisco.cta.taxii.adapter;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.StartElement;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class PollRequestMatcher extends TypeSafeDiagnosingMatcher<ByteArrayOutputStream> {
 

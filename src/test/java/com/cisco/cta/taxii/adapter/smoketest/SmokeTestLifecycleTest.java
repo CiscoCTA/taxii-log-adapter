@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import com.cisco.cta.taxii.adapter.YamlFileApplicationContextInitializer;
 import org.apache.commons.io.FileUtils;
@@ -50,7 +51,10 @@ import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.joran.spi.JoranException;
 
 
-@ContextConfiguration(classes = {SmokeTestConfiguration.class}, initializers = YamlFileApplicationContextInitializer.class)
+@ContextConfiguration(
+        classes = SmokeTestConfiguration.class,
+        initializers = YamlFileApplicationContextInitializer.class
+)
 @ActiveProfiles("smoketest")
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -64,7 +68,7 @@ public class SmokeTestLifecycleTest {
 
     private Logger logger;
     private Appender<ILoggingEvent> appender;
-    LoggerContext loggerContext;
+    private LoggerContext loggerContext;
 
     @Before
     @SuppressWarnings("unchecked")
@@ -112,7 +116,7 @@ public class SmokeTestLifecycleTest {
         verify(appender).doAppend(argThat(containsMessage("Error in logback.xml, no appender-ref is declared")));
     }
 
-    private void loadLogConfig(String resource) throws JoranException, Exception, IOException {
+    private void loadLogConfig(String resource) throws Exception {
         try (InputStream in = SmokeTestLifecycleTest.class.getResourceAsStream(resource)) {
             loggerContext.stop();
             JoranConfigurator logConfigurator = new JoranConfigurator();
@@ -126,8 +130,11 @@ public class SmokeTestLifecycleTest {
     @Test
     public void writeTestIncident() throws Exception {
         smokeTestLifecycle.sendTestIncident();
-        assertThat(OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
-                FileUtils.readFileToString(OUTPUT_FILE), is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE)));
+        assertThat(
+                OUTPUT_FILE + " content expected same as " + EXPECTED_OUTPUT_FILE,
+                FileUtils.readFileToString(OUTPUT_FILE, StandardCharsets.UTF_8),
+                is(FileUtils.readFileToString(EXPECTED_OUTPUT_FILE, StandardCharsets.UTF_8))
+        );
         verify(appender).doAppend(argThat(containsMessage("Please manually validate the result in your target system.")));
     }
 }

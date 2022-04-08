@@ -20,11 +20,13 @@ import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.spi.FilterReply;
 import com.cisco.cta.taxii.adapter.OutputValidationException;
 import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,13 +35,11 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 public class JsonValidationFilterTest {
-    private JsonValidationFilter jsonValidationFilter = new JsonValidationFilter();
+    private JsonValidationFilter jsonValidationFilter;
 
-    private String readFirstLine(String resource) throws IOException {
-        try(InputStream istream = getClass().getResourceAsStream(resource)) {
-            List<String> lines = IOUtils.readLines(istream);
-            return lines.get(0);
-        }
+    @Before
+    public void setUp() throws Exception {
+        jsonValidationFilter = new JsonValidationFilter();
     }
 
     @Test
@@ -61,6 +61,13 @@ public class JsonValidationFilterTest {
             assertThat(MDC.get(OutputValidationException.MDC_KEY), notNullValue());
         }finally {
             MDC.remove(OutputValidationException.MDC_KEY);
+        }
+    }
+
+    private String readFirstLine(String resource) throws IOException {
+        try(InputStream istream = getClass().getResourceAsStream(resource)) {
+            List<String> lines = IOUtils.readLines(istream, StandardCharsets.UTF_8);
+            return lines.get(0);
         }
     }
 

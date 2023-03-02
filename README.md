@@ -1,3 +1,5 @@
+⚠️ **In March 2023, Cisco CTA stopped supporting the STIX/TAXII API. We recommend that you [use our new REST API instead](https://api.cta.eu.amp.cisco.com).** ⚠️
+
 Please see the project homepage https://github.com/CiscoCTA/taxii-log-adapter/wiki
 
 #### RELEASE NOTES
